@@ -1637,9 +1637,15 @@
         const data = await res.json();
         if (res.ok) {
           authUser = null;
+          cartState = [];
+          wishlistState = [];
+          localStorage.removeItem('beestyle_cart');
+          localStorage.removeItem('beestyle_wishlist');
+          updateCartBadge();
+          updateWishlistBadge();
           showToast('Đăng xuất thành công!', 'info');
           renderAuthUI();
-          if (window.location.hash === '#/admin') {
+          if (window.location.hash === '#/admin' || window.location.hash === '#/profile' || window.location.hash === '#/orders' || window.location.hash.startsWith('#/order-detail/')) {
             window.location.hash = '#/';
           } else {
             await router();
@@ -1654,19 +1660,27 @@
     }
 
     async function initData() {
-      cartState = JSON.parse(localStorage.getItem('beestyle_cart') || '[]');
-      wishlistState = JSON.parse(localStorage.getItem('beestyle_wishlist') || '[]');
-      
       try {
         const authRes = await fetch('/api/auth/status');
         const authData = await authRes.json();
         if (authData.logged_in) {
           authUser = authData.user;
+          cartState = JSON.parse(localStorage.getItem('beestyle_cart') || '[]');
+          wishlistState = JSON.parse(localStorage.getItem('beestyle_wishlist') || '[]');
         } else {
           authUser = null;
+          cartState = [];
+          wishlistState = [];
+          localStorage.removeItem('beestyle_cart');
+          localStorage.removeItem('beestyle_wishlist');
         }
       } catch (err) {
         console.error("Error checking auth status:", err);
+        authUser = null;
+        cartState = [];
+        wishlistState = [];
+        localStorage.removeItem('beestyle_cart');
+        localStorage.removeItem('beestyle_wishlist');
       }
       
       renderAuthUI();
@@ -2588,6 +2602,11 @@
     // Shopping Cart State & View Actions
     // -------------------------------------------------------------
     function addToCartState(productId, quantity, size, color, customPrice) {
+      if (!authUser) {
+        showToast('Vui lòng đăng nhập để thêm sản phẩm vào giỏ hàng!', 'info');
+        openAuthModal();
+        return;
+      }
       const existing = cartState.find(item => item.productId.toString() === productId.toString() && item.size === size && item.color === color);
       if (existing) {
         existing.quantity += quantity;
