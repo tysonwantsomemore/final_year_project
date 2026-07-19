@@ -1,223 +1,4564 @@
-<!DOCTYPE html>
-<html lang="{{ str_replace('_', '-', app()->getLocale()) }}">
-    <head>
-        <meta charset="utf-8">
-        <meta name="viewport" content="width=device-width, initial-scale=1">
+<!doctype html>
+<html lang="vi" class="h-full">
+ <head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <meta name="csrf-token" content="{{ csrf_token() }}">
+  <title>Beestyle - Thời Trang Cao Cấp &amp; Phong Cách</title>
+  <script src="https://cdn.tailwindcss.com/3.4.17"></script>
+  <script src="https://cdn.jsdelivr.net/npm/lucide@0.263.0/dist/umd/lucide.min.js"></script>
+  <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+  <script src="/_sdk/element_sdk.js"></script>
+  <link href="https://fonts.googleapis.com/css2?family=Playfair+Display:wght@400;500;600;700&amp;family=DM+Sans:wght@300;400;500;600;700&amp;display=swap" rel="stylesheet">
+  <style>
+    html, body { height: 100%; margin: 0; scroll-behavior: smooth; }
+    .font-heading { font-family: 'Playfair Display', serif; }
+    .font-body { font-family: 'DM Sans', sans-serif; }
+    .product-card:hover .product-img { transform: scale(1.05); }
+    .product-img { transition: transform 0.4s ease; }
+    .nav-link { position: relative; }
+    .nav-link::after { content: ''; position: absolute; bottom: -2px; left: 0; width: 0; height: 2px; background: #c45e3a; transition: width 0.3s; }
+    .nav-link:hover::after { width: 100%; }
+    .active-nav-link::after { width: 100%; }
+    @keyframes fadeUp { from { opacity: 0; transform: translateY(20px); } to { opacity: 1; transform: translateY(0); } }
+    .fade-up { animation: fadeUp 0.6s ease forwards; }
+    
+    /* Custom Scrollbar */
+    ::-webkit-scrollbar { width: 6px; height: 6px; }
+    ::-webkit-scrollbar-track { background: #faf9f7; }
+    ::-webkit-scrollbar-thumb { background: #e8e5e0; border-radius: 3px; }
+    ::-webkit-scrollbar-thumb:hover { background: #c45e3a; }
+    /* Color Swatch active state animation */
+    .color-swatch-active {
+        box-shadow: 0 0 0 2px #ffffff, 0 0 0 4px #c45e3a;
+        transform: scale(1.1);
+    }
+    /* Color Swatch active state animation */
+    .color-swatch-active {
+        box-shadow: 0 0 0 2px #ffffff, 0 0 0 4px #c45e3a;
+        transform: scale(1.1);
+    }
+  </style>
+  <style>body { box-sizing: border-box; }</style>
+  <script src="/_sdk/data_sdk.js" type="text/javascript"></script>
+ </head>
+ <body class="h-full font-body bg-[#faf9f7] text-[#1a1a1a] flex flex-col overflow-x-hidden">
 
-        <title>{{ config('app.name', 'Laravel') }}</title>
+  <!-- Header -->
+  <header class="sticky top-0 z-50 bg-[#faf9f7]/95 backdrop-blur-md border-b border-[#e8e5e0]">
+   <div class="max-w-7xl mx-auto px-4 py-4 flex items-center justify-between">
+    <a href="#/" id="brand-name" class="font-heading text-2xl font-bold tracking-tight text-[#1a1a1a] hover:text-[#c45e3a] transition flex items-center gap-2">
+      <span class="text-3xl">🐝</span>Beestyle
+    </a>
+    
+    <nav class="hidden md:flex gap-8 text-sm font-medium">
+      <a href="#/" class="nav-link py-1 text-gray-700 hover:text-black transition" id="nav-home">Trang chủ</a> 
+      <a href="#/shop" class="nav-link py-1 text-gray-700 hover:text-black transition" id="nav-shop">Cửa hàng</a> 
+      <a href="#/orders" class="nav-link py-1 text-gray-700 hover:text-black transition" id="nav-orders">Đơn mua của tôi</a> 
+      <a href="#/admin" class="nav-link py-1 text-gray-700 hover:text-[#c45e3a] transition flex items-center gap-1 font-semibold text-[#c45e3a] hidden" id="nav-admin">
+        <i data-lucide="shield-check" class="w-4 h-4"></i>Quản trị
+      </a>
+    </nav>
+    
+    <div class="flex items-center gap-3">
+     <button class="relative p-2 hover:bg-[#e8e5e0] rounded-full transition" id="search-btn" title="Tìm kiếm">
+       <i data-lucide="search" style="width:20px;height:20px;"></i>
+     </button> 
+     
+     <a href="#/shop?wishlist=true" class="relative p-2 hover:bg-[#e8e5e0] rounded-full transition" id="wishlist-btn" title="Yêu thích">
+       <i data-lucide="heart" style="width:20px;height:20px;" class="text-red-500 fill-transparent hover:fill-red-500 transition"></i>
+       <span id="wishlist-count" class="absolute -top-0.5 -right-0.5 bg-red-500 text-white text-[9px] w-4 h-4 rounded-full flex items-center justify-center font-bold hidden">0</span>
+     </a> 
+     
+     <button class="relative p-2 hover:bg-[#e8e5e0] rounded-full transition" id="cart-btn" title="Giỏ hàng"> 
+       <i data-lucide="shopping-bag" style="width:20px;height:20px;"></i> 
+       <span id="cart-count" class="absolute -top-0.5 -right-0.5 bg-[#c45e3a] text-white text-[10px] w-4.5 h-4.5 rounded-full flex items-center justify-center font-semibold">0</span> 
+     </button> 
 
-        @fonts
+     <!-- Auth Button / Dropdown Container -->
+     <div id="auth-header-container" class="relative z-50"></div>
+     
+     <button class="md:hidden p-2 hover:bg-[#e8e5e0] rounded-full transition" id="menu-btn" title="Menu">
+       <i data-lucide="menu" style="width:20px;height:20px;"></i>
+     </button>
+    </div>
+   </div>
+   
+   <!-- Mobile menu -->
+   <div id="mobile-menu" class="hidden md:hidden border-t border-[#e8e5e0] bg-[#faf9f7] px-4 py-4 space-y-3 shadow-lg">
+     <a href="#/" class="block text-sm font-medium py-2 border-b border-gray-100 hover:text-[#c45e3a]">Trang chủ</a> 
+     <a href="#/shop" class="block text-sm font-medium py-2 border-b border-gray-100 hover:text-[#c45e3a]">Cửa hàng</a> 
+     <a href="#/orders" class="block text-sm font-medium py-2 border-b border-gray-100 hover:text-[#c45e3a]">Đơn mua của tôi</a> 
+     <a href="#/admin" id="nav-admin-mobile" class="block text-sm font-semibold py-2 text-[#c45e3a] flex items-center gap-2 border-b border-gray-100 hidden">
+        <i data-lucide="shield-check" class="w-4 h-4"></i>Quản trị Admin
+      </a>
+      <div id="mobile-auth-container" class="pt-2"></div>
+    </div>
+  </header>
 
-        <!-- Styles / Scripts -->
-        @if (file_exists(public_path('build/manifest.json')) || file_exists(public_path('hot')))
-            @vite(['resources/css/app.css', 'resources/js/app.js'])
-        @else
-            <style>
-                /*! tailwindcss v4.0.7 | MIT License | https://tailwindcss.com */ @layer properties{@supports (((-webkit-hyphens:none)) and (not (margin-trim:inline))) or ((-moz-orient:inline) and (not (color:rgb(from red r g b)))){*,:before,:after,::backdrop{--tw-translate-x:0;--tw-translate-y:0;--tw-translate-z:0;--tw-rotate-x:initial;--tw-rotate-y:initial;--tw-rotate-z:initial;--tw-skew-x:initial;--tw-skew-y:initial;--tw-space-x-reverse:0;--tw-border-style:solid;--tw-leading:initial;--tw-font-weight:initial;--tw-tracking:initial;--tw-shadow:0 0 #0000;--tw-shadow-color:initial;--tw-shadow-alpha:100%;--tw-inset-shadow:0 0 #0000;--tw-inset-shadow-color:initial;--tw-inset-shadow-alpha:100%;--tw-ring-color:initial;--tw-ring-shadow:0 0 #0000;--tw-inset-ring-color:initial;--tw-inset-ring-shadow:0 0 #0000;--tw-ring-inset:initial;--tw-ring-offset-width:0px;--tw-ring-offset-color:#fff;--tw-ring-offset-shadow:0 0 #0000;--tw-blur:initial;--tw-brightness:initial;--tw-contrast:initial;--tw-grayscale:initial;--tw-hue-rotate:initial;--tw-invert:initial;--tw-opacity:initial;--tw-saturate:initial;--tw-sepia:initial;--tw-drop-shadow:initial;--tw-drop-shadow-color:initial;--tw-drop-shadow-alpha:100%;--tw-drop-shadow-size:initial;--tw-duration:initial;--tw-ease:initial;--tw-content:""}}}@layer theme{:root,:host{--font-sans:"Instrument Sans", ui-sans-serif, system-ui, sans-serif, "Apple Color Emoji", "Segoe UI Emoji", "Segoe UI Symbol", "Noto Color Emoji";--font-serif:ui-serif, Georgia, Cambria, "Times New Roman", Times, serif;--font-mono:ui-monospace, SFMono-Regular, Menlo, Monaco, Consolas, "Liberation Mono", "Courier New", monospace;--color-red-50:oklch(97.1% .013 17.38);--color-red-100:oklch(93.6% .032 17.717);--color-red-200:oklch(88.5% .062 18.334);--color-red-300:oklch(80.8% .114 19.571);--color-red-400:oklch(70.4% .191 22.216);--color-red-500:oklch(63.7% .237 25.331);--color-red-600:oklch(57.7% .245 27.325);--color-red-700:oklch(50.5% .213 27.518);--color-red-800:oklch(44.4% .177 26.899);--color-red-900:oklch(39.6% .141 25.723);--color-red-950:oklch(25.8% .092 26.042);--color-orange-50:oklch(98% .016 73.684);--color-orange-100:oklch(95.4% .038 75.164);--color-orange-200:oklch(90.1% .076 70.697);--color-orange-300:oklch(83.7% .128 66.29);--color-orange-400:oklch(75% .183 55.934);--color-orange-500:oklch(70.5% .213 47.604);--color-orange-600:oklch(64.6% .222 41.116);--color-orange-700:oklch(55.3% .195 38.402);--color-orange-800:oklch(47% .157 37.304);--color-orange-900:oklch(40.8% .123 38.172);--color-orange-950:oklch(26.6% .079 36.259);--color-amber-50:oklch(98.7% .022 95.277);--color-amber-100:oklch(96.2% .059 95.617);--color-amber-200:oklch(92.4% .12 95.746);--color-amber-300:oklch(87.9% .169 91.605);--color-amber-400:oklch(82.8% .189 84.429);--color-amber-500:oklch(76.9% .188 70.08);--color-amber-600:oklch(66.6% .179 58.318);--color-amber-700:oklch(55.5% .163 48.998);--color-amber-800:oklch(47.3% .137 46.201);--color-amber-900:oklch(41.4% .112 45.904);--color-amber-950:oklch(27.9% .077 45.635);--color-yellow-50:oklch(98.7% .026 102.212);--color-yellow-100:oklch(97.3% .071 103.193);--color-yellow-200:oklch(94.5% .129 101.54);--color-yellow-300:oklch(90.5% .182 98.111);--color-yellow-400:oklch(85.2% .199 91.936);--color-yellow-500:oklch(79.5% .184 86.047);--color-yellow-600:oklch(68.1% .162 75.834);--color-yellow-700:oklch(55.4% .135 66.442);--color-yellow-800:oklch(47.6% .114 61.907);--color-yellow-900:oklch(42.1% .095 57.708);--color-yellow-950:oklch(28.6% .066 53.813);--color-lime-50:oklch(98.6% .031 120.757);--color-lime-100:oklch(96.7% .067 122.328);--color-lime-200:oklch(93.8% .127 124.321);--color-lime-300:oklch(89.7% .196 126.665);--color-lime-400:oklch(84.1% .238 128.85);--color-lime-500:oklch(76.8% .233 130.85);--color-lime-600:oklch(64.8% .2 131.684);--color-lime-700:oklch(53.2% .157 131.589);--color-lime-800:oklch(45.3% .124 130.933);--color-lime-900:oklch(40.5% .101 131.063);--color-lime-950:oklch(27.4% .072 132.109);--color-green-50:oklch(98.2% .018 155.826);--color-green-100:oklch(96.2% .044 156.743);--color-green-200:oklch(92.5% .084 155.995);--color-green-300:oklch(87.1% .15 154.449);--color-green-400:oklch(79.2% .209 151.711);--color-green-500:oklch(72.3% .219 149.579);--color-green-600:oklch(62.7% .194 149.214);--color-green-700:oklch(52.7% .154 150.069);--color-green-800:oklch(44.8% .119 151.328);--color-green-900:oklch(39.3% .095 152.535);--color-green-950:oklch(26.6% .065 152.934);--color-emerald-50:oklch(97.9% .021 166.113);--color-emerald-100:oklch(95% .052 163.051);--color-emerald-200:oklch(90.5% .093 164.15);--color-emerald-300:oklch(84.5% .143 164.978);--color-emerald-400:oklch(76.5% .177 163.223);--color-emerald-500:oklch(69.6% .17 162.48);--color-emerald-600:oklch(59.6% .145 163.225);--color-emerald-700:oklch(50.8% .118 165.612);--color-emerald-800:oklch(43.2% .095 166.913);--color-emerald-900:oklch(37.8% .077 168.94);--color-emerald-950:oklch(26.2% .051 172.552);--color-teal-50:oklch(98.4% .014 180.72);--color-teal-100:oklch(95.3% .051 180.801);--color-teal-200:oklch(91% .096 180.426);--color-teal-300:oklch(85.5% .138 181.071);--color-teal-400:oklch(77.7% .152 181.912);--color-teal-500:oklch(70.4% .14 182.503);--color-teal-600:oklch(60% .118 184.704);--color-teal-700:oklch(51.1% .096 186.391);--color-teal-800:oklch(43.7% .078 188.216);--color-teal-900:oklch(38.6% .063 188.416);--color-teal-950:oklch(27.7% .046 192.524);--color-cyan-50:oklch(98.4% .019 200.873);--color-cyan-100:oklch(95.6% .045 203.388);--color-cyan-200:oklch(91.7% .08 205.041);--color-cyan-300:oklch(86.5% .127 207.078);--color-cyan-400:oklch(78.9% .154 211.53);--color-cyan-500:oklch(71.5% .143 215.221);--color-cyan-600:oklch(60.9% .126 221.723);--color-cyan-700:oklch(52% .105 223.128);--color-cyan-800:oklch(45% .085 224.283);--color-cyan-900:oklch(39.8% .07 227.392);--color-cyan-950:oklch(30.2% .056 229.695);--color-sky-50:oklch(97.7% .013 236.62);--color-sky-100:oklch(95.1% .026 236.824);--color-sky-200:oklch(90.1% .058 230.902);--color-sky-300:oklch(82.8% .111 230.318);--color-sky-400:oklch(74.6% .16 232.661);--color-sky-500:oklch(68.5% .169 237.323);--color-sky-600:oklch(58.8% .158 241.966);--color-sky-700:oklch(50% .134 242.749);--color-sky-800:oklch(44.3% .11 240.79);--color-sky-900:oklch(39.1% .09 240.876);--color-sky-950:oklch(29.3% .066 243.157);--color-blue-50:oklch(97% .014 254.604);--color-blue-100:oklch(93.2% .032 255.585);--color-blue-200:oklch(88.2% .059 254.128);--color-blue-300:oklch(80.9% .105 251.813);--color-blue-400:oklch(70.7% .165 254.624);--color-blue-500:oklch(62.3% .214 259.815);--color-blue-600:oklch(54.6% .245 262.881);--color-blue-700:oklch(48.8% .243 264.376);--color-blue-800:oklch(42.4% .199 265.638);--color-blue-900:oklch(37.9% .146 265.522);--color-blue-950:oklch(28.2% .091 267.935);--color-indigo-50:oklch(96.2% .018 272.314);--color-indigo-100:oklch(93% .034 272.788);--color-indigo-200:oklch(87% .065 274.039);--color-indigo-300:oklch(78.5% .115 274.713);--color-indigo-400:oklch(67.3% .182 276.935);--color-indigo-500:oklch(58.5% .233 277.117);--color-indigo-600:oklch(51.1% .262 276.966);--color-indigo-700:oklch(45.7% .24 277.023);--color-indigo-800:oklch(39.8% .195 277.366);--color-indigo-900:oklch(35.9% .144 278.697);--color-indigo-950:oklch(25.7% .09 281.288);--color-violet-50:oklch(96.9% .016 293.756);--color-violet-100:oklch(94.3% .029 294.588);--color-violet-200:oklch(89.4% .057 293.283);--color-violet-300:oklch(81.1% .111 293.571);--color-violet-400:oklch(70.2% .183 293.541);--color-violet-500:oklch(60.6% .25 292.717);--color-violet-600:oklch(54.1% .281 293.009);--color-violet-700:oklch(49.1% .27 292.581);--color-violet-800:oklch(43.2% .232 292.759);--color-violet-900:oklch(38% .189 293.745);--color-violet-950:oklch(28.3% .141 291.089);--color-purple-50:oklch(97.7% .014 308.299);--color-purple-100:oklch(94.6% .033 307.174);--color-purple-200:oklch(90.2% .063 306.703);--color-purple-300:oklch(82.7% .119 306.383);--color-purple-400:oklch(71.4% .203 305.504);--color-purple-500:oklch(62.7% .265 303.9);--color-purple-600:oklch(55.8% .288 302.321);--color-purple-700:oklch(49.6% .265 301.924);--color-purple-800:oklch(43.8% .218 303.724);--color-purple-900:oklch(38.1% .176 304.987);--color-purple-950:oklch(29.1% .149 302.717);--color-fuchsia-50:oklch(97.7% .017 320.058);--color-fuchsia-100:oklch(95.2% .037 318.852);--color-fuchsia-200:oklch(90.3% .076 319.62);--color-fuchsia-300:oklch(83.3% .145 321.434);--color-fuchsia-400:oklch(74% .238 322.16);--color-fuchsia-500:oklch(66.7% .295 322.15);--color-fuchsia-600:oklch(59.1% .293 322.896);--color-fuchsia-700:oklch(51.8% .253 323.949);--color-fuchsia-800:oklch(45.2% .211 324.591);--color-fuchsia-900:oklch(40.1% .17 325.612);--color-fuchsia-950:oklch(29.3% .136 325.661);--color-pink-50:oklch(97.1% .014 343.198);--color-pink-100:oklch(94.8% .028 342.258);--color-pink-200:oklch(89.9% .061 343.231);--color-pink-300:oklch(82.3% .12 346.018);--color-pink-400:oklch(71.8% .202 349.761);--color-pink-500:oklch(65.6% .241 354.308);--color-pink-600:oklch(59.2% .249 .584);--color-pink-700:oklch(52.5% .223 3.958);--color-pink-800:oklch(45.9% .187 3.815);--color-pink-900:oklch(40.8% .153 2.432);--color-pink-950:oklch(28.4% .109 3.907);--color-rose-50:oklch(96.9% .015 12.422);--color-rose-100:oklch(94.1% .03 12.58);--color-rose-200:oklch(89.2% .058 10.001);--color-rose-300:oklch(81% .117 11.638);--color-rose-400:oklch(71.2% .194 13.428);--color-rose-500:oklch(64.5% .246 16.439);--color-rose-600:oklch(58.6% .253 17.585);--color-rose-700:oklch(51.4% .222 16.935);--color-rose-800:oklch(45.5% .188 13.697);--color-rose-900:oklch(41% .159 10.272);--color-rose-950:oklch(27.1% .105 12.094);--color-slate-50:oklch(98.4% .003 247.858);--color-slate-100:oklch(96.8% .007 247.896);--color-slate-200:oklch(92.9% .013 255.508);--color-slate-300:oklch(86.9% .022 252.894);--color-slate-400:oklch(70.4% .04 256.788);--color-slate-500:oklch(55.4% .046 257.417);--color-slate-600:oklch(44.6% .043 257.281);--color-slate-700:oklch(37.2% .044 257.287);--color-slate-800:oklch(27.9% .041 260.031);--color-slate-900:oklch(20.8% .042 265.755);--color-slate-950:oklch(12.9% .042 264.695);--color-gray-50:oklch(98.5% .002 247.839);--color-gray-100:oklch(96.7% .003 264.542);--color-gray-200:oklch(92.8% .006 264.531);--color-gray-300:oklch(87.2% .01 258.338);--color-gray-400:oklch(70.7% .022 261.325);--color-gray-500:oklch(55.1% .027 264.364);--color-gray-600:oklch(44.6% .03 256.802);--color-gray-700:oklch(37.3% .034 259.733);--color-gray-800:oklch(27.8% .033 256.848);--color-gray-900:oklch(21% .034 264.665);--color-gray-950:oklch(13% .028 261.692);--color-zinc-50:oklch(98.5% 0 0);--color-zinc-100:oklch(96.7% .001 286.375);--color-zinc-200:oklch(92% .004 286.32);--color-zinc-300:oklch(87.1% .006 286.286);--color-zinc-400:oklch(70.5% .015 286.067);--color-zinc-500:oklch(55.2% .016 285.938);--color-zinc-600:oklch(44.2% .017 285.786);--color-zinc-700:oklch(37% .013 285.805);--color-zinc-800:oklch(27.4% .006 286.033);--color-zinc-900:oklch(21% .006 285.885);--color-zinc-950:oklch(14.1% .005 285.823);--color-neutral-50:oklch(98.5% 0 0);--color-neutral-100:oklch(97% 0 0);--color-neutral-200:oklch(92.2% 0 0);--color-neutral-300:oklch(87% 0 0);--color-neutral-400:oklch(70.8% 0 0);--color-neutral-500:oklch(55.6% 0 0);--color-neutral-600:oklch(43.9% 0 0);--color-neutral-700:oklch(37.1% 0 0);--color-neutral-800:oklch(26.9% 0 0);--color-neutral-900:oklch(20.5% 0 0);--color-neutral-950:oklch(14.5% 0 0);--color-stone-50:oklch(98.5% .001 106.423);--color-stone-100:oklch(97% .001 106.424);--color-stone-200:oklch(92.3% .003 48.717);--color-stone-300:oklch(86.9% .005 56.366);--color-stone-400:oklch(70.9% .01 56.259);--color-stone-500:oklch(55.3% .013 58.071);--color-stone-600:oklch(44.4% .011 73.639);--color-stone-700:oklch(37.4% .01 67.558);--color-stone-800:oklch(26.8% .007 34.298);--color-stone-900:oklch(21.6% .006 56.043);--color-stone-950:oklch(14.7% .004 49.25);--color-black:#000;--color-white:#fff;--spacing:.25rem;--breakpoint-sm:40rem;--breakpoint-md:48rem;--breakpoint-lg:64rem;--breakpoint-xl:80rem;--breakpoint-2xl:96rem;--container-3xs:16rem;--container-2xs:18rem;--container-xs:20rem;--container-sm:24rem;--container-md:28rem;--container-lg:32rem;--container-xl:36rem;--container-2xl:42rem;--container-3xl:48rem;--container-4xl:56rem;--container-5xl:64rem;--container-6xl:72rem;--container-7xl:80rem;--text-xs:.75rem;--text-xs--line-height:calc(1 / .75);--text-sm:.875rem;--text-sm--line-height:calc(1.25 / .875);--text-base:1rem;--text-base--line-height: 1.5 ;--text-lg:1.125rem;--text-lg--line-height:calc(1.75 / 1.125);--text-xl:1.25rem;--text-xl--line-height:calc(1.75 / 1.25);--text-2xl:1.5rem;--text-2xl--line-height:calc(2 / 1.5);--text-3xl:1.875rem;--text-3xl--line-height: 1.2 ;--text-4xl:2.25rem;--text-4xl--line-height:calc(2.5 / 2.25);--text-5xl:3rem;--text-5xl--line-height:1;--text-6xl:3.75rem;--text-6xl--line-height:1;--text-7xl:4.5rem;--text-7xl--line-height:1;--text-8xl:6rem;--text-8xl--line-height:1;--text-9xl:8rem;--text-9xl--line-height:1;--font-weight-thin:100;--font-weight-extralight:200;--font-weight-light:300;--font-weight-normal:400;--font-weight-medium:500;--font-weight-semibold:600;--font-weight-bold:700;--font-weight-extrabold:800;--font-weight-black:900;--tracking-tighter:-.05em;--tracking-tight:-.025em;--tracking-normal:0em;--tracking-wide:.025em;--tracking-wider:.05em;--tracking-widest:.1em;--leading-tight:1.25;--leading-snug:1.375;--leading-normal:1.5;--leading-relaxed:1.625;--leading-loose:2;--radius-xs:.125rem;--radius-sm:.25rem;--radius-md:.375rem;--radius-lg:.5rem;--radius-xl:.75rem;--radius-2xl:1rem;--radius-3xl:1.5rem;--radius-4xl:2rem;--shadow-2xs:0 1px #0000000d;--shadow-xs:0 1px 2px 0 #0000000d;--shadow-sm:0 1px 3px 0 #0000001a, 0 1px 2px -1px #0000001a;--shadow-md:0 4px 6px -1px #0000001a, 0 2px 4px -2px #0000001a;--shadow-lg:0 10px 15px -3px #0000001a, 0 4px 6px -4px #0000001a;--shadow-xl:0 20px 25px -5px #0000001a, 0 8px 10px -6px #0000001a;--shadow-2xl:0 25px 50px -12px #00000040;--inset-shadow-2xs:inset 0 1px #0000000d;--inset-shadow-xs:inset 0 1px 1px #0000000d;--inset-shadow-sm:inset 0 2px 4px #0000000d;--drop-shadow-xs:0 1px 1px #0000000d;--drop-shadow-sm:0 1px 2px #00000026;--drop-shadow-md:0 3px 3px #0000001f;--drop-shadow-lg:0 4px 4px #00000026;--drop-shadow-xl:0 9px 7px #0000001a;--drop-shadow-2xl:0 25px 25px #00000026;--ease-in:cubic-bezier(.4, 0, 1, 1);--ease-out:cubic-bezier(0, 0, .2, 1);--ease-in-out:cubic-bezier(.4, 0, .2, 1);--animate-spin:spin 1s linear infinite;--animate-ping:ping 1s cubic-bezier(0, 0, .2, 1) infinite;--animate-pulse:pulse 2s cubic-bezier(.4, 0, .6, 1) infinite;--animate-bounce:bounce 1s infinite;--blur-xs:4px;--blur-sm:8px;--blur-md:12px;--blur-lg:16px;--blur-xl:24px;--blur-2xl:40px;--blur-3xl:64px;--perspective-dramatic:100px;--perspective-near:300px;--perspective-normal:500px;--perspective-midrange:800px;--perspective-distant:1200px;--aspect-video:16 / 9;--default-transition-duration:.15s;--default-transition-timing-function:cubic-bezier(.4, 0, .2, 1);--default-font-family:var(--font-sans);--default-mono-font-family:var(--font-mono)}}@layer base{*,:after,:before,::backdrop{box-sizing:border-box;border:0 solid;margin:0;padding:0}::file-selector-button{box-sizing:border-box;border:0 solid;margin:0;padding:0}html,:host{-webkit-text-size-adjust:100%;tab-size:4;line-height:1.5;font-family:var(--default-font-family,ui-sans-serif, system-ui, sans-serif, "Apple Color Emoji", "Segoe UI Emoji", "Segoe UI Symbol", "Noto Color Emoji");font-feature-settings:var(--default-font-feature-settings,normal);font-variation-settings:var(--default-font-variation-settings,normal);-webkit-tap-highlight-color:transparent}hr{height:0;color:inherit;border-top-width:1px}abbr:where([title]){-webkit-text-decoration:underline dotted;text-decoration:underline dotted}h1,h2,h3,h4,h5,h6{font-size:inherit;font-weight:inherit}a{color:inherit;-webkit-text-decoration:inherit;text-decoration:inherit}b,strong{font-weight:bolder}code,kbd,samp,pre{font-family:var(--default-mono-font-family,ui-monospace, SFMono-Regular, Menlo, Monaco, Consolas, "Liberation Mono", "Courier New", monospace);font-feature-settings:var(--default-mono-font-feature-settings,normal);font-variation-settings:var(--default-mono-font-variation-settings,normal);font-size:1em}small{font-size:80%}sub,sup{vertical-align:baseline;font-size:75%;line-height:0;position:relative}sub{bottom:-.25em}sup{top:-.5em}table{text-indent:0;border-color:inherit;border-collapse:collapse}:-moz-focusring{outline:auto}progress{vertical-align:baseline}summary{display:list-item}ol,ul,menu{list-style:none}img,svg,video,canvas,audio,iframe,embed,object{vertical-align:middle;display:block}img,video{max-width:100%;height:auto}button,input,select,optgroup,textarea{font:inherit;font-feature-settings:inherit;font-variation-settings:inherit;letter-spacing:inherit;color:inherit;opacity:1;background-color:#0000;border-radius:0}::file-selector-button{font:inherit;font-feature-settings:inherit;font-variation-settings:inherit;letter-spacing:inherit;color:inherit;opacity:1;background-color:#0000;border-radius:0}:where(select:is([multiple],[size])) optgroup{font-weight:bolder}:where(select:is([multiple],[size])) optgroup option{padding-inline-start:20px}::file-selector-button{margin-inline-end:4px}::placeholder{opacity:1}@supports (not ((-webkit-appearance:-apple-pay-button))) or (contain-intrinsic-size:1px){::placeholder{color:currentColor}@supports (color:color-mix(in lab,red,red)){::placeholder{color:color-mix(in oklab,currentcolor 50%,transparent)}}}textarea{resize:vertical}::-webkit-search-decoration{-webkit-appearance:none}::-webkit-date-and-time-value{min-height:1lh;text-align:inherit}::-webkit-datetime-edit{display:inline-flex}::-webkit-datetime-edit-fields-wrapper{padding:0}::-webkit-datetime-edit{padding-block:0}::-webkit-datetime-edit-year-field{padding-block:0}::-webkit-datetime-edit-month-field{padding-block:0}::-webkit-datetime-edit-day-field{padding-block:0}::-webkit-datetime-edit-hour-field{padding-block:0}::-webkit-datetime-edit-minute-field{padding-block:0}::-webkit-datetime-edit-second-field{padding-block:0}::-webkit-datetime-edit-millisecond-field{padding-block:0}::-webkit-datetime-edit-meridiem-field{padding-block:0}::-webkit-calendar-picker-indicator{line-height:1}:-moz-ui-invalid{box-shadow:none}button,input:where([type=button],[type=reset],[type=submit]){appearance:button}::file-selector-button{appearance:button}::-webkit-inner-spin-button{height:auto}::-webkit-outer-spin-button{height:auto}[hidden]:where(:not([hidden=until-found])){display:none!important}}@layer components;@layer utilities{.absolute{position:absolute}.fixed{position:fixed}.relative{position:relative}.static{position:static}.inset-0{inset:calc(var(--spacing) * 0)}.start{inset-inline-start:var(--spacing)}.top-0{top:calc(var(--spacing) * 0)}.right-0{right:calc(var(--spacing) * 0)}.container{width:100%}@media(min-width:40rem){.container{max-width:40rem}}@media(min-width:48rem){.container{max-width:48rem}}@media(min-width:64rem){.container{max-width:64rem}}@media(min-width:80rem){.container{max-width:80rem}}@media(min-width:96rem){.container{max-width:96rem}}.mx-auto{margin-inline:auto}.-mt-\[6\.6rem\]{margin-top:-6.6rem}.-mt-px{margin-top:-1px}.mt-2{margin-top:calc(var(--spacing) * 2)}.mt-4{margin-top:calc(var(--spacing) * 4)}.mt-6{margin-top:calc(var(--spacing) * 6)}.mt-8{margin-top:calc(var(--spacing) * 8)}.mr-2{margin-right:calc(var(--spacing) * 2)}.-mb-px{margin-bottom:-1px}.mb-1{margin-bottom:calc(var(--spacing) * 1)}.mb-2{margin-bottom:calc(var(--spacing) * 2)}.mb-4{margin-bottom:calc(var(--spacing) * 4)}.mb-6{margin-bottom:calc(var(--spacing) * 6)}.-ml-8{margin-left:calc(var(--spacing) * -8)}.-ml-px{margin-left:-1px}.ml-1{margin-left:calc(var(--spacing) * 1)}.ml-2{margin-left:calc(var(--spacing) * 2)}.ml-4{margin-left:calc(var(--spacing) * 4)}.ml-12{margin-left:calc(var(--spacing) * 12)}.contents{display:contents}.flex{display:flex}.grid{display:grid}.hidden{display:none}.inline-block{display:inline-block}.inline-flex{display:inline-flex}.table{display:table}.aspect-\[335\/364\]{aspect-ratio:335/364}.h-1{height:calc(var(--spacing) * 1)}.h-1\.5{height:calc(var(--spacing) * 1.5)}.h-2{height:calc(var(--spacing) * 2)}.h-2\.5{height:calc(var(--spacing) * 2.5)}.h-3{height:calc(var(--spacing) * 3)}.h-3\.5{height:calc(var(--spacing) * 3.5)}.h-5{height:calc(var(--spacing) * 5)}.h-8{height:calc(var(--spacing) * 8)}.h-14{height:calc(var(--spacing) * 14)}.h-14\.5{height:calc(var(--spacing) * 14.5)}.h-16{height:calc(var(--spacing) * 16)}.min-h-screen{min-height:100vh}.w-1{width:calc(var(--spacing) * 1)}.w-1\.5{width:calc(var(--spacing) * 1.5)}.w-2{width:calc(var(--spacing) * 2)}.w-2\.5{width:calc(var(--spacing) * 2.5)}.w-3{width:calc(var(--spacing) * 3)}.w-3\.5{width:calc(var(--spacing) * 3.5)}.w-5{width:calc(var(--spacing) * 5)}.w-8{width:calc(var(--spacing) * 8)}.w-\[438px\]{width:438px}.w-auto{width:auto}.w-full{width:100%}.max-w-6xl{max-width:var(--container-6xl)}.max-w-\[335px\]{max-width:335px}.max-w-none{max-width:none}.max-w-xl{max-width:var(--container-xl)}.flex-1{flex:1}.shrink-0{flex-shrink:0}.translate-y-0{--tw-translate-y:calc(var(--spacing) * 0);translate:var(--tw-translate-x) var(--tw-translate-y)}.transform{transform:var(--tw-rotate-x,) var(--tw-rotate-y,) var(--tw-rotate-z,) var(--tw-skew-x,) var(--tw-skew-y,)}.cursor-default{cursor:default}.cursor-not-allowed{cursor:not-allowed}.grid-cols-1{grid-template-columns:repeat(1,minmax(0,1fr))}.flex-col{flex-direction:column}.flex-col-reverse{flex-direction:column-reverse}.items-center{align-items:center}.justify-between{justify-content:space-between}.justify-center{justify-content:center}.justify-end{justify-content:flex-end}.justify-items-center{justify-items:center}.gap-2{gap:calc(var(--spacing) * 2)}.gap-3{gap:calc(var(--spacing) * 3)}.gap-4{gap:calc(var(--spacing) * 4)}:where(.space-x-1>:not(:last-child)){--tw-space-x-reverse:0;margin-inline-start:calc(calc(var(--spacing) * 1) * var(--tw-space-x-reverse));margin-inline-end:calc(calc(var(--spacing) * 1) * calc(1 - var(--tw-space-x-reverse)))}.overflow-hidden{overflow:hidden}.rounded-full{border-radius:3.40282e38px}.rounded-md{border-radius:var(--radius-md)}.rounded-sm{border-radius:var(--radius-sm)}.rounded-t-lg{border-top-left-radius:var(--radius-lg);border-top-right-radius:var(--radius-lg)}.rounded-l-md{border-top-left-radius:var(--radius-md);border-bottom-left-radius:var(--radius-md)}.rounded-r-md{border-top-right-radius:var(--radius-md);border-bottom-right-radius:var(--radius-md)}.rounded-br-lg{border-bottom-right-radius:var(--radius-lg)}.rounded-bl-lg{border-bottom-left-radius:var(--radius-lg)}.border{border-style:var(--tw-border-style);border-width:1px}.border-t{border-top-style:var(--tw-border-style);border-top-width:1px}.border-r{border-right-style:var(--tw-border-style);border-right-width:1px}.border-\[\#19140035\]{border-color:#19140035}.border-\[\#e3e3e0\]{border-color:#e3e3e0}.border-black{border-color:var(--color-black)}.border-gray-200{border-color:var(--color-gray-200)}.border-gray-300{border-color:var(--color-gray-300)}.border-gray-400{border-color:var(--color-gray-400)}.border-transparent{border-color:#0000}.bg-\[\#1b1b18\]{background-color:#1b1b18}.bg-\[\#FDFDFC\]{background-color:#fdfdfc}.bg-\[\#dbdbd7\]{background-color:#dbdbd7}.bg-\[\#fff2f2\]{background-color:#fff2f2}.bg-gray-100{background-color:var(--color-gray-100)}.bg-gray-200{background-color:var(--color-gray-200)}.bg-white{background-color:var(--color-white)}.p-6{padding:calc(var(--spacing) * 6)}.px-2{padding-inline:calc(var(--spacing) * 2)}.px-4{padding-inline:calc(var(--spacing) * 4)}.px-5{padding-inline:calc(var(--spacing) * 5)}.px-6{padding-inline:calc(var(--spacing) * 6)}.py-1{padding-block:calc(var(--spacing) * 1)}.py-1\.5{padding-block:calc(var(--spacing) * 1.5)}.py-2{padding-block:calc(var(--spacing) * 2)}.py-4{padding-block:calc(var(--spacing) * 4)}.pt-8{padding-top:calc(var(--spacing) * 8)}.pb-6{padding-bottom:calc(var(--spacing) * 6)}.pb-12{padding-bottom:calc(var(--spacing) * 12)}.text-center{text-align:center}.text-lg{font-size:var(--text-lg);line-height:var(--tw-leading,var(--text-lg--line-height))}.text-sm{font-size:var(--text-sm);line-height:var(--tw-leading,var(--text-sm--line-height))}.text-\[13px\]{font-size:13px}.leading-5{--tw-leading:calc(var(--spacing) * 5);line-height:calc(var(--spacing) * 5)}.leading-7{--tw-leading:calc(var(--spacing) * 7);line-height:calc(var(--spacing) * 7)}.leading-\[20px\]{--tw-leading:20px;line-height:20px}.leading-normal{--tw-leading:var(--leading-normal);line-height:var(--leading-normal)}.font-medium{--tw-font-weight:var(--font-weight-medium);font-weight:var(--font-weight-medium)}.font-semibold{--tw-font-weight:var(--font-weight-semibold);font-weight:var(--font-weight-semibold)}.tracking-wider{--tw-tracking:var(--tracking-wider);letter-spacing:var(--tracking-wider)}.text-\[\#1B1B18\],.text-\[\#1b1b18\]{color:#1b1b18}.text-\[\#706f6c\]{color:#706f6c}.text-\[\#F3BEC7\]{color:#f3bec7}.text-\[\#F8B803\]{color:#f8b803}.text-\[\#F53003\],.text-\[\#f53003\]{color:#f53003}.text-gray-200{color:var(--color-gray-200)}.text-gray-300{color:var(--color-gray-300)}.text-gray-400{color:var(--color-gray-400)}.text-gray-500{color:var(--color-gray-500)}.text-gray-600{color:var(--color-gray-600)}.text-gray-700{color:var(--color-gray-700)}.text-gray-800{color:var(--color-gray-800)}.text-gray-900{color:var(--color-gray-900)}.text-white{color:var(--color-white)}.uppercase{text-transform:uppercase}.underline{text-decoration-line:underline}.underline-offset-4{text-underline-offset:4px}.antialiased{-webkit-font-smoothing:antialiased;-moz-osx-font-smoothing:grayscale}.opacity-100{opacity:1}.mix-blend-color{mix-blend-mode:color}.mix-blend-darken{mix-blend-mode:darken}.mix-blend-hard-light{mix-blend-mode:hard-light}.mix-blend-multiply{mix-blend-mode:multiply}.shadow{--tw-shadow:0 1px 3px 0 var(--tw-shadow-color,#0000001a), 0 1px 2px -1px var(--tw-shadow-color,#0000001a);box-shadow:var(--tw-inset-shadow),var(--tw-inset-ring-shadow),var(--tw-ring-offset-shadow),var(--tw-ring-shadow),var(--tw-shadow)}.shadow-\[0px_0px_1px_0px_rgba\(0\,0\,0\,0\.03\)\,0px_1px_2px_0px_rgba\(0\,0\,0\,0\.06\)\]{--tw-shadow:0px 0px 1px 0px var(--tw-shadow-color,#00000008), 0px 1px 2px 0px var(--tw-shadow-color,#0000000f);box-shadow:var(--tw-inset-shadow),var(--tw-inset-ring-shadow),var(--tw-ring-offset-shadow),var(--tw-ring-shadow),var(--tw-shadow)}.shadow-\[inset_0px_0px_0px_1px_rgba\(26\,26\,0\,0\.16\)\]{--tw-shadow:inset 0px 0px 0px 1px var(--tw-shadow-color,#1a1a0029);box-shadow:var(--tw-inset-shadow),var(--tw-inset-ring-shadow),var(--tw-ring-offset-shadow),var(--tw-ring-shadow),var(--tw-shadow)}.shadow-sm{--tw-shadow:0 1px 3px 0 var(--tw-shadow-color,#0000001a), 0 1px 2px -1px var(--tw-shadow-color,#0000001a);box-shadow:var(--tw-inset-shadow),var(--tw-inset-ring-shadow),var(--tw-ring-offset-shadow),var(--tw-ring-shadow),var(--tw-shadow)}.ring-gray-300{--tw-ring-color:var(--color-gray-300)}.filter{filter:var(--tw-blur,) var(--tw-brightness,) var(--tw-contrast,) var(--tw-grayscale,) var(--tw-hue-rotate,) var(--tw-invert,) var(--tw-saturate,) var(--tw-sepia,) var(--tw-drop-shadow,)}.transition{transition-property:color,background-color,border-color,outline-color,text-decoration-color,fill,stroke,--tw-gradient-from,--tw-gradient-via,--tw-gradient-to,opacity,box-shadow,transform,translate,scale,rotate,filter,-webkit-backdrop-filter,backdrop-filter,display,content-visibility,overlay,pointer-events;transition-timing-function:var(--tw-ease,var(--default-transition-timing-function));transition-duration:var(--tw-duration,var(--default-transition-duration))}.transition-all{transition-property:all;transition-timing-function:var(--tw-ease,var(--default-transition-timing-function));transition-duration:var(--tw-duration,var(--default-transition-duration))}.transition-opacity{transition-property:opacity;transition-timing-function:var(--tw-ease,var(--default-transition-timing-function));transition-duration:var(--tw-duration,var(--default-transition-duration))}.delay-200{transition-delay:.2s}.delay-300{transition-delay:.3s}.delay-400{transition-delay:.4s}.duration-150{--tw-duration:.15s;transition-duration:.15s}.duration-750{--tw-duration:.75s;transition-duration:.75s}.ease-in-out{--tw-ease:var(--ease-in-out);transition-timing-function:var(--ease-in-out)}.\[--stroke-color\:\#1B1B18\]{--stroke-color:#1b1b18}.not-has-\[nav\]\:hidden:not(:has(:is(nav))){display:none}.before\:absolute:before{content:var(--tw-content);position:absolute}.before\:top-0:before{content:var(--tw-content);top:calc(var(--spacing) * 0)}.before\:top-1\/2:before{content:var(--tw-content);top:50%}.before\:bottom-0:before{content:var(--tw-content);bottom:calc(var(--spacing) * 0)}.before\:bottom-1\/2:before{content:var(--tw-content);bottom:50%}.before\:left-\[0\.4rem\]:before{content:var(--tw-content);left:.4rem}.before\:border-l:before{content:var(--tw-content);border-left-style:var(--tw-border-style);border-left-width:1px}.before\:border-\[\#e3e3e0\]:before{content:var(--tw-content);border-color:#e3e3e0}@media(hover:hover){.hover\:border-\[\#1915014a\]:hover{border-color:#1915014a}.hover\:border-\[\#19140035\]:hover{border-color:#19140035}.hover\:border-black:hover{border-color:var(--color-black)}.hover\:bg-black:hover{background-color:var(--color-black)}.hover\:bg-gray-100:hover{background-color:var(--color-gray-100)}.hover\:text-gray-400:hover{color:var(--color-gray-400)}.hover\:text-gray-700:hover{color:var(--color-gray-700)}}.focus\:border-blue-300:focus{border-color:var(--color-blue-300)}.focus\:ring:focus{--tw-ring-shadow:var(--tw-ring-inset,) 0 0 0 calc(1px + var(--tw-ring-offset-width)) var(--tw-ring-color,currentcolor);box-shadow:var(--tw-inset-shadow),var(--tw-inset-ring-shadow),var(--tw-ring-offset-shadow),var(--tw-ring-shadow),var(--tw-shadow)}.focus\:outline-none:focus{--tw-outline-style:none;outline-style:none}.active\:bg-gray-100:active{background-color:var(--color-gray-100)}.active\:text-gray-500:active{color:var(--color-gray-500)}.active\:text-gray-700:active{color:var(--color-gray-700)}.active\:text-gray-800:active{color:var(--color-gray-800)}@media(min-width:40rem){.sm\:flex{display:flex}.sm\:hidden{display:none}.sm\:flex-1{flex:1}.sm\:items-center{align-items:center}.sm\:justify-between{justify-content:space-between}.sm\:justify-start{justify-content:flex-start}.sm\:gap-2{gap:calc(var(--spacing) * 2)}.sm\:px-6{padding-inline:calc(var(--spacing) * 6)}.sm\:pt-0{padding-top:calc(var(--spacing) * 0)}}@media(min-width:64rem){.lg\:mt-10{margin-top:calc(var(--spacing) * 10)}.lg\:mb-0{margin-bottom:calc(var(--spacing) * 0)}.lg\:mb-6{margin-bottom:calc(var(--spacing) * 6)}.lg\:-ml-px{margin-left:-1px}.lg\:ml-0{margin-left:calc(var(--spacing) * 0)}.lg\:block{display:block}.lg\:aspect-auto{aspect-ratio:auto}.lg\:w-\[438px\]{width:438px}.lg\:max-w-4xl{max-width:var(--container-4xl)}.lg\:grow{flex-grow:1}.lg\:flex-row{flex-direction:row}.lg\:justify-center{justify-content:center}.lg\:rounded-t-none{border-top-left-radius:0;border-top-right-radius:0}.lg\:rounded-tl-lg{border-top-left-radius:var(--radius-lg)}.lg\:rounded-r-lg{border-top-right-radius:var(--radius-lg);border-bottom-right-radius:var(--radius-lg)}.lg\:rounded-br-none{border-bottom-right-radius:0}.lg\:p-8{padding:calc(var(--spacing) * 8)}.lg\:p-20{padding:calc(var(--spacing) * 20)}.lg\:px-8{padding-inline:calc(var(--spacing) * 8)}.lg\:pb-10{padding-bottom:calc(var(--spacing) * 10)}}.rtl\:flex-row-reverse:where(:dir(rtl),[dir=rtl],[dir=rtl] *){flex-direction:row-reverse}@media(prefers-color-scheme:dark){.dark\:border-\[\#3E3E3A\]{border-color:#3e3e3a}.dark\:border-\[\#eeeeec\]{border-color:#eeeeec}.dark\:border-gray-600{border-color:var(--color-gray-600)}.dark\:bg-\[\#0a0a0a\]{background-color:#0a0a0a}.dark\:bg-\[\#1D0002\]{background-color:#1d0002}.dark\:bg-\[\#3E3E3A\]{background-color:#3e3e3a}.dark\:bg-\[\#161615\]{background-color:#161615}.dark\:bg-\[\#eeeeec\]{background-color:#eeeeec}.dark\:bg-gray-700{background-color:var(--color-gray-700)}.dark\:bg-gray-800{background-color:var(--color-gray-800)}.dark\:bg-gray-900{background-color:var(--color-gray-900)}.dark\:text-\[\#1C1C1A\]{color:#1c1c1a}.dark\:text-\[\#4B0600\]{color:#4b0600}.dark\:text-\[\#391800\]{color:#391800}.dark\:text-\[\#733000\]{color:#733000}.dark\:text-\[\#A1A09A\]{color:#a1a09a}.dark\:text-\[\#EDEDEC\]{color:#ededec}.dark\:text-\[\#F61500\]{color:#f61500}.dark\:text-\[\#FF4433\]{color:#f43}.dark\:text-black{color:var(--color-black)}.dark\:text-gray-200{color:var(--color-gray-200)}.dark\:text-gray-300{color:var(--color-gray-300)}.dark\:text-gray-400{color:var(--color-gray-400)}.dark\:text-gray-600{color:var(--color-gray-600)}.dark\:mix-blend-hard-light{mix-blend-mode:hard-light}.dark\:mix-blend-normal{mix-blend-mode:normal}.dark\:shadow-\[inset_0px_0px_0px_1px_\#fffaed2d\]{--tw-shadow:inset 0px 0px 0px 1px var(--tw-shadow-color,#fffaed2d);box-shadow:var(--tw-inset-shadow),var(--tw-inset-ring-shadow),var(--tw-ring-offset-shadow),var(--tw-ring-shadow),var(--tw-shadow)}.dark\:\[--stroke-color\:\#FF750F\]{--stroke-color:#ff750f}.dark\:before\:border-\[\#3E3E3A\]:before{content:var(--tw-content);border-color:#3e3e3a}@media(hover:hover){.dark\:hover\:border-\[\#3E3E3A\]:hover{border-color:#3e3e3a}.dark\:hover\:border-\[\#62605b\]:hover{border-color:#62605b}.dark\:hover\:border-white:hover{border-color:var(--color-white)}.dark\:hover\:bg-gray-900:hover{background-color:var(--color-gray-900)}.dark\:hover\:bg-white:hover{background-color:var(--color-white)}.dark\:hover\:text-gray-200:hover{color:var(--color-gray-200)}.dark\:hover\:text-gray-300:hover{color:var(--color-gray-300)}}.dark\:focus\:border-blue-700:focus{border-color:var(--color-blue-700)}.dark\:focus\:border-blue-800:focus{border-color:var(--color-blue-800)}.dark\:active\:bg-gray-700:active{background-color:var(--color-gray-700)}.dark\:active\:text-gray-300:active{color:var(--color-gray-300)}}@starting-style{.starting\:opacity-0{opacity:0}}@media(prefers-reduced-motion:no-preference){@starting-style{.motion-safe\:starting\:-translate-x-\[26px\]{--tw-translate-x: -26px ;translate:var(--tw-translate-x) var(--tw-translate-y)}}@starting-style{.motion-safe\:starting\:-translate-x-\[51px\]{--tw-translate-x: -51px ;translate:var(--tw-translate-x) var(--tw-translate-y)}}@starting-style{.motion-safe\:starting\:-translate-x-\[78px\]{--tw-translate-x: -78px ;translate:var(--tw-translate-x) var(--tw-translate-y)}}@starting-style{.motion-safe\:starting\:-translate-x-\[102px\]{--tw-translate-x: -102px ;translate:var(--tw-translate-x) var(--tw-translate-y)}}@starting-style{.motion-safe\:starting\:translate-y-6{--tw-translate-y:calc(var(--spacing) * 6);translate:var(--tw-translate-x) var(--tw-translate-y)}}}}@property --tw-translate-x{syntax:"*";inherits:false;initial-value:0}@property --tw-translate-y{syntax:"*";inherits:false;initial-value:0}@property --tw-translate-z{syntax:"*";inherits:false;initial-value:0}@property --tw-rotate-x{syntax:"*";inherits:false}@property --tw-rotate-y{syntax:"*";inherits:false}@property --tw-rotate-z{syntax:"*";inherits:false}@property --tw-skew-x{syntax:"*";inherits:false}@property --tw-skew-y{syntax:"*";inherits:false}@property --tw-space-x-reverse{syntax:"*";inherits:false;initial-value:0}@property --tw-border-style{syntax:"*";inherits:false;initial-value:solid}@property --tw-leading{syntax:"*";inherits:false}@property --tw-font-weight{syntax:"*";inherits:false}@property --tw-tracking{syntax:"*";inherits:false}@property --tw-shadow{syntax:"*";inherits:false;initial-value:0 0 #0000}@property --tw-shadow-color{syntax:"*";inherits:false}@property --tw-shadow-alpha{syntax:"<percentage>";inherits:false;initial-value:100%}@property --tw-inset-shadow{syntax:"*";inherits:false;initial-value:0 0 #0000}@property --tw-inset-shadow-color{syntax:"*";inherits:false}@property --tw-inset-shadow-alpha{syntax:"<percentage>";inherits:false;initial-value:100%}@property --tw-ring-color{syntax:"*";inherits:false}@property --tw-ring-shadow{syntax:"*";inherits:false;initial-value:0 0 #0000}@property --tw-inset-ring-color{syntax:"*";inherits:false}@property --tw-inset-ring-shadow{syntax:"*";inherits:false;initial-value:0 0 #0000}@property --tw-ring-inset{syntax:"*";inherits:false}@property --tw-ring-offset-width{syntax:"<length>";inherits:false;initial-value:0}@property --tw-ring-offset-color{syntax:"*";inherits:false;initial-value:#fff}@property --tw-ring-offset-shadow{syntax:"*";inherits:false;initial-value:0 0 #0000}@property --tw-blur{syntax:"*";inherits:false}@property --tw-brightness{syntax:"*";inherits:false}@property --tw-contrast{syntax:"*";inherits:false}@property --tw-grayscale{syntax:"*";inherits:false}@property --tw-hue-rotate{syntax:"*";inherits:false}@property --tw-invert{syntax:"*";inherits:false}@property --tw-opacity{syntax:"*";inherits:false}@property --tw-saturate{syntax:"*";inherits:false}@property --tw-sepia{syntax:"*";inherits:false}@property --tw-drop-shadow{syntax:"*";inherits:false}@property --tw-drop-shadow-color{syntax:"*";inherits:false}@property --tw-drop-shadow-alpha{syntax:"<percentage>";inherits:false;initial-value:100%}@property --tw-drop-shadow-size{syntax:"*";inherits:false}@property --tw-duration{syntax:"*";inherits:false}@property --tw-ease{syntax:"*";inherits:false}@property --tw-content{syntax:"*";inherits:false;initial-value:""}@keyframes spin{to{transform:rotate(360deg)}}@keyframes ping{75%,to{opacity:0;transform:scale(2)}}@keyframes pulse{50%{opacity:.5}}@keyframes bounce{0%,to{animation-timing-function:cubic-bezier(.8,0,1,1);transform:translateY(-25%)}50%{animation-timing-function:cubic-bezier(0,0,.2,1);transform:none}}
-            </style>
-        @endif
-    </head>
-    <body class="bg-[#FDFDFC] dark:bg-[#0a0a0a] text-[#1b1b18] flex p-6 lg:p-8 items-center lg:justify-center min-h-screen flex-col">
-        <header class="w-full lg:max-w-4xl max-w-[335px] text-sm mb-6 not-has-[nav]:hidden">
-            @if (Route::has('login'))
-                <nav class="flex items-center justify-end gap-4">
-                    @auth
-                        <a
-                            href="{{ url('/dashboard') }}"
-                            class="inline-block px-5 py-1.5 dark:text-[#EDEDEC] border-[#19140035] hover:border-[#1915014a] border text-[#1b1b18] dark:border-[#3E3E3A] dark:hover:border-[#62605b] rounded-sm text-sm leading-normal"
-                        >
-                            Dashboard
-                        </a>
-                    @else
-                        <a
-                            href="{{ route('login') }}"
-                            class="inline-block px-5 py-1.5 dark:text-[#EDEDEC] text-[#1b1b18] border border-transparent hover:border-[#19140035] dark:hover:border-[#3E3E3A] rounded-sm text-sm leading-normal"
-                        >
-                            Log in
-                        </a>
+  <!-- Search overlay -->
+  <div id="search-overlay" class="hidden fixed inset-0 z-[60] bg-black/50 flex items-start justify-center pt-24 backdrop-blur-sm transition-all duration-300">
+   <div class="bg-white rounded-2xl p-6 w-full max-w-xl mx-4 shadow-2xl scale-95 opacity-0 transition-all duration-300 transform" id="search-box">
+    <div class="flex items-center gap-3 border-b border-[#e8e5e0] pb-4">
+      <i data-lucide="search" style="width:22px;height:22px;color:#c45e3a;"></i> 
+      <input type="text" placeholder="Tìm kiếm trang phục, phụ kiện..." class="flex-1 outline-none text-lg font-body placeholder-gray-400" id="search-input"> 
+      <button id="close-search" class="p-1.5 hover:bg-gray-100 rounded-full transition"><i data-lucide="x" style="width:20px;height:20px;"></i></button>
+    </div>
+    <div class="mt-4">
+      <p class="text-xs font-semibold text-gray-400 uppercase tracking-wider mb-2">Từ khóa hot</p>
+      <div class="flex flex-wrap gap-2" id="search-suggestions">
+        <button onclick="quickSearch('Áo thun')" class="text-xs bg-[#f5f0ea] hover:bg-[#c45e3a] hover:text-white px-3 py-1.5 rounded-full text-gray-600 transition">Áo thun</button>
+        <button onclick="quickSearch('Váy')" class="text-xs bg-[#f5f0ea] hover:bg-[#c45e3a] hover:text-white px-3 py-1.5 rounded-full text-gray-600 transition">Váy midi</button>
+        <button onclick="quickSearch('Quần jeans')" class="text-xs bg-[#f5f0ea] hover:bg-[#c45e3a] hover:text-white px-3 py-1.5 rounded-full text-gray-600 transition">Quần jeans</button>
+        <button onclick="quickSearch('Mới')" class="text-xs bg-[#f5f0ea] hover:bg-[#c45e3a] hover:text-white px-3 py-1.5 rounded-full text-gray-600 transition">Mới về</button>
+      </div>
+    </div>
+    <div class="mt-4 border-t border-gray-100 pt-4 max-h-60 overflow-y-auto hidden" id="search-results-box">
+      <p class="text-xs font-semibold text-gray-400 uppercase tracking-wider mb-2">Kết quả tìm kiếm</p>
+      <div id="search-results-list" class="space-y-2"></div>
+    </div>
+   </div>
+  </div>
 
-                        @if (Route::has('register'))
-                            <a
-                                href="{{ route('register') }}"
-                                class="inline-block px-5 py-1.5 dark:text-[#EDEDEC] border-[#19140035] hover:border-[#1915014a] border text-[#1b1b18] dark:border-[#3E3E3A] dark:hover:border-[#62605b] rounded-sm text-sm leading-normal">
-                                Register
-                            </a>
-                        @endif
-                    @endauth
-                </nav>
-            @endif
-        </header>
-        <div class="flex items-center justify-center w-full transition-opacity opacity-100 duration-750 lg:grow starting:opacity-0">
-            <main class="flex max-w-[335px] w-full flex-col-reverse lg:max-w-4xl lg:flex-row">
-                <div class="text-[13px] leading-[20px] flex-1 p-6 pb-6 lg:p-20 lg:pb-10 bg-white dark:bg-[#161615] dark:text-[#EDEDEC] shadow-[inset_0px_0px_0px_1px_rgba(26,26,0,0.16)] dark:shadow-[inset_0px_0px_0px_1px_#fffaed2d] rounded-bl-lg rounded-br-lg lg:rounded-tl-lg lg:rounded-br-none">
-                    <h1 class="mb-1 font-medium">Let's get started</h1>
-                    <p class="mb-2 text-[#706f6c] dark:text-[#A1A09A]">With so many options available to you,<br /> we suggest you start with the following:</p>
-                    <ul class="flex flex-col mb-4 lg:mb-6">
-                        <li class="flex items-center gap-4 py-2 relative before:border-l before:border-[#e3e3e0] dark:before:border-[#3E3E3A] before:top-1/2 before:bottom-0 before:left-[0.4rem] before:absolute">
-                            <span class="relative py-1 bg-white dark:bg-[#161615]">
-                                <span class="flex items-center justify-center rounded-full bg-[#FDFDFC] dark:bg-[#161615] shadow-[0px_0px_1px_0px_rgba(0,0,0,0.03),0px_1px_2px_0px_rgba(0,0,0,0.06)] w-3.5 h-3.5 border dark:border-[#3E3E3A] border-[#e3e3e0]">
-                                    <span class="rounded-full bg-[#dbdbd7] dark:bg-[#3E3E3A] w-1.5 h-1.5"></span>
-                                </span>
-                            </span>
-                            <span>
-                                Read the
-                                <a href="https://laravel.com/docs" target="_blank" class="inline-flex items-center space-x-1 font-medium underline underline-offset-4 text-[#f53003] dark:text-[#FF4433] ml-1">
-                                    <span>Documentation</span>
-                                    <svg
-                                        width="10"
-                                        height="11"
-                                        viewBox="0 0 10 11"
-                                        fill="none"
-                                        xmlns="http://www.w3.org/2000/svg"
-                                        class="w-2.5 h-2.5"
-                                    >
-                                        <path
-                                            d="M7.70833 6.95834V2.79167H3.54167M2.5 8L7.5 3.00001"
-                                            stroke="currentColor"
-                                            stroke-linecap="square"
-                                        />
-                                    </svg>
-                                </a>
-                            </span>
-                        </li>
-                        <li class="flex items-center gap-4 py-2 relative before:border-l before:border-[#e3e3e0] dark:before:border-[#3E3E3A] before:bottom-1/2 before:top-0 before:left-[0.4rem] before:absolute">
-                            <span class="relative py-1 bg-white dark:bg-[#161615]">
-                                <span class="flex items-center justify-center rounded-full bg-[#FDFDFC] dark:bg-[#161615] shadow-[0px_0px_1px_0px_rgba(0,0,0,0.03),0px_1px_2px_0px_rgba(0,0,0,0.06)] w-3.5 h-3.5 border dark:border-[#3E3E3A] border-[#e3e3e0]">
-                                    <span class="rounded-full bg-[#dbdbd7] dark:bg-[#3E3E3A] w-1.5 h-1.5"></span>
-                                </span>
-                            </span>
-                            <span>
-                                Watch video tutorials at
-                                <a href="https://laracasts.com" target="_blank" class="inline-flex items-center space-x-1 font-medium underline underline-offset-4 text-[#f53003] dark:text-[#FF4433] ml-1">
-                                    <span>Laracasts</span>
-                                    <svg
-                                        width="10"
-                                        height="11"
-                                        viewBox="0 0 10 11"
-                                        fill="none"
-                                        xmlns="http://www.w3.org/2000/svg"
-                                        class="w-2.5 h-2.5"
-                                    >
-                                        <path
-                                            d="M7.70833 6.95834V2.79167H3.54167M2.5 8L7.5 3.00001"
-                                            stroke="currentColor"
-                                            stroke-linecap="square"
-                                        />
-                                    </svg>
-                                </a>
-                            </span>
-                        </li>
-                    </ul>
-                    <ul class="flex gap-3 text-sm leading-normal">
-                        <li>
-                            <a href="https://cloud.laravel.com" target="_blank" class="inline-block dark:bg-[#eeeeec] dark:border-[#eeeeec] dark:text-[#1C1C1A] dark:hover:bg-white dark:hover:border-white hover:bg-black hover:border-black px-5 py-1.5 bg-[#1b1b18] rounded-sm border border-black text-white text-sm leading-normal">
-                                Deploy now
-                            </a>
-                        </li>
-                    </ul>
+  <!-- Main Views Container -->
+  <main class="flex-1">
+    
+    <!-- HOME VIEW -->
+    <div id="home-view" class="page-view hidden">
+      <!-- Hero Section -->
+      <section class="relative overflow-hidden bg-gradient-to-br from-[#f5f0ea] via-[#faf9f7] to-[#e8dfd4] border-b border-[#e8e5e0]">
+       <div class="max-w-7xl mx-auto px-4 py-16 md:py-24 flex flex-col md:flex-row items-center gap-12">
+        <div class="flex-1 space-y-6 text-center md:text-left z-10">
+         <p class="text-xs uppercase tracking-[4px] text-[#c45e3a] font-bold">Bộ sưu tập thời thượng 2026</p>
+         <h1 id="hero-title" class="font-heading text-4xl md:text-6xl font-bold leading-tight text-[#1a1a1a]">
+           Nâng tầm<br><span class="text-[#c45e3a] italic">phong cách</span><br>của bạn
+         </h1>
+         <p id="hero-subtitle" class="text-gray-600 text-base md:text-lg max-w-lg mx-auto md:mx-0 font-light leading-relaxed">
+           Thời trang cao cấp, tối giản nhưng đậm chất riêng. Hãy khám phá và tự tin tỏa sáng mỗi ngày cùng Beestyle.
+         </p>
+         <div class="flex flex-wrap justify-center md:justify-start gap-4">
+           <a href="#/shop" class="bg-[#1a1a1a] text-white px-8 py-3.5 rounded-full font-medium hover:bg-[#c45e3a] transition shadow-lg shadow-[#1a1a1a]/10 hover:shadow-[#c45e3a]/20">Mua Ngay</a> 
+           <a href="#/shop?tag=Mới" class="border-2 border-[#1a1a1a] px-8 py-3.5 rounded-full font-medium hover:bg-[#1a1a1a] hover:text-white transition">Hàng Mới Về</a>
+         </div>
+        </div>
+        <div class="flex-1 flex justify-center relative w-full">
+         <div class="absolute -top-10 -left-10 w-48 h-48 bg-[#c45e3a]/10 rounded-full blur-3xl"></div>
+         <div class="absolute -bottom-10 -right-10 w-48 h-48 bg-[#d4956b]/20 rounded-full blur-3xl"></div>
+         <div class="w-72 h-96 md:w-96 md:h-[30rem] rounded-2xl overflow-hidden shadow-2xl relative border-4 border-white bg-white group">
+          <img src="https://images.unsplash.com/photo-1515886657613-9f3515b0c78f?w=600&auto=format&fit=crop&q=80" alt="Hero Fashion" class="w-full h-full object-cover group-hover:scale-105 transition-transform duration-500">
+          <div class="absolute bottom-6 left-6 right-6 bg-white/95 backdrop-blur-sm p-4 rounded-xl shadow-lg border border-gray-100 flex items-center justify-between">
+            <div>
+              <p class="text-xs text-gray-500 uppercase tracking-widest font-semibold">Phong cách mùa xuân</p>
+              <h4 class="font-heading font-bold text-gray-800 text-sm">BST Cotton &amp; Linen</h4>
+            </div>
+            <a href="#/shop" class="bg-[#1a1a1a] text-white p-2 rounded-full hover:bg-[#c45e3a] transition">
+              <i data-lucide="arrow-right" class="w-4 h-4"></i>
+            </a>
+          </div>
+         </div>
+        </div>
+       </div>
+      </section>
 
-                    <p class="mt-6 lg:mt-10 text-[#706f6c] dark:text-[#A1A09A]">
-                        v{{ app()->version() }}
-                        <a href="https://github.com/laravel/framework/blob/13.x/CHANGELOG.md" target="_blank" class="inline-flex items-center space-x-1 font-medium underline underline-offset-4 text-[#f53003] dark:text-[#FF4433] ml-1">
-                            <span>View changelog</span>
-                            <svg
-                                width="10"
-                                height="11"
-                                viewBox="0 0 10 11"
-                                fill="none"
-                                xmlns="http://www.w3.org/2000/svg"
-                                class="w-2.5 h-2.5"
-                            >
-                                <path
-                                    d="M7.70833 6.95834V2.79167H3.54167M2.5 8L7.5 3.00001"
-                                    stroke="currentColor"
-                                    stroke-linecap="square"
-                                />
-                            </svg>
-                        </a>
-                    </p>
+      <!-- Categories Section -->
+      <section class="max-w-7xl mx-auto px-4 py-16">
+       <div class="text-center max-w-lg mx-auto mb-12">
+         <h2 class="font-heading text-3xl font-bold mb-3">Danh Mục Nổi Bật</h2>
+         <p class="text-gray-500 text-sm">Các thiết kế tinh tế được phân loại giúp bạn dễ dàng chọn lựa bộ trang phục phù hợp nhất</p>
+       </div>
+       <div class="grid grid-cols-2 md:grid-cols-4 gap-6">
+        <a href="#/shop?category=shirt" class="bg-[#f0ebe4] rounded-2xl p-8 text-center hover:shadow-xl transition-all duration-300 cursor-pointer group flex flex-col items-center">
+         <div class="w-16 h-16 bg-white rounded-full flex items-center justify-center text-3xl group-hover:scale-110 transition-transform shadow-md">👕</div>
+         <p class="font-semibold text-gray-800 mt-4 group-hover:text-[#c45e3a] transition">Áo Nam &amp; Nữ</p>
+         <span class="text-xs text-gray-400 mt-1 font-medium hover:underline">Khám phá →</span>
+        </a>
+        <a href="#/shop?category=pants" class="bg-[#e4ecf0] rounded-2xl p-8 text-center hover:shadow-xl transition-all duration-300 cursor-pointer group flex flex-col items-center">
+         <div class="w-16 h-16 bg-white rounded-full flex items-center justify-center text-3xl group-hover:scale-110 transition-transform shadow-md">👖</div>
+         <p class="font-semibold text-gray-800 mt-4 group-hover:text-[#c45e3a] transition">Quần Jeans &amp; Tây</p>
+         <span class="text-xs text-gray-400 mt-1 font-medium hover:underline">Khám phá →</span>
+        </a>
+        <a href="#/shop?category=dress" class="bg-[#f0e4ec] rounded-2xl p-8 text-center hover:shadow-xl transition-all duration-300 cursor-pointer group flex flex-col items-center">
+         <div class="w-16 h-16 bg-white rounded-full flex items-center justify-center text-3xl group-hover:scale-110 transition-transform shadow-md">👗</div>
+         <p class="font-semibold text-gray-800 mt-4 group-hover:text-[#c45e3a] transition">Váy Đầm Dạo Phố</p>
+         <span class="text-xs text-gray-400 mt-1 font-medium hover:underline">Khám phá →</span>
+        </a>
+        <a href="#/shop?category=accessories" class="bg-[#ecf0e4] rounded-2xl p-8 text-center hover:shadow-xl transition-all duration-300 cursor-pointer group flex flex-col items-center">
+         <div class="w-16 h-16 bg-white rounded-full flex items-center justify-center text-3xl group-hover:scale-110 transition-transform shadow-md">👜</div>
+         <p class="font-semibold text-gray-800 mt-4 group-hover:text-[#c45e3a] transition">Phụ Kiện Cao Cấp</p>
+         <span class="text-xs text-gray-400 mt-1 font-medium hover:underline">Khám phá →</span>
+        </a>
+       </div>
+      </section>
+
+      <!-- Promo Banner 1 -->
+      <section class="max-w-7xl mx-auto px-4 py-8">
+        <div class="bg-[#1a1a1a] rounded-3xl p-8 md:p-12 text-white flex flex-col md:flex-row items-center justify-between gap-6 relative overflow-hidden">
+          <div class="absolute right-0 top-0 w-64 h-64 bg-[#c45e3a]/10 rounded-full blur-3xl"></div>
+          <div class="z-10 text-center md:text-left">
+            <span class="bg-[#c45e3a] text-white text-xs font-bold px-3 py-1 rounded-full uppercase tracking-wider">Ưu Đãi Đặc Biệt</span>
+            <h3 class="font-heading text-3xl md:text-4xl font-bold mt-3 mb-2">Giảm 30% khi thanh toán lần đầu</h3>
+            <p class="text-gray-400 text-sm">Nhập mã ưu đãi tại màn hình thanh toán để được giảm trừ trực tiếp. Áp dụng cho giỏ hàng bất kỳ.</p>
+            <div class="mt-4 flex items-center justify-center md:justify-start gap-2">
+              <span class="text-xs text-gray-300">Mã code:</span>
+              <span class="bg-white/10 text-[#d4956b] border border-white/20 px-3 py-1 rounded font-mono font-bold select-all">BEESTYLE30</span>
+            </div>
+          </div>
+          <a href="#/shop" class="bg-white text-[#1a1a1a] px-8 py-4 rounded-full font-semibold hover:bg-[#c45e3a] hover:text-white transition z-10 whitespace-nowrap shadow-lg shadow-black/20">Mua Ngay Cửa Hàng</a>
+        </div>
+      </section>
+
+      <!-- Featured Products -->
+      <section class="max-w-7xl mx-auto px-4 py-16">
+       <div class="flex items-center justify-between mb-10">
+        <div>
+          <h2 class="font-heading text-3xl font-bold text-gray-800">Sản Phẩm Nổi Bật</h2>
+          <p class="text-gray-500 text-xs mt-1">Những sản phẩm được yêu thích và đánh giá tốt nhất trong tuần</p>
+        </div>
+        <a href="#/shop" class="text-sm font-semibold text-[#c45e3a] hover:underline flex items-center gap-1">Xem tất cả <i data-lucide="arrow-right" class="w-4 h-4"></i></a>
+       </div>
+       <div class="grid grid-cols-2 md:grid-cols-4 gap-6" id="home-product-grid"></div>
+      </section>
+
+      <!-- Why Choose Us -->
+      <section class="bg-[#f5f0ea]/50 border-t border-b border-[#e8e5e0] py-16 my-8">
+        <div class="max-w-7xl mx-auto px-4 grid grid-cols-1 md:grid-cols-3 gap-8">
+          <div class="text-center space-y-3">
+            <div class="w-12 h-12 bg-white rounded-full flex items-center justify-center text-xl shadow mx-auto text-[#c45e3a]"><i data-lucide="truck" class="w-6 h-6"></i></div>
+            <h4 class="font-semibold text-lg text-gray-800">Miễn Phí Vận Chuyển</h4>
+            <p class="text-gray-500 text-sm max-w-xs mx-auto">Áp dụng cho mọi đơn hàng từ 500.000₫ trở lên trên phạm vi toàn quốc.</p>
+          </div>
+          <div class="text-center space-y-3">
+            <div class="w-12 h-12 bg-white rounded-full flex items-center justify-center text-xl shadow mx-auto text-[#c45e3a]"><i data-lucide="refresh-cw" class="w-6 h-6"></i></div>
+            <h4 class="font-semibold text-lg text-gray-800">Đổi Trả Dễ Dàng</h4>
+            <p class="text-gray-500 text-sm max-w-xs mx-auto">Hỗ trợ đổi trả sản phẩm trong vòng 7 ngày nếu không vừa size hoặc có lỗi từ sản xuất.</p>
+          </div>
+          <div class="text-center space-y-3">
+            <div class="w-12 h-12 bg-white rounded-full flex items-center justify-center text-xl shadow mx-auto text-[#c45e3a]"><i data-lucide="shield-check" class="w-6 h-6"></i></div>
+            <h4 class="font-semibold text-lg text-gray-800">100% Chính Hãng</h4>
+            <p class="text-gray-500 text-sm max-w-xs mx-auto">Cam kết mọi mặt hàng thời trang tại Beestyle đều do xưởng thiết kế và sản xuất tỉ mỉ.</p>
+          </div>
+        </div>
+      </section>
+    </div>
+
+    <!-- SHOP VIEW -->
+    <div id="shop-view" class="page-view hidden">
+      <div class="bg-[#f0ebe4]/40 border-b border-[#e8e5e0] py-8 mb-8">
+        <div class="max-w-7xl mx-auto px-4">
+          <h1 class="font-heading text-3xl font-bold text-gray-800" id="shop-title">Cửa Hàng Thời Trang</h1>
+          <p class="text-gray-500 text-sm mt-1" id="shop-subtitle">Khám phá các thiết kế chất lượng cao phù hợp với phong cách của bạn.</p>
+        </div>
+      </div>
+      
+      <div class="max-w-7xl mx-auto px-4 pb-16 flex flex-col md:flex-row gap-8">
+        <!-- Sidebar filters -->
+        <aside class="w-full md:w-64 shrink-0 space-y-6">
+          <div class="bg-white rounded-2xl p-5 border border-[#e8e5e0] shadow-sm space-y-6">
+            <!-- Search field inside sidebar (responsive) -->
+            <div class="space-y-2">
+              <h4 class="font-semibold text-sm text-gray-800">Tìm kiếm</h4>
+              <div class="relative">
+                <input type="text" id="shop-search-input" placeholder="Từ khóa..." class="w-full pl-9 pr-4 py-2 text-sm border border-gray-200 rounded-xl outline-none focus:border-[#c45e3a] transition">
+                <i data-lucide="search" class="w-4 h-4 text-gray-400 absolute left-3 top-2.5"></i>
+              </div>
+            </div>
+            
+            <!-- Category Filter -->
+            <div class="space-y-2">
+              <h4 class="font-semibold text-sm text-gray-800">Danh mục sản phẩm</h4>
+              <div class="space-y-1" id="category-filter-list">
+                <label class="flex items-center gap-2 text-sm text-gray-600 hover:text-black cursor-pointer py-1">
+                  <input type="radio" name="category" value="all" checked class="accent-[#c45e3a]"> Tất cả sản phẩm
+                </label>
+                <label class="flex items-center gap-2 text-sm text-gray-600 hover:text-black cursor-pointer py-1">
+                  <input type="radio" name="category" value="shirt" class="accent-[#c45e3a]"> Áo Nam & Nữ
+                </label>
+                <label class="flex items-center gap-2 text-sm text-gray-600 hover:text-black cursor-pointer py-1">
+                  <input type="radio" name="category" value="pants" class="accent-[#c45e3a]"> Quần Jeans & Tây
+                </label>
+                <label class="flex items-center gap-2 text-sm text-gray-600 hover:text-black cursor-pointer py-1">
+                  <input type="radio" name="category" value="dress" class="accent-[#c45e3a]"> Váy Đầm Dạo Phố
+                </label>
+                <label class="flex items-center gap-2 text-sm text-gray-600 hover:text-black cursor-pointer py-1">
+                  <input type="radio" name="category" value="accessories" class="accent-[#c45e3a]"> Phụ kiện
+                </label>
+              </div>
+            </div>
+            
+            <!-- Price Range Filter -->
+            <div class="space-y-2">
+              <h4 class="font-semibold text-sm text-gray-800">Khoảng giá (₫)</h4>
+              <div class="space-y-2">
+                <input type="range" id="price-range" min="0" max="1500000" step="50000" value="1500000" class="w-full accent-[#c45e3a]">
+                <div class="flex justify-between text-xs text-gray-500 font-semibold">
+                  <span>0đ</span>
+                  <span id="price-range-val">Dưới 1.500.000₫</span>
                 </div>
-                <div class="bg-[#fff2f2] dark:bg-[#1D0002] relative lg:-ml-px -mb-px lg:mb-0 rounded-t-lg lg:rounded-t-none lg:rounded-r-lg aspect-[335/364] lg:aspect-auto w-full lg:w-[438px] shrink-0 overflow-hidden">
-                    {{-- Laravel Logo --}}
-                    <svg class="w-full text-[#F53003] dark:text-[#F61500] transition-all translate-y-0 opacity-100 max-w-none duration-750 starting:opacity-0 motion-safe:starting:translate-y-6" viewBox="0 0 438 104" fill="none" xmlns="http://www.w3.org/2000/svg">
-                        <path d="M17.2036 -3H0V102.197H49.5189V86.7187H17.2036V-3Z" fill="currentColor" />
-                        <path d="M110.256 41.6337C108.061 38.1275 104.945 35.3731 100.905 33.3681C96.8667 31.3647 92.8016 30.3618 88.7131 30.3618C83.4247 30.3618 78.5885 31.3389 74.201 33.2923C69.8111 35.2456 66.0474 37.928 62.9059 41.3333C59.7643 44.7401 57.3198 48.6726 55.5754 53.1293C53.8287 57.589 52.9572 62.274 52.9572 67.1813C52.9572 72.1925 53.8287 76.8995 55.5754 81.3069C57.3191 85.7173 59.7636 89.6241 62.9059 93.0293C66.0474 96.4361 69.8119 99.1155 74.201 101.069C78.5885 103.022 83.4247 103.999 88.7131 103.999C92.8016 103.999 96.8667 102.997 100.905 100.994C104.945 98.9911 108.061 96.2359 110.256 92.7282V102.195H126.563V32.1642H110.256V41.6337ZM108.76 75.7472C107.762 78.4531 106.366 80.8078 104.572 82.8112C102.776 84.8161 100.606 86.4183 98.0637 87.6206C95.5202 88.823 92.7004 89.4238 89.6103 89.4238C86.5178 89.4238 83.7252 88.823 81.2324 87.6206C78.7388 86.4183 76.5949 84.8161 74.7998 82.8112C73.004 80.8078 71.6319 78.4531 70.6856 75.7472C69.7356 73.0421 69.2644 70.1868 69.2644 67.1821C69.2644 64.1758 69.7356 61.3205 70.6856 58.6154C71.6319 55.9102 73.004 53.5571 74.7998 51.5522C76.5949 49.5495 78.738 47.9451 81.2324 46.7427C83.7252 45.5404 86.5178 44.9396 89.6103 44.9396C92.7012 44.9396 95.5202 45.5404 98.0637 46.7427C100.606 47.9451 102.776 49.5487 104.572 51.5522C106.367 53.5571 107.762 55.9102 108.76 58.6154C109.756 61.3205 110.256 64.1758 110.256 67.1821C110.256 70.1868 109.756 73.0421 108.76 75.7472Z" fill="currentColor" />
-                        <path d="M242.805 41.6337C240.611 38.1275 237.494 35.3731 233.455 33.3681C229.416 31.3647 225.351 30.3618 221.262 30.3618C215.974 30.3618 211.138 31.3389 206.75 33.2923C202.36 35.2456 198.597 37.928 195.455 41.3333C192.314 44.7401 189.869 48.6726 188.125 53.1293C186.378 57.589 185.507 62.274 185.507 67.1813C185.507 72.1925 186.378 76.8995 188.125 81.3069C189.868 85.7173 192.313 89.6241 195.455 93.0293C198.597 96.4361 202.361 99.1155 206.75 101.069C211.138 103.022 215.974 103.999 221.262 103.999C225.351 103.999 229.416 102.997 233.455 100.994C237.494 98.9911 240.611 96.2359 242.805 92.7282V102.195H259.112V32.1642H242.805V41.6337ZM241.31 75.7472C240.312 78.4531 238.916 80.8078 237.122 82.8112C235.326 84.8161 233.156 86.4183 230.614 87.6206C228.07 88.823 225.251 89.4238 222.16 89.4238C219.068 89.4238 216.275 88.823 213.782 87.6206C211.289 86.4183 209.145 84.8161 207.35 82.8112C205.554 80.8078 204.182 78.4531 203.236 75.7472C202.286 73.0421 201.814 70.1868 201.814 67.1821C201.814 64.1758 202.286 61.3205 203.236 58.6154C204.182 55.9102 205.554 53.5571 207.35 51.5522C209.145 49.5495 211.288 47.9451 213.782 46.7427C216.275 45.5404 219.068 44.9396 222.16 44.9396C225.251 44.9396 228.07 45.5404 230.614 46.7427C233.156 47.9451 235.326 49.5487 237.122 51.5522C238.917 53.5571 240.312 55.9102 241.31 58.6154C242.306 61.3205 242.806 64.1758 242.806 67.1821C242.805 70.1868 242.305 73.0421 241.31 75.7472Z" fill="currentColor" />
-                        <path d="M438 -3H421.694V102.197H438V-3Z" fill="currentColor" />
-                        <path d="M139.43 102.197H155.735V48.2834H183.712V32.1665H139.43V102.197Z" fill="currentColor" />
-                        <path d="M324.49 32.1665L303.995 85.794L283.498 32.1665H266.983L293.748 102.197H314.242L341.006 32.1665H324.49Z" fill="currentColor" />
-                        <path d="M376.571 30.3656C356.603 30.3656 340.797 46.8497 340.797 67.1828C340.797 89.6597 356.094 104 378.661 104C391.29 104 399.354 99.1488 409.206 88.5848L398.189 80.0226C398.183 80.031 389.874 90.9895 377.468 90.9895C363.048 90.9895 356.977 79.3111 356.977 73.269H411.075C413.917 50.1328 398.775 30.3656 376.571 30.3656ZM357.02 61.0967C357.145 59.7487 359.023 43.3761 376.442 43.3761C393.861 43.3761 395.978 59.7464 396.099 61.0967H357.02Z" fill="currentColor" />
-                    </svg>
+              </div>
+            </div>
+            
+            <!-- Tags/Badges filter -->
+            <div class="space-y-2">
+              <h4 class="font-semibold text-sm text-gray-800">Khác</h4>
+              <div class="flex flex-wrap gap-2">
+                <button id="filter-tag-new" class="text-xs bg-[#f5f0ea] hover:bg-[#c45e3a] hover:text-white px-2.5 py-1.5 rounded-lg text-gray-600 transition">Hàng Mới</button>
+                <button id="filter-tag-sale" class="text-xs bg-[#f5f0ea] hover:bg-[#c45e3a] hover:text-white px-2.5 py-1.5 rounded-lg text-gray-600 transition">Khuyến Mại</button>
+                <button id="filter-wishlist" class="text-xs bg-[#f5f0ea] hover:bg-red-500 hover:text-white px-2.5 py-1.5 rounded-lg text-gray-600 transition flex items-center gap-1">
+                  <i data-lucide="heart" class="w-3 h-3 text-red-500 fill-current"></i>Đang Thích
+                </button>
+              </div>
+            </div>
+            
+            <button id="reset-filters" class="w-full text-center py-2 text-xs font-semibold border border-gray-200 text-gray-500 hover:bg-gray-50 hover:text-black rounded-xl transition">Xóa bộ lọc</button>
+          </div>
+        </aside>
+        
+        <!-- Products list & sorting -->
+        <div class="flex-1 space-y-6">
+          <div class="flex flex-col sm:flex-row sm:items-center sm:justify-between gap-4 bg-white p-4 rounded-2xl border border-[#e8e5e0] shadow-sm">
+            <p class="text-sm text-gray-500 font-medium" id="product-count-text">Hiển thị 0 sản phẩm</p>
+            <div class="flex items-center gap-2 text-sm">
+              <span class="text-gray-400 font-medium">Sắp xếp:</span>
+              <select id="sort-select" class="border border-gray-200 rounded-xl px-3 py-1.5 outline-none focus:border-[#c45e3a] transition bg-white text-gray-700 font-semibold cursor-pointer">
+                <option value="default">Mặc định</option>
+                <option value="price-asc">Giá: Thấp đến Cao</option>
+                <option value="price-desc">Giá: Cao đến Thấp</option>
+                <option value="rating-desc">Đánh giá tốt nhất</option>
+              </select>
+            </div>
+          </div>
+          
+          <!-- Product grid -->
+          <div class="grid grid-cols-2 md:grid-cols-3 gap-6" id="shop-product-grid"></div>
+          
+          <!-- Empty State -->
+          <div id="shop-empty-state" class="hidden flex flex-col items-center justify-center py-16 bg-white rounded-3xl border border-[#e8e5e0] text-center p-6">
+            <span class="text-5xl">🔍</span>
+            <h3 class="font-heading font-bold text-xl text-gray-800 mt-4">Không tìm thấy sản phẩm nào</h3>
+            <p class="text-gray-400 text-sm max-w-sm mt-2">Vui lòng thử tìm kiếm với từ khóa khác hoặc điều chỉnh lại bộ lọc để tìm sản phẩm.</p>
+            <button onclick="resetAllFilters()" class="bg-[#1a1a1a] text-white text-xs font-semibold px-6 py-2.5 rounded-full mt-4 hover:bg-[#c45e3a] transition">Xem tất cả</button>
+          </div>
+        </div>
+      </div>
+    </div>
 
-                    {{-- 13 --}}
-                    <svg class="w-[438px] max-w-none relative -mt-[6.6rem] -ml-8 lg:ml-0 [--stroke-color:#1B1B18] dark:[--stroke-color:#FF750F]" viewBox="0 0 440 392" fill="none" xmlns="http://www.w3.org/2000/svg">
-                        <g class="mix-blend-darken dark:mix-blend-normal transition-all delay-300 opacity-100 duration-750 starting:opacity-0 text-[#1B1B18] dark:text-black">
-                            <mask id="path-1-mask" maskUnits="userSpaceOnUse" x="-0.328613" y="103" width="338" height="299" fill="black">
-                                <rect fill="white" x="-0.328613" y="103" width="338" height="299"/>
-                                <path d="M234.936 400.8C204.136 400.8 178.936 392.4 159.336 375.6C140.136 358.8 130.536 337 130.536 310.2H200.736C200.736 318.2 203.736 324.8 209.736 330C215.736 335.2 223.736 337.8 233.736 337.8C243.336 337.8 251.136 335 257.136 329.4C263.536 323.8 266.736 316.6 266.736 307.8C266.736 299.8 263.936 293.2 258.336 288C252.736 282.8 245.536 280.2 236.736 280.2H199.536V218.4H236.736C243.536 218.4 249.336 216 254.136 211.2C258.936 206.4 261.336 200.4 261.336 193.2C261.336 184.8 258.736 178.2 253.536 173.4C248.336 168.6 241.736 166.2 233.736 166.2C226.536 166.2 220.336 168.4 215.136 172.8C210.336 177.2 207.936 182.8 207.936 189.6H141.336C141.336 164.8 150.136 144.6 167.736 129C185.336 113 207.936 105 235.536 105C263.136 105 285.536 112.2 302.736 126.6C320.336 141 329.136 160 329.136 183.6C329.136 200.8 324.536 214.8 315.336 225.6C306.136 236 294.336 243.2 279.936 247.2C297.136 252 310.736 260.2 320.736 271.8C331.136 283.4 336.336 298 336.336 315.6C336.336 340.4 326.936 360.8 308.136 376.8C289.336 392.8 264.936 400.8 234.936 400.8Z"/>
-                                <path d="M26.8714 167.6H1.67139V105.2H94.6714V400.2H26.8714V167.6Z"/>
-                            </mask>
-                            <path d="M234.936 400.8C204.136 400.8 178.936 392.4 159.336 375.6C140.136 358.8 130.536 337 130.536 310.2H200.736C200.736 318.2 203.736 324.8 209.736 330C215.736 335.2 223.736 337.8 233.736 337.8C243.336 337.8 251.136 335 257.136 329.4C263.536 323.8 266.736 316.6 266.736 307.8C266.736 299.8 263.936 293.2 258.336 288C252.736 282.8 245.536 280.2 236.736 280.2H199.536V218.4H236.736C243.536 218.4 249.336 216 254.136 211.2C258.936 206.4 261.336 200.4 261.336 193.2C261.336 184.8 258.736 178.2 253.536 173.4C248.336 168.6 241.736 166.2 233.736 166.2C226.536 166.2 220.336 168.4 215.136 172.8C210.336 177.2 207.936 182.8 207.936 189.6H141.336C141.336 164.8 150.136 144.6 167.736 129C185.336 113 207.936 105 235.536 105C263.136 105 285.536 112.2 302.736 126.6C320.336 141 329.136 160 329.136 183.6C329.136 200.8 324.536 214.8 315.336 225.6C306.136 236 294.336 243.2 279.936 247.2C297.136 252 310.736 260.2 320.736 271.8C331.136 283.4 336.336 298 336.336 315.6C336.336 340.4 326.936 360.8 308.136 376.8C289.336 392.8 264.936 400.8 234.936 400.8Z" fill="currentColor"/>
-                            <path d="M26.8714 167.6H1.67139V105.2H94.6714V400.2H26.8714V167.6Z" fill="currentColor"/>
-                            <path d="M234.936 400.8C204.136 400.8 178.936 392.4 159.336 375.6C140.136 358.8 130.536 337 130.536 310.2H200.736C200.736 318.2 203.736 324.8 209.736 330C215.736 335.2 223.736 337.8 233.736 337.8C243.336 337.8 251.136 335 257.136 329.4C263.536 323.8 266.736 316.6 266.736 307.8C266.736 299.8 263.936 293.2 258.336 288C252.736 282.8 245.536 280.2 236.736 280.2H199.536V218.4H236.736C243.536 218.4 249.336 216 254.136 211.2C258.936 206.4 261.336 200.4 261.336 193.2C261.336 184.8 258.736 178.2 253.536 173.4C248.336 168.6 241.736 166.2 233.736 166.2C226.536 166.2 220.336 168.4 215.136 172.8C210.336 177.2 207.936 182.8 207.936 189.6H141.336C141.336 164.8 150.136 144.6 167.736 129C185.336 113 207.936 105 235.536 105C263.136 105 285.536 112.2 302.736 126.6C320.336 141 329.136 160 329.136 183.6C329.136 200.8 324.536 214.8 315.336 225.6C306.136 236 294.336 243.2 279.936 247.2C297.136 252 310.736 260.2 320.736 271.8C331.136 283.4 336.336 298 336.336 315.6C336.336 340.4 326.936 360.8 308.136 376.8C289.336 392.8 264.936 400.8 234.936 400.8Z" stroke="var(--stroke-color)" stroke-width="2.4" mask="url(#path-1-mask)"/>
-                            <path d="M26.8714 167.6H1.67139V105.2H94.6714V400.2H26.8714V167.6Z" stroke="var(--stroke-color)" stroke-width="2.4" mask="url(#path-1-mask)"/>
-                        </g>
+    <!-- PRODUCT DETAIL VIEW -->
+    <div id="product-detail-view" class="page-view hidden max-w-7xl mx-auto px-4 py-8 md:py-16">
+      <a href="#/shop" class="inline-flex items-center gap-2 text-sm font-semibold text-gray-500 hover:text-black mb-8 transition">
+        <i data-lucide="arrow-left" class="w-4 h-4"></i> Quay lại cửa hàng
+      </a>
+      
+      <div id="product-detail-content"></div>
+      
+      <!-- Reviews and comments -->
+      <div class="mt-16 bg-white rounded-3xl p-6 md:p-8 border border-[#e8e5e0] shadow-sm">
+        <h3 class="font-heading text-2xl font-bold text-gray-800 mb-6">Nhận xét từ Khách Hàng</h3>
+        
+        <div class="grid grid-cols-1 md:grid-cols-3 lg:grid-cols-4 gap-8">
+          <!-- Rating Summary -->
+          <div class="bg-[#faf9f7] p-6 rounded-3xl text-center flex flex-col items-center justify-center border border-gray-100 shadow-sm">
+            <span class="text-5xl font-bold text-[#c45e3a]" id="detail-avg-rating">4.8</span>
+            <div class="flex items-center gap-0.5 my-2.5" id="detail-avg-stars"></div>
+            <p class="text-xs text-gray-400 uppercase font-bold tracking-wider" id="detail-review-count">Dựa trên 0 đánh giá</p>
+          </div>
+          
+          <!-- Rating Statistics Bars -->
+          <div class="flex flex-col justify-center space-y-2 bg-gray-50/50 p-5 rounded-3xl border border-gray-100/50">
+            <!-- 5 Star Bar -->
+            <div class="flex items-center gap-2 text-xs">
+              <span class="w-3 font-bold text-gray-600">5</span>
+              <i data-lucide="star" class="w-3.5 h-3.5 text-amber-400 fill-current shrink-0"></i>
+              <div class="flex-1 h-2 bg-gray-100 rounded-full overflow-hidden">
+                <div id="bar-5-star" class="h-full bg-amber-400 rounded-full transition-all duration-500" style="width: 0%;"></div>
+              </div>
+              <span id="pct-5-star" class="w-8 text-right font-semibold text-gray-400">0%</span>
+            </div>
+            <!-- 4 Star Bar -->
+            <div class="flex items-center gap-2 text-xs">
+              <span class="w-3 font-bold text-gray-600">4</span>
+              <i data-lucide="star" class="w-3.5 h-3.5 text-amber-400 fill-current shrink-0"></i>
+              <div class="flex-1 h-2 bg-gray-100 rounded-full overflow-hidden">
+                <div id="bar-4-star" class="h-full bg-amber-400 rounded-full transition-all duration-500" style="width: 0%;"></div>
+              </div>
+              <span id="pct-4-star" class="w-8 text-right font-semibold text-gray-400">0%</span>
+            </div>
+            <!-- 3 Star Bar -->
+            <div class="flex items-center gap-2 text-xs">
+              <span class="w-3 font-bold text-gray-600">3</span>
+              <i data-lucide="star" class="w-3.5 h-3.5 text-amber-400 fill-current shrink-0"></i>
+              <div class="flex-1 h-2 bg-gray-100 rounded-full overflow-hidden">
+                <div id="bar-3-star" class="h-full bg-amber-400 rounded-full transition-all duration-500" style="width: 0%;"></div>
+              </div>
+              <span id="pct-3-star" class="w-8 text-right font-semibold text-gray-400">0%</span>
+            </div>
+            <!-- 2 Star Bar -->
+            <div class="flex items-center gap-2 text-xs">
+              <span class="w-3 font-bold text-gray-600">2</span>
+              <i data-lucide="star" class="w-3.5 h-3.5 text-amber-400 fill-current shrink-0"></i>
+              <div class="flex-1 h-2 bg-gray-100 rounded-full overflow-hidden">
+                <div id="bar-2-star" class="h-full bg-amber-400 rounded-full transition-all duration-500" style="width: 0%;"></div>
+              </div>
+              <span id="pct-2-star" class="w-8 text-right font-semibold text-gray-400">0%</span>
+            </div>
+            <!-- 1 Star Bar -->
+            <div class="flex items-center gap-2 text-xs">
+              <span class="w-3 font-bold text-gray-600">1</span>
+              <i data-lucide="star" class="w-3.5 h-3.5 text-amber-400 fill-current shrink-0"></i>
+              <div class="flex-1 h-2 bg-gray-100 rounded-full overflow-hidden">
+                <div id="bar-1-star" class="h-full bg-amber-400 rounded-full transition-all duration-500" style="width: 0%;"></div>
+              </div>
+              <span id="pct-1-star" class="w-8 text-right font-semibold text-gray-400">0%</span>
+            </div>
+          </div>
+          
+          <!-- Submit Review Form -->
+          <form id="review-form" class="md:col-span-1 lg:col-span-2 space-y-4">
+            <h4 class="font-semibold text-base text-gray-800">Viết đánh giá của bạn</h4>
+            <div class="flex items-center gap-2">
+              <span class="text-sm text-gray-500 font-medium">Đánh giá sao:</span>
+              <div class="flex gap-1" id="star-rating-select">
+                <button type="button" data-rating="1" class="text-gray-300 hover:text-amber-400 transition"><i data-lucide="star" class="w-6 h-6 fill-current"></i></button>
+                <button type="button" data-rating="2" class="text-gray-300 hover:text-amber-400 transition"><i data-lucide="star" class="w-6 h-6 fill-current"></i></button>
+                <button type="button" data-rating="3" class="text-gray-300 hover:text-amber-400 transition"><i data-lucide="star" class="w-6 h-6 fill-current"></i></button>
+                <button type="button" data-rating="4" class="text-gray-300 hover:text-amber-400 transition"><i data-lucide="star" class="w-6 h-6 fill-current"></i></button>
+                <button type="button" data-rating="5" class="text-gray-300 hover:text-amber-400 transition"><i data-lucide="star" class="w-6 h-6 fill-current"></i></button>
+              </div>
+            </div>
+            <div class="grid grid-cols-1 sm:grid-cols-2 gap-4">
+              <input type="text" id="review-name" placeholder="Tên của bạn" required class="w-full px-4 py-2.5 border border-gray-200 rounded-xl outline-none focus:border-[#c45e3a] transition text-sm">
+              <input type="email" id="review-email" placeholder="Email (bảo mật)" class="w-full px-4 py-2.5 border border-gray-200 rounded-xl outline-none focus:border-[#c45e3a] transition text-sm">
+            </div>
+            <textarea id="review-comment" placeholder="Bạn cảm nhận thế nào về kiểu dáng, chất liệu sản phẩm này?" required rows="3" class="w-full px-4 py-3 border border-gray-200 rounded-xl outline-none focus:border-[#c45e3a] transition text-sm"></textarea>
+            <button type="submit" class="bg-[#1a1a1a] text-white px-6 py-2.5 rounded-full text-xs font-semibold hover:bg-[#c45e3a] transition shadow-md">Gửi nhận xét</button>
+          </form>
+        </div>
+        
+        <!-- Comments list -->
+        <div class="mt-8 border-t border-gray-100 pt-8 space-y-6" id="product-reviews-list"></div>
+      </div>
 
-                        <g class="transition-all delay-400 opacity-100 duration-750 starting:opacity-0 motion-safe:starting:-translate-x-[26px] text-[#F3BEC7] dark:text-[#4B0600]">
-                            <mask id="path-2-mask" maskUnits="userSpaceOnUse" x="25.3357" y="103" width="338" height="299" fill="black">
-                                <rect fill="white" x="25.3357" y="103" width="338" height="299"/>
-                                <path d="M260.6 400.8C229.8 400.8 204.6 392.4 185 375.6C165.8 358.8 156.2 337 156.2 310.2H226.4C226.4 318.2 229.4 324.8 235.4 330C241.4 335.2 249.4 337.8 259.4 337.8C269 337.8 276.8 335 282.8 329.4C289.2 323.8 292.4 316.6 292.4 307.8C292.4 299.8 289.6 293.2 284 288C278.4 282.8 271.2 280.2 262.4 280.2H225.2V218.4H262.4C269.2 218.4 275 216 279.8 211.2C284.6 206.4 287 200.4 287 193.2C287 184.8 284.4 178.2 279.2 173.4C274 168.6 267.4 166.2 259.4 166.2C252.2 166.2 246 168.4 240.8 172.8C236 177.2 233.6 182.8 233.6 189.6H167C167 164.8 175.8 144.6 193.4 129C211 113 233.6 105 261.2 105C288.8 105 311.2 112.2 328.4 126.6C346 141 354.8 160 354.8 183.6C354.8 200.8 350.2 214.8 341 225.6C331.8 236 320 243.2 305.6 247.2C322.8 252 336.4 260.2 346.4 271.8C356.8 283.4 362 298 362 315.6C362 340.4 352.6 360.8 333.8 376.8C315 392.8 290.6 400.8 260.6 400.8Z"/>
-                                <path d="M52.5357 167.6H27.3357V105.2H120.336V400.2H52.5357V167.6Z"/>
-                            </mask>
-                            <path d="M260.6 400.8C229.8 400.8 204.6 392.4 185 375.6C165.8 358.8 156.2 337 156.2 310.2H226.4C226.4 318.2 229.4 324.8 235.4 330C241.4 335.2 249.4 337.8 259.4 337.8C269 337.8 276.8 335 282.8 329.4C289.2 323.8 292.4 316.6 292.4 307.8C292.4 299.8 289.6 293.2 284 288C278.4 282.8 271.2 280.2 262.4 280.2H225.2V218.4H262.4C269.2 218.4 275 216 279.8 211.2C284.6 206.4 287 200.4 287 193.2C287 184.8 284.4 178.2 279.2 173.4C274 168.6 267.4 166.2 259.4 166.2C252.2 166.2 246 168.4 240.8 172.8C236 177.2 233.6 182.8 233.6 189.6H167C167 164.8 175.8 144.6 193.4 129C211 113 233.6 105 261.2 105C288.8 105 311.2 112.2 328.4 126.6C346 141 354.8 160 354.8 183.6C354.8 200.8 350.2 214.8 341 225.6C331.8 236 320 243.2 305.6 247.2C322.8 252 336.4 260.2 346.4 271.8C356.8 283.4 362 298 362 315.6C362 340.4 352.6 360.8 333.8 376.8C315 392.8 290.6 400.8 260.6 400.8Z" fill="currentColor"/>
-                            <path d="M52.5357 167.6H27.3357V105.2H120.336V400.2H52.5357V167.6Z" fill="currentColor"/>
-                            <path d="M260.6 400.8C229.8 400.8 204.6 392.4 185 375.6C165.8 358.8 156.2 337 156.2 310.2H226.4C226.4 318.2 229.4 324.8 235.4 330C241.4 335.2 249.4 337.8 259.4 337.8C269 337.8 276.8 335 282.8 329.4C289.2 323.8 292.4 316.6 292.4 307.8C292.4 299.8 289.6 293.2 284 288C278.4 282.8 271.2 280.2 262.4 280.2H225.2V218.4H262.4C269.2 218.4 275 216 279.8 211.2C284.6 206.4 287 200.4 287 193.2C287 184.8 284.4 178.2 279.2 173.4C274 168.6 267.4 166.2 259.4 166.2C252.2 166.2 246 168.4 240.8 172.8C236 177.2 233.6 182.8 233.6 189.6H167C167 164.8 175.8 144.6 193.4 129C211 113 233.6 105 261.2 105C288.8 105 311.2 112.2 328.4 126.6C346 141 354.8 160 354.8 183.6C354.8 200.8 350.2 214.8 341 225.6C331.8 236 320 243.2 305.6 247.2C322.8 252 336.4 260.2 346.4 271.8C356.8 283.4 362 298 362 315.6C362 340.4 352.6 360.8 333.8 376.8C315 392.8 290.6 400.8 260.6 400.8Z" stroke="var(--stroke-color)" stroke-width="2.4" mask="url(#path-2-mask)"/>
-                            <path d="M52.5357 167.6H27.3357V105.2H120.336V400.2H52.5357V167.6Z" stroke="var(--stroke-color)" stroke-width="2.4" mask="url(#path-2-mask)"/>
-                        </g>
-                        
-                        <g class="mix-blend-color dark:mix-blend-hard-light transition-all delay-400 opacity-100 duration-750 starting:opacity-0 motion-safe:starting:-translate-x-[51px] text-[#F8B803] dark:text-[#391800]">
-                            <mask id="path-3-mask" maskUnits="userSpaceOnUse" x="51" y="103" width="338" height="299" fill="black">
-                                <rect fill="white" x="51" y="103" width="338" height="299"/>
-                                <path d="M286.264 400.8C255.464 400.8 230.264 392.4 210.664 375.6C191.464 358.8 181.864 337 181.864 310.2H252.064C252.064 318.2 255.064 324.8 261.064 330C267.064 335.2 275.064 337.8 285.064 337.8C294.664 337.8 302.464 335 308.464 329.4C314.864 323.8 318.064 316.6 318.064 307.8C318.064 299.8 315.264 293.2 309.664 288C304.064 282.8 296.864 280.2 288.064 280.2H250.864V218.4H288.064C294.864 218.4 300.664 216 305.464 211.2C310.264 206.4 312.664 200.4 312.664 193.2C312.664 184.8 310.064 178.2 304.864 173.4C299.664 168.6 293.064 166.2 285.064 166.2C277.864 166.2 271.664 168.4 266.464 172.8C261.664 177.2 259.264 182.8 259.264 189.6H192.664C192.664 164.8 201.464 144.6 219.064 129C236.664 113 259.264 105 286.864 105C314.464 105 336.864 112.2 354.064 126.6C371.664 141 380.464 160 380.464 183.6C380.464 200.8 375.864 214.8 366.664 225.6C357.464 236 345.664 243.2 331.264 247.2C348.464 252 362.064 260.2 372.064 271.8C382.464 283.4 387.664 298 387.664 315.6C387.664 340.4 378.264 360.8 359.464 376.8C340.664 392.8 316.264 400.8 286.264 400.8Z"/>
-                                <path d="M78.2 167.6H53V105.2H146V400.2H78.2V167.6Z"/>
-                            </mask>
-                            <path d="M286.264 400.8C255.464 400.8 230.264 392.4 210.664 375.6C191.464 358.8 181.864 337 181.864 310.2H252.064C252.064 318.2 255.064 324.8 261.064 330C267.064 335.2 275.064 337.8 285.064 337.8C294.664 337.8 302.464 335 308.464 329.4C314.864 323.8 318.064 316.6 318.064 307.8C318.064 299.8 315.264 293.2 309.664 288C304.064 282.8 296.864 280.2 288.064 280.2H250.864V218.4H288.064C294.864 218.4 300.664 216 305.464 211.2C310.264 206.4 312.664 200.4 312.664 193.2C312.664 184.8 310.064 178.2 304.864 173.4C299.664 168.6 293.064 166.2 285.064 166.2C277.864 166.2 271.664 168.4 266.464 172.8C261.664 177.2 259.264 182.8 259.264 189.6H192.664C192.664 164.8 201.464 144.6 219.064 129C236.664 113 259.264 105 286.864 105C314.464 105 336.864 112.2 354.064 126.6C371.664 141 380.464 160 380.464 183.6C380.464 200.8 375.864 214.8 366.664 225.6C357.464 236 345.664 243.2 331.264 247.2C348.464 252 362.064 260.2 372.064 271.8C382.464 283.4 387.664 298 387.664 315.6C387.664 340.4 378.264 360.8 359.464 376.8C340.664 392.8 316.264 400.8 286.264 400.8Z" fill="currentColor"/>
-                            <path d="M78.2 167.6H53V105.2H146V400.2H78.2V167.6Z" fill="currentColor"/>
-                            <path d="M286.264 400.8C255.464 400.8 230.264 392.4 210.664 375.6C191.464 358.8 181.864 337 181.864 310.2H252.064C252.064 318.2 255.064 324.8 261.064 330C267.064 335.2 275.064 337.8 285.064 337.8C294.664 337.8 302.464 335 308.464 329.4C314.864 323.8 318.064 316.6 318.064 307.8C318.064 299.8 315.264 293.2 309.664 288C304.064 282.8 296.864 280.2 288.064 280.2H250.864V218.4H288.064C294.864 218.4 300.664 216 305.464 211.2C310.264 206.4 312.664 200.4 312.664 193.2C312.664 184.8 310.064 178.2 304.864 173.4C299.664 168.6 293.064 166.2 285.064 166.2C277.864 166.2 271.664 168.4 266.464 172.8C261.664 177.2 259.264 182.8 259.264 189.6H192.664C192.664 164.8 201.464 144.6 219.064 129C236.664 113 259.264 105 286.864 105C314.464 105 336.864 112.2 354.064 126.6C371.664 141 380.464 160 380.464 183.6C380.464 200.8 375.864 214.8 366.664 225.6C357.464 236 345.664 243.2 331.264 247.2C348.464 252 362.064 260.2 372.064 271.8C382.464 283.4 387.664 298 387.664 315.6C387.664 340.4 378.264 360.8 359.464 376.8C340.664 392.8 316.264 400.8 286.264 400.8Z" stroke="var(--stroke-color)" stroke-width="2.4" mask="url(#path-3-mask)"/>
-                            <path d="M78.2 167.6H53V105.2H146V400.2H78.2V167.6Z" stroke="var(--stroke-color)" stroke-width="2.4" mask="url(#path-3-mask)"/>
-                        </g>
-                        
-                        <g class="mix-blend-multiply dark:mix-blend-normal transition-all delay-400 opacity-100 duration-750 starting:opacity-0 motion-safe:starting:-translate-x-[78px] text-[#F3BEC7] dark:text-[#733000]">
-                            <mask id="path-4-mask" maskUnits="userSpaceOnUse" x="76.6643" y="103" width="338" height="299" fill="black">
-                                <rect fill="white" x="76.6643" y="103" width="338" height="299"/>
-                                <path d="M311.929 400.8C281.129 400.8 255.929 392.4 236.329 375.6C217.129 358.8 207.529 337 207.529 310.2H277.729C277.729 318.2 280.729 324.8 286.729 330C292.729 335.2 300.729 337.8 310.729 337.8C320.329 337.8 328.129 335 334.129 329.4C340.529 323.8 343.729 316.6 343.729 307.8C343.729 299.8 340.929 293.2 335.329 288C329.729 282.8 322.529 280.2 313.729 280.2H276.529V218.4H313.729C320.529 218.4 326.329 216 331.129 211.2C335.929 206.4 338.329 200.4 338.329 193.2C338.329 184.8 335.729 178.2 330.529 173.4C325.329 168.6 318.729 166.2 310.729 166.2C303.529 166.2 297.329 168.4 292.129 172.8C287.329 177.2 284.929 182.8 284.929 189.6H218.329C218.329 164.8 227.129 144.6 244.729 129C262.329 113 284.929 105 312.529 105C340.129 105 362.529 112.2 379.729 126.6C397.329 141 406.129 160 406.129 183.6C406.129 200.8 401.529 214.8 392.329 225.6C383.129 236 371.329 243.2 356.929 247.2C374.129 252 387.729 260.2 397.729 271.8C408.129 283.4 413.329 298 413.329 315.6C413.329 340.4 403.929 360.8 385.129 376.8C366.329 392.8 341.929 400.8 311.929 400.8Z"/>
-                                <path d="M103.864 167.6H78.6643V105.2H171.664V400.2H103.864V167.6Z"/>
-                            </mask>
-                            <path d="M311.929 400.8C281.129 400.8 255.929 392.4 236.329 375.6C217.129 358.8 207.529 337 207.529 310.2H277.729C277.729 318.2 280.729 324.8 286.729 330C292.729 335.2 300.729 337.8 310.729 337.8C320.329 337.8 328.129 335 334.129 329.4C340.529 323.8 343.729 316.6 343.729 307.8C343.729 299.8 340.929 293.2 335.329 288C329.729 282.8 322.529 280.2 313.729 280.2H276.529V218.4H313.729C320.529 218.4 326.329 216 331.129 211.2C335.929 206.4 338.329 200.4 338.329 193.2C338.329 184.8 335.729 178.2 330.529 173.4C325.329 168.6 318.729 166.2 310.729 166.2C303.529 166.2 297.329 168.4 292.129 172.8C287.329 177.2 284.929 182.8 284.929 189.6H218.329C218.329 164.8 227.129 144.6 244.729 129C262.329 113 284.929 105 312.529 105C340.129 105 362.529 112.2 379.729 126.6C397.329 141 406.129 160 406.129 183.6C406.129 200.8 401.529 214.8 392.329 225.6C383.129 236 371.329 243.2 356.929 247.2C374.129 252 387.729 260.2 397.729 271.8C408.129 283.4 413.329 298 413.329 315.6C413.329 340.4 403.929 360.8 385.129 376.8C366.329 392.8 341.929 400.8 311.929 400.8Z" fill="currentColor"/>
-                            <path d="M103.864 167.6H78.6643V105.2H171.664V400.2H103.864V167.6Z" fill="currentColor"/>
-                            <path d="M311.929 400.8C281.129 400.8 255.929 392.4 236.329 375.6C217.129 358.8 207.529 337 207.529 310.2H277.729C277.729 318.2 280.729 324.8 286.729 330C292.729 335.2 300.729 337.8 310.729 337.8C320.329 337.8 328.129 335 334.129 329.4C340.529 323.8 343.729 316.6 343.729 307.8C343.729 299.8 340.929 293.2 335.329 288C329.729 282.8 322.529 280.2 313.729 280.2H276.529V218.4H313.729C320.529 218.4 326.329 216 331.129 211.2C335.929 206.4 338.329 200.4 338.329 193.2C338.329 184.8 335.729 178.2 330.529 173.4C325.329 168.6 318.729 166.2 310.729 166.2C303.529 166.2 297.329 168.4 292.129 172.8C287.329 177.2 284.929 182.8 284.929 189.6H218.329C218.329 164.8 227.129 144.6 244.729 129C262.329 113 284.929 105 312.529 105C340.129 105 362.529 112.2 379.729 126.6C397.329 141 406.129 160 406.129 183.6C406.129 200.8 401.529 214.8 392.329 225.6C383.129 236 371.329 243.2 356.929 247.2C374.129 252 387.729 260.2 397.729 271.8C408.129 283.4 413.329 298 413.329 315.6C413.329 340.4 403.929 360.8 385.129 376.8C366.329 392.8 341.929 400.8 311.929 400.8Z" stroke="var(--stroke-color)" stroke-width="2.4" mask="url(#path-4-mask)"/>
-                            <path d="M103.864 167.6H78.6643V105.2H171.664V400.2H103.864V167.6Z" stroke="var(--stroke-color)" stroke-width="2.4" mask="url(#path-4-mask)"/>
-                        </g>
-                        
-                        <g class="mix-blend-hard-light transition-all delay-400 opacity-100 duration-750 starting:opacity-0 motion-safe:starting:-translate-x-[102px] text-[#F3BEC7] dark:text-[#4B0600]">
-                            <mask id="path-5-mask" maskUnits="userSpaceOnUse" x="102.329" y="103" width="338" height="299" fill="black">
-                                <rect fill="white" x="102.329" y="103" width="338" height="299"/>
-                                <path d="M337.593 400.8C306.793 400.8 281.593 392.4 261.993 375.6C242.793 358.8 233.193 337 233.193 310.2H303.393C303.393 318.2 306.393 324.8 312.393 330C318.393 335.2 326.393 337.8 336.393 337.8C345.993 337.8 353.793 335 359.793 329.4C366.193 323.8 369.393 316.6 369.393 307.8C369.393 299.8 366.593 293.2 360.993 288C355.393 282.8 348.193 280.2 339.393 280.2H302.193V218.4H339.393C346.193 218.4 351.993 216 356.793 211.2C361.593 206.4 363.993 200.4 363.993 193.2C363.993 184.8 361.393 178.2 356.193 173.4C350.993 168.6 344.393 166.2 336.393 166.2C329.193 166.2 322.993 168.4 317.793 172.8C312.993 177.2 310.593 182.8 310.593 189.6H243.993C243.993 164.8 252.793 144.6 270.393 129C287.993 113 310.593 105 338.193 105C365.793 105 388.193 112.2 405.393 126.6C422.993 141 431.793 160 431.793 183.6C431.793 200.8 427.193 214.8 417.993 225.6C408.793 236 396.993 243.2 382.593 247.2C399.793 252 413.393 260.2 423.393 271.8C433.793 283.4 438.993 298 438.993 315.6C438.993 340.4 429.593 360.8 410.793 376.8C391.993 392.8 367.593 400.8 337.593 400.8Z"/>
-                                <path d="M129.529 167.6H104.329V105.2H197.329V400.2H129.529V167.6Z"/>
-                            </mask>
-                            <path d="M337.593 400.8C306.793 400.8 281.593 392.4 261.993 375.6C242.793 358.8 233.193 337 233.193 310.2H303.393C303.393 318.2 306.393 324.8 312.393 330C318.393 335.2 326.393 337.8 336.393 337.8C345.993 337.8 353.793 335 359.793 329.4C366.193 323.8 369.393 316.6 369.393 307.8C369.393 299.8 366.593 293.2 360.993 288C355.393 282.8 348.193 280.2 339.393 280.2H302.193V218.4H339.393C346.193 218.4 351.993 216 356.793 211.2C361.593 206.4 363.993 200.4 363.993 193.2C363.993 184.8 361.393 178.2 356.193 173.4C350.993 168.6 344.393 166.2 336.393 166.2C329.193 166.2 322.993 168.4 317.793 172.8C312.993 177.2 310.593 182.8 310.593 189.6H243.993C243.993 164.8 252.793 144.6 270.393 129C287.993 113 310.593 105 338.193 105C365.793 105 388.193 112.2 405.393 126.6C422.993 141 431.793 160 431.793 183.6C431.793 200.8 427.193 214.8 417.993 225.6C408.793 236 396.993 243.2 382.593 247.2C399.793 252 413.393 260.2 423.393 271.8C433.793 283.4 438.993 298 438.993 315.6C438.993 340.4 429.593 360.8 410.793 376.8C391.993 392.8 367.593 400.8 337.593 400.8Z" fill="currentColor"/>
-                            <path d="M129.529 167.6H104.329V105.2H197.329V400.2H129.529V167.6Z" fill="currentColor"/>
-                            <path d="M337.593 400.8C306.793 400.8 281.593 392.4 261.993 375.6C242.793 358.8 233.193 337 233.193 310.2H303.393C303.393 318.2 306.393 324.8 312.393 330C318.393 335.2 326.393 337.8 336.393 337.8C345.993 337.8 353.793 335 359.793 329.4C366.193 323.8 369.393 316.6 369.393 307.8C369.393 299.8 366.593 293.2 360.993 288C355.393 282.8 348.193 280.2 339.393 280.2H302.193V218.4H339.393C346.193 218.4 351.993 216 356.793 211.2C361.593 206.4 363.993 200.4 363.993 193.2C363.993 184.8 361.393 178.2 356.193 173.4C350.993 168.6 344.393 166.2 336.393 166.2C329.193 166.2 322.993 168.4 317.793 172.8C312.993 177.2 310.593 182.8 310.593 189.6H243.993C243.993 164.8 252.793 144.6 270.393 129C287.993 113 310.593 105 338.193 105C365.793 105 388.193 112.2 405.393 126.6C422.993 141 431.793 160 431.793 183.6C431.793 200.8 427.193 214.8 417.993 225.6C408.793 236 396.993 243.2 382.593 247.2C399.793 252 413.393 260.2 423.393 271.8C433.793 283.4 438.993 298 438.993 315.6C438.993 340.4 429.593 360.8 410.793 376.8C391.993 392.8 367.593 400.8 337.593 400.8Z" stroke="var(--stroke-color)" stroke-width="2.4" mask="url(#path-5-mask)"/>
-                            <path d="M129.529 167.6H104.329V105.2H197.329V400.2H129.529V167.6Z" stroke="var(--stroke-color)" stroke-width="2.4" mask="url(#path-5-mask)"/>
-                        </g>
-                    </svg>
-                    <div class="absolute inset-0 rounded-t-lg lg:rounded-t-none lg:rounded-r-lg shadow-[inset_0px_0px_0px_1px_rgba(26,26,0,0.16)] dark:shadow-[inset_0px_0px_0px_1px_#fffaed2d]"></div>
-                </div>
-            </main>
+      <!-- Related Products -->
+      <div class="mt-16">
+        <h3 class="font-heading text-2xl font-bold text-gray-800 mb-8">Có Thể Bạn Sẽ Thích</h3>
+        <div class="grid grid-cols-2 md:grid-cols-4 gap-6" id="related-product-grid"></div>
+      </div>
+    </div>
+
+    <!-- CART VIEW -->
+    <div id="cart-view" class="page-view hidden max-w-7xl mx-auto px-4 py-8 md:py-16">
+      <h1 class="font-heading text-3xl font-bold text-gray-800 mb-8">Giỏ Hàng Của Bạn</h1>
+      <div class="flex flex-col lg:flex-row gap-8">
+        <!-- Cart Items Table -->
+        <div class="flex-1 space-y-4" id="cart-items-wrapper"></div>
+        
+        <!-- Order Summary Card -->
+        <aside class="w-full lg:w-96 shrink-0" id="cart-summary-wrapper"></aside>
+      </div>
+    </div>
+
+    <!-- CHECKOUT VIEW -->
+    <div id="checkout-view" class="page-view hidden max-w-7xl mx-auto px-4 py-8 md:py-16">
+      <h1 class="font-heading text-3xl font-bold text-gray-800 mb-8">Thông Tin Thanh Toán</h1>
+      <div class="flex flex-col lg:flex-row gap-8">
+        <!-- Checkout Form -->
+        <form id="checkout-form" class="flex-1 bg-white rounded-3xl p-6 md:p-8 border border-[#e8e5e0] shadow-sm space-y-6">
+          <div class="space-y-4">
+            <h3 class="font-semibold text-lg text-gray-800 border-b border-gray-100 pb-2">Thông tin giao hàng</h3>
+            <div class="grid grid-cols-1 sm:grid-cols-2 gap-4">
+              <div class="space-y-1">
+                <label class="text-xs font-semibold text-gray-500">Họ và tên *</label>
+                <input type="text" id="checkout-name" placeholder="Nguyễn Văn A" required class="w-full px-4 py-2 border border-gray-200 rounded-xl outline-none focus:border-[#c45e3a] transition text-sm">
+              </div>
+              <div class="space-y-1">
+                <label class="text-xs font-semibold text-gray-500">Số điện thoại *</label>
+                <input type="tel" id="checkout-phone" placeholder="0901234567" required class="w-full px-4 py-2 border border-gray-200 rounded-xl outline-none focus:border-[#c45e3a] transition text-sm">
+              </div>
+            </div>
+            <div class="space-y-1">
+              <label class="text-xs font-semibold text-gray-500">Địa chỉ chi tiết (Số nhà, Tên đường, Quận, Thành phố) *</label>
+              <input type="text" id="checkout-address" placeholder="123 Đường Nguyễn Huệ, Quận 1, TP. HCM" required class="w-full px-4 py-2 border border-gray-200 rounded-xl outline-none focus:border-[#c45e3a] transition text-sm">
+            </div>
+            <div class="space-y-1">
+              <label class="text-xs font-semibold text-gray-500">Ghi chú giao hàng (Không bắt buộc)</label>
+              <textarea id="checkout-note" placeholder="Giao giờ hành chính, gọi trước khi giao..." rows="2" class="w-full px-4 py-2 border border-gray-200 rounded-xl outline-none focus:border-[#c45e3a] transition text-sm"></textarea>
+            </div>
+          </div>
+          
+          <div class="space-y-4">
+            <h3 class="font-semibold text-lg text-gray-800 border-b border-gray-100 pb-2">Phương thức thanh toán</h3>
+            <div class="grid grid-cols-1 sm:grid-cols-3 gap-3">
+              <label class="flex items-center justify-between p-4 border border-gray-200 hover:border-[#c45e3a] rounded-2xl cursor-pointer transition">
+                <span class="flex items-center gap-3">
+                  <span class="text-xl">💵</span>
+                  <span class="text-sm font-semibold text-gray-700">Thanh toán khi nhận hàng (COD)</span>
+                </span>
+                <input type="radio" name="payment-method" value="cod" checked class="accent-[#c45e3a]">
+              </label>
+              <label class="flex items-center justify-between p-4 border border-gray-200 hover:border-[#c45e3a] rounded-2xl cursor-pointer transition">
+                <span class="flex items-center gap-3">
+                  <span class="text-xl">💳</span>
+                  <span class="text-sm font-semibold text-gray-700">Chuyển khoản ngân hàng</span>
+                </span>
+                <input type="radio" name="payment-method" value="bank" class="accent-[#c45e3a]">
+              </label>
+              <label class="flex items-center justify-between p-4 border border-gray-200 hover:border-[#c45e3a] rounded-2xl cursor-pointer transition">
+                <span class="flex items-center gap-3">
+                  <span class="text-xl">⚡</span>
+                  <span class="text-sm font-semibold text-gray-700">Thanh toán Online (VNPAY/MoMo)</span>
+                </span>
+                <input type="radio" name="payment-method" value="online_vnpay" class="accent-[#c45e3a]">
+              </label>
+            </div>
+            
+            <div id="bank-info" class="hidden bg-[#faf9f7] border border-dashed border-gray-200 p-4 rounded-2xl text-xs space-y-2">
+              <p class="font-bold text-gray-700">Thông tin tài khoản ngân hàng:</p>
+              <p>Ngân hàng: Techcombank</p>
+              <p>Chủ tài khoản: CONG TY BEESTYLE VIET NAM</p>
+              <p>Số tài khoản: 1903456789012</p>
+              <p class="text-red-500 font-medium">Nội dung chuyển khoản: BEESTYLE + [Số điện thoại của bạn]</p>
+            </div>
+          </div>
+          
+          <button type="submit" class="w-full bg-[#1a1a1a] hover:bg-[#c45e3a] text-white py-4 rounded-full font-bold shadow-lg transition">Xác Nhận Đặt Hàng</button>
+        </form>
+        
+        <!-- Summary items checkout -->
+        <aside class="w-full lg:w-96 shrink-0 bg-white rounded-3xl p-6 border border-[#e8e5e0] shadow-sm space-y-4 h-fit">
+          <h3 class="font-semibold text-lg text-gray-800 border-b border-gray-100 pb-2">Đơn hàng của bạn</h3>
+          <div id="checkout-items-list" class="divide-y divide-gray-100 max-h-60 overflow-y-auto"></div>
+          <div class="border-t border-gray-200 pt-4 space-y-2 text-sm" id="checkout-summary-calc"></div>
+        </aside>
+      </div>
+    </div>
+
+    <!-- ORDERS VIEW (Order Purchase History) -->
+    <div id="orders-view" class="page-view hidden max-w-7xl mx-auto px-4 py-8 md:py-16">
+      <div class="flex items-center justify-between mb-8">
+        <div>
+          <h1 class="font-heading text-3xl font-bold text-gray-800">Lịch Sử Mua Hàng</h1>
+          <p class="text-gray-500 text-sm mt-1">Quản lý và tra cứu các đơn hàng đã đặt của bạn</p>
+        </div>
+        <button onclick="clearOrderHistory()" class="text-xs text-red-500 hover:text-red-700 font-semibold border border-red-200 hover:bg-red-50 px-3 py-2 rounded-xl transition">Xóa lịch sử đơn hàng</button>
+      </div>
+      
+      <div id="orders-list-container" class="space-y-6"></div>
+    </div>
+
+    <!-- PROFILE VIEW (User Settings) -->
+    <div id="profile-view" class="page-view hidden max-w-2xl mx-auto px-4 py-8 md:py-16">
+      <div class="bg-white rounded-3xl p-6 md:p-8 border border-[#e8e5e0] shadow-sm space-y-6">
+        <div>
+          <h1 class="font-heading text-2xl font-bold text-gray-800">Thông Tin Tài Khoản</h1>
+          <p class="text-xs text-gray-400 mt-1">Cập nhật thông tin cá nhân và thay đổi mật khẩu của bạn.</p>
+        </div>
+        <form id="profile-form" class="space-y-4 text-xs" onsubmit="handleProfileUpdate(event)">
+          <div class="space-y-1.5">
+            <label class="font-bold text-gray-500 uppercase tracking-wider">Họ và tên *</label>
+            <input type="text" id="profile-name" required class="w-full px-4 py-2.5 border border-gray-200 rounded-xl outline-none focus:border-[#c45e3a] transition text-sm">
+          </div>
+          <div class="space-y-1.5">
+            <label class="font-bold text-gray-500 uppercase tracking-wider">Email (Không thể sửa)</label>
+            <input type="email" id="profile-email" disabled class="w-full px-4 py-2.5 border border-gray-100 bg-gray-50 rounded-xl outline-none text-sm text-gray-400 cursor-not-allowed">
+          </div>
+          <div class="space-y-1.5">
+            <label class="font-bold text-gray-500 uppercase tracking-wider">Số điện thoại</label>
+            <input type="tel" id="profile-phone" class="w-full px-4 py-2.5 border border-gray-200 rounded-xl outline-none focus:border-[#c45e3a] transition text-sm">
+          </div>
+          <div class="space-y-1.5">
+            <label class="font-bold text-gray-500 uppercase tracking-wider">Mật khẩu mới (Bỏ trống nếu không đổi)</label>
+            <input type="password" id="profile-password" placeholder="Tối thiểu 6 ký tự" class="w-full px-4 py-2.5 border border-gray-200 rounded-xl outline-none focus:border-[#c45e3a] transition text-sm">
+          </div>
+          <button type="submit" class="w-full bg-[#1a1a1a] hover:bg-[#c45e3a] text-white py-3.5 rounded-full text-xs font-bold shadow-lg transition">Cập Nhật Thông Tin</button>
+        </form>
+      </div>
+    </div>
+
+    <!-- ORDER DETAIL VIEW -->
+    <div id="order-detail-view" class="page-view hidden max-w-4xl mx-auto px-4 py-8 md:py-16">
+      <a href="#/orders" class="inline-flex items-center gap-2 text-sm font-semibold text-gray-500 hover:text-black mb-6 transition">
+        <i data-lucide="arrow-left" class="w-4 h-4"></i> Quay lại đơn hàng
+      </a>
+      
+      <div class="bg-white rounded-3xl p-6 md:p-8 border border-gray-200 shadow-sm space-y-6">
+        <div class="flex flex-col sm:flex-row sm:items-center justify-between border-b border-gray-100 pb-4 gap-2">
+          <div>
+            <h2 class="font-heading text-2xl font-bold text-gray-800">Chi tiết đơn hàng: <span class="font-mono text-[#c45e3a]" id="cust-order-id"></span></h2>
+            <p class="text-xs text-gray-400 mt-1 font-semibold" id="cust-order-date"></p>
+          </div>
+          <span class="text-xs px-3 py-1 rounded-full font-semibold" id="cust-order-status"></span>
         </div>
 
-        @if (Route::has('login'))
-            <div class="h-14.5 hidden lg:block"></div>
-        @endif
-    </body>
+        <div class="py-4">
+          <div class="flex items-center justify-between w-full max-w-2xl mx-auto text-[10px] font-bold text-gray-400 relative" id="cust-order-stepper">
+          </div>
+        </div>
+
+        <div class="grid grid-cols-1 md:grid-cols-2 gap-6 pt-4 border-t border-gray-100">
+          <div class="space-y-2 bg-[#faf9f7] p-5 rounded-2xl border border-gray-100">
+            <h4 class="font-bold text-sm text-gray-800">Thông tin giao hàng</h4>
+            <div class="space-y-1.5 text-xs text-gray-600 font-light mt-2">
+              <p>👤 Người nhận: <span class="font-semibold text-gray-800" id="cust-order-name"></span></p>
+              <p>📞 Điện thoại: <span class="font-semibold text-gray-800" id="cust-order-phone"></span></p>
+              <p>🏠 Địa chỉ: <span class="font-semibold text-gray-800" id="cust-order-address"></span></p>
+              <p>✉️ Ghi chú: <span class="font-semibold text-gray-800" id="cust-order-note"></span></p>
+            </div>
+          </div>
+          
+          <div class="space-y-2 bg-[#faf9f7] p-5 rounded-2xl border border-gray-100">
+            <h4 class="font-bold text-sm text-gray-800">Thông tin thanh toán</h4>
+            <div class="space-y-1.5 text-xs text-gray-600 font-light mt-2">
+              <p>💳 Phương thức: <span class="font-semibold text-gray-800 uppercase" id="cust-order-payment-method"></span></p>
+              <p>💸 Trạng thái: <span class="font-semibold text-gray-800" id="cust-order-payment-status"></span></p>
+            </div>
+          </div>
+        </div>
+
+        <div class="space-y-3 pt-4 border-t border-gray-100">
+          <h4 class="font-bold text-sm text-gray-800">Sản phẩm đã chọn</h4>
+          <div class="divide-y divide-gray-100 mt-2" id="cust-order-items-tbody">
+          </div>
+        </div>
+
+        <div class="border-t border-gray-100 pt-4 flex flex-col items-end space-y-1.5 text-xs">
+          <div class="flex justify-between w-full max-w-[280px] text-gray-500 font-light">
+            <span>Tạm tính:</span>
+            <span class="font-semibold text-gray-800" id="cust-order-subtotal"></span>
+          </div>
+          <div class="flex justify-between w-full max-w-[280px] text-gray-500 font-light">
+            <span>Giảm giá (Voucher):</span>
+            <span class="font-semibold text-gray-800" id="cust-order-discount"></span>
+          </div>
+          <div class="flex justify-between w-full max-w-[280px] text-sm font-bold text-gray-800 border-t border-gray-100 pt-2">
+            <span>Tổng thanh toán:</span>
+            <span class="text-lg text-[#c45e3a]" id="cust-order-total"></span>
+          </div>
+        </div>
+
+        <div class="flex justify-end pt-4 border-t border-gray-100 hidden" id="cust-order-action-div">
+          <button onclick="cancelClientOrderFromDetails()" class="text-xs text-red-500 hover:text-red-700 font-semibold border border-red-100 hover:bg-red-50 px-5 py-2.5 rounded-xl transition">Hủy đơn hàng này</button>
+        </div>
+      </div>
+    </div>
+
+    <!-- ADMIN VIEW -->
+    <div id="admin-view" class="page-view hidden w-full min-h-screen flex bg-[#f8f9fc]">
+      <!-- Sidebar -->
+      <aside id="admin-sidebar" class="fixed md:static inset-y-0 left-0 z-20 w-64 -translate-x-full md:translate-x-0 bg-gradient-to-b from-[#4e73df] to-[#224abe] text-white flex flex-col shrink-0 transition-all duration-300 shadow-xl md:shadow-none">
+        <!-- Brand -->
+        <a href="#/" class="h-16 flex items-center justify-center gap-2 border-b border-white/10 px-4">
+          <span class="text-2xl animate-pulse">🐝</span>
+          <span class="font-heading font-bold text-lg tracking-wider sidebar-text">Beestyle Admin</span>
+        </a>
+        
+        <!-- Sidebar Navigation -->
+        <div class="flex-1 py-4 space-y-1 overflow-y-auto">
+          <div class="px-6 text-[10px] uppercase font-bold text-white/40 tracking-wider sidebar-text mb-2">Bảng điều khiển</div>
+          
+          <button onclick="switchAdminTab('stat')" id="btn-admin-sidebar-stat" class="w-full flex items-center gap-3 px-6 py-3 text-sm font-semibold transition text-white border-l-4 border-white bg-white/10 text-left outline-none">
+            <i data-lucide="layout-dashboard" class="w-5 h-5 shrink-0"></i>
+            <span class="sidebar-text">Dashboard</span>
+          </button>
+
+          <div class="h-px bg-white/10 my-2"></div>
+          
+          <div class="px-6 text-[10px] uppercase font-bold text-white/40 tracking-wider sidebar-text mb-2">Quản lý cửa hàng</div>
+
+          <button onclick="switchAdminTab('prod')" id="btn-admin-sidebar-prod" class="w-full flex items-center gap-3 px-6 py-3 text-sm font-semibold transition text-white/60 hover:text-white hover:bg-white/5 border-l-4 border-transparent text-left outline-none">
+            <i data-lucide="package" class="w-5 h-5 shrink-0"></i>
+            <span class="sidebar-text">Sản phẩm</span>
+          </button>
+
+          <button onclick="switchAdminTab('ord')" id="btn-admin-sidebar-ord" class="w-full flex items-center gap-3 px-6 py-3 text-sm font-semibold transition text-white/60 hover:text-white hover:bg-white/5 border-l-4 border-transparent text-left outline-none">
+            <i data-lucide="shopping-cart" class="w-5 h-5 shrink-0"></i>
+            <span class="sidebar-text">Đơn hàng</span>
+          </button>
+
+          <button onclick="switchAdminTab('voucher')" id="btn-admin-sidebar-voucher" class="w-full flex items-center gap-3 px-6 py-3 text-sm font-semibold transition text-white/60 hover:text-white hover:bg-white/5 border-l-4 border-transparent text-left outline-none">
+            <i data-lucide="ticket" class="w-5 h-5 shrink-0"></i>
+            <span class="sidebar-text">Vouchers</span>
+          </button>
+
+          <button onclick="switchAdminTab('user')" id="btn-admin-sidebar-user" class="w-full flex items-center gap-3 px-6 py-3 text-sm font-semibold transition text-white/60 hover:text-white hover:bg-white/5 border-l-4 border-transparent text-left outline-none">
+            <i data-lucide="users" class="w-5 h-5 shrink-0"></i>
+            <span class="sidebar-text">Người dùng</span>
+          </button>
+
+          <button onclick="switchAdminTab('review')" id="btn-admin-sidebar-review" class="w-full flex items-center gap-3 px-6 py-3 text-sm font-semibold transition text-white/60 hover:text-white hover:bg-white/5 border-l-4 border-transparent text-left outline-none">
+            <i data-lucide="message-square" class="w-5 h-5 shrink-0"></i>
+            <span class="sidebar-text">Đánh giá</span>
+          </button>
+          
+          <div class="h-px bg-white/10 my-2"></div>
+          
+          <a href="#/" class="flex items-center gap-3 px-6 py-3 text-sm font-semibold transition text-white/60 hover:text-white hover:bg-white/5 text-left">
+            <i data-lucide="arrow-left-right" class="w-5 h-5 shrink-0"></i>
+            <span class="sidebar-text">Xem Cửa Hàng</span>
+          </a>
+        </div>
+
+        <!-- Sidebar Toggler -->
+        <div class="p-4 flex justify-center border-t border-white/10">
+          <button onclick="toggleAdminSidebar()" class="w-8 h-8 rounded-full bg-white/10 flex items-center justify-center hover:bg-white/20 transition outline-none">
+            <i data-lucide="chevron-left" id="sidebar-toggle-icon" class="w-4 h-4"></i>
+          </button>
+        </div>
+      </aside>
+
+      <!-- Content Area -->
+      <div class="flex-grow flex flex-col min-w-0">
+        <!-- Topbar -->
+        <header class="h-16 bg-white border-b border-gray-200 flex items-center justify-between px-6 shadow-sm z-10">
+          <div class="flex items-center gap-4">
+            <button onclick="toggleAdminSidebarMobile()" class="md:hidden p-2 hover:bg-gray-100 rounded-full transition text-gray-500">
+              <i data-lucide="menu" class="w-5 h-5"></i>
+            </button>
+            <div class="relative hidden sm:block">
+              <input type="text" placeholder="Tìm kiếm nhanh..." class="w-64 bg-gray-100 border border-gray-200 rounded-xl px-4 py-1.5 text-xs outline-none focus:border-[#4e73df] transition">
+              <button class="absolute right-2 top-1.5 text-gray-400 hover:text-[#4e73df]"><i data-lucide="search" class="w-4 h-4"></i></button>
+            </div>
+          </div>
+
+          <div class="flex items-center gap-4">
+            <!-- Notifications -->
+            <div class="relative">
+              <button class="p-2 hover:bg-gray-100 rounded-full transition text-gray-500 relative">
+                <i data-lucide="bell" class="w-5 h-5"></i>
+                <span class="absolute top-1 right-1 w-2 h-2 bg-red-500 rounded-full"></span>
+              </button>
+            </div>
+
+            <!-- Messages -->
+            <div class="relative">
+              <button class="p-2 hover:bg-gray-100 rounded-full transition text-gray-500 relative">
+                <i data-lucide="mail" class="w-5 h-5"></i>
+                <span class="absolute top-1 right-1 w-2 h-2 bg-[#4e73df] rounded-full"></span>
+              </button>
+            </div>
+
+            <div class="h-8 w-px bg-gray-200"></div>
+
+            <!-- Profile Info -->
+            <div class="flex items-center gap-2">
+              <span class="text-xs font-semibold text-gray-600 hidden md:inline">Beestyle Admin</span>
+              <img src="https://images.unsplash.com/photo-1534528741775-53994a69daeb?w=100&auto=format&fit=crop&q=80" alt="Avatar" class="w-8 h-8 rounded-full object-cover border border-[#4e73df]/20">
+            </div>
+          </div>
+        </header>
+
+        <!-- Page Content -->
+        <div class="flex-grow p-6 overflow-y-auto space-y-6">
+          
+          <!-- Stat Tab (Dashboard) -->
+          <div id="admin-tab-stat" class="admin-tab space-y-6">
+            <!-- Page Header -->
+            <div class="flex flex-col sm:flex-row sm:items-center sm:justify-between gap-4">
+              <div>
+                <h1 class="font-heading text-2xl font-bold text-gray-800">Dashboard</h1>
+                <p class="text-xs text-gray-500">Xem thống kê và doanh số cửa hàng thời trang Beestyle.</p>
+              </div>
+              <button class="bg-[#4e73df] hover:bg-[#2e59d9] text-white text-xs font-bold px-4 py-2.5 rounded-xl shadow-md shadow-[#4e73df]/20 transition flex items-center gap-2">
+                <i data-lucide="download-cloud" class="w-4 h-4"></i> Tải Báo Cáo
+              </button>
+            </div>
+
+            <!-- Stat widgets (SB Admin 2 Cards) -->
+            <div class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-6">
+              <!-- Earnings Monthly Card -->
+              <div class="bg-white p-5 rounded-xl border-l-4 border-[#4e73df] shadow-sm flex items-center justify-between">
+                <div>
+                  <p class="text-[10px] text-[#4e73df] uppercase font-bold tracking-wider">Doanh Thu (Tổng cộng)</p>
+                  <h3 class="text-xl font-bold text-gray-800 mt-1" id="stat-revenue">0₫</h3>
+                </div>
+                <div class="text-gray-300"><i data-lucide="dollar-sign" class="w-8 h-8"></i></div>
+              </div>
+              
+              <!-- Orders Count Card -->
+              <div class="bg-white p-5 rounded-xl border-l-4 border-[#1cc88a] shadow-sm flex items-center justify-between">
+                <div>
+                  <p class="text-[10px] text-[#1cc88a] uppercase font-bold tracking-wider">Đơn Hàng</p>
+                  <h3 class="text-xl font-bold text-gray-800 mt-1" id="stat-orders-count">0</h3>
+                </div>
+                <div class="text-gray-300"><i data-lucide="shopping-bag" class="w-8 h-8"></i></div>
+              </div>
+              
+              <!-- Products Count Card -->
+              <div class="bg-white p-5 rounded-xl border-l-4 border-[#36b9cc] shadow-sm flex items-center justify-between">
+                <div>
+                  <p class="text-[10px] text-[#36b9cc] uppercase font-bold tracking-wider">Sản Phẩm</p>
+                  <h3 class="text-xl font-bold text-gray-800 mt-1" id="stat-products-count">0</h3>
+                </div>
+                <div class="text-gray-300"><i data-lucide="package" class="w-8 h-8"></i></div>
+              </div>
+              
+              <!-- Reviews Count Card -->
+              <div class="bg-white p-5 rounded-xl border-l-4 border-[#f6c23e] shadow-sm flex items-center justify-between">
+                <div>
+                  <p class="text-[10px] text-[#f6c23e] uppercase font-bold tracking-wider">Đánh Giá</p>
+                  <h3 class="text-xl font-bold text-gray-800 mt-1" id="stat-reviews-count">0</h3>
+                </div>
+                <div class="text-gray-300"><i data-lucide="star" class="w-8 h-8"></i></div>
+              </div>
+            </div>
+
+            <!-- Charts Row (SB Admin 2 style charts) -->
+            <div class="grid grid-cols-1 lg:grid-cols-3 gap-6">
+              <!-- Line Chart (Earnings Overview) -->
+              <div class="lg:col-span-2 bg-white rounded-xl border border-gray-200 shadow-sm overflow-hidden flex flex-col">
+                <div class="bg-gray-50 px-5 py-4 border-b border-gray-200 flex items-center justify-between">
+                  <h3 class="font-bold text-sm text-[#4e73df]">Tổng Quan Doanh Thu</h3>
+                  <button class="text-gray-400 hover:text-gray-600"><i data-lucide="more-vertical" class="w-4 h-4"></i></button>
+                </div>
+                <div class="p-5 flex-grow flex items-center justify-center" style="position: relative; height: 320px;">
+                  <canvas id="earningsAreaChart"></canvas>
+                </div>
+              </div>
+
+              <!-- Doughnut Chart (Revenue Sources) -->
+              <div class="bg-white rounded-xl border border-gray-200 shadow-sm overflow-hidden flex flex-col">
+                <div class="bg-gray-50 px-5 py-4 border-b border-gray-200 flex items-center justify-between">
+                  <h3 class="font-bold text-sm text-[#4e73df]">Nguồn Doanh Thu</h3>
+                  <button class="text-gray-400 hover:text-gray-600"><i data-lucide="more-vertical" class="w-4 h-4"></i></button>
+                </div>
+                <div class="p-5 flex-grow flex flex-col justify-center items-center" style="position: relative; height: 320px;">
+                  <div class="w-full flex-grow max-h-[220px]">
+                    <canvas id="revenuePieChart"></canvas>
+                  </div>
+                  <div class="flex justify-center gap-4 text-xs mt-4" id="pie-chart-legend"></div>
+                </div>
+              </div>
+            </div>
+            
+            <!-- Top products & activities -->
+            <div class="grid grid-cols-1 lg:grid-cols-2 gap-6">
+              <!-- Top Selling Products Card -->
+              <div class="bg-white rounded-xl border border-gray-200 shadow-sm overflow-hidden">
+                <div class="bg-gray-50 px-5 py-4 border-b border-gray-200 flex items-center justify-between">
+                  <h3 class="font-bold text-sm text-gray-800">Top Sản Phẩm Giá Trị Nhất</h3>
+                </div>
+                <div class="p-5 overflow-x-auto">
+                  <table class="w-full text-xs text-left border-collapse">
+                    <thead>
+                      <tr class="text-[10px] text-gray-400 uppercase border-b border-gray-100">
+                        <th class="py-2.5 pb-3">Sản phẩm</th>
+                        <th class="py-2.5 pb-3 text-right">Giá tiền</th>
+                        <th class="py-2.5 pb-3 text-right">Đánh giá</th>
+                      </tr>
+                    </thead>
+                    <tbody id="top-products-tbody"></tbody>
+                  </table>
+                </div>
+              </div>
+              
+              <!-- Recent Activity Log Card -->
+              <div class="bg-white rounded-xl border border-gray-200 shadow-sm overflow-hidden">
+                <div class="bg-gray-50 px-5 py-4 border-b border-gray-200">
+                  <h3 class="font-bold text-sm text-gray-800">Hoạt Động Gần Đây</h3>
+                </div>
+                <div class="p-5 space-y-4 max-h-[300px] overflow-y-auto" id="recent-orders-list"></div>
+              </div>
+            </div>
+          </div>
+
+          <!-- Product Management Tab -->
+          <div id="admin-tab-prod" class="admin-tab hidden grid grid-cols-1 lg:grid-cols-3 gap-6">
+            <!-- Add/Edit form -->
+            <div class="bg-white p-5 rounded-xl border border-gray-200 shadow-sm h-fit">
+              <h3 class="font-bold text-gray-800 text-sm mb-4" id="admin-prod-form-title">Thêm Sản Phẩm Mới</h3>
+              <form id="admin-product-form" class="space-y-3">
+                <input type="hidden" id="admin-prod-id">
+                
+                <div class="space-y-1">
+                  <label class="text-[10px] text-gray-500 font-semibold uppercase">Tên sản phẩm *</label>
+                  <input type="text" id="admin-prod-name" placeholder="Áo thun polo Beestyle" required class="w-full px-3 py-2 border border-gray-200 rounded-xl outline-none focus:border-[#4e73df] transition text-xs">
+                </div>
+                
+                <div class="grid grid-cols-2 gap-3">
+                  <div class="space-y-1">
+                    <label class="text-[10px] text-gray-500 font-semibold uppercase">Giá bán (₫) *</label>
+                    <input type="number" id="admin-prod-price" placeholder="350000" required class="w-full px-3 py-2 border border-gray-200 rounded-xl outline-none focus:border-[#4e73df] transition text-xs">
+                  </div>
+                  <div class="space-y-1">
+                    <label class="text-[10px] text-gray-500 font-semibold uppercase">Giá cũ (₫)</label>
+                    <input type="number" id="admin-prod-old-price" placeholder="450000" class="w-full px-3 py-2 border border-gray-200 rounded-xl outline-none focus:border-[#4e73df] transition text-xs">
+                  </div>
+                </div>
+                
+                <div class="grid grid-cols-3 gap-3">
+                  <div class="space-y-1">
+                    <label class="text-[10px] text-gray-500 font-semibold uppercase">Danh mục *</label>
+                    <select id="admin-prod-category" required class="w-full px-3 py-2 border border-gray-200 rounded-xl outline-none focus:border-[#4e73df] transition text-xs bg-white cursor-pointer">
+                      <option value="shirt">Áo Nam & Nữ</option>
+                      <option value="pants">Quần Jeans & Tây</option>
+                      <option value="dress">Váy Đầm Dạo Phố</option>
+                      <option value="accessories">Phụ kiện</option>
+                    </select>
+                  </div>
+                  <div class="space-y-1">
+                    <label class="text-[10px] text-gray-500 font-semibold uppercase">Nhãn/Tag</label>
+                    <input type="text" id="admin-prod-tag" placeholder="Mới, Hot, Sale" class="w-full px-3 py-2 border border-gray-200 rounded-xl outline-none focus:border-[#4e73df] transition text-xs">
+                  </div>
+                  <div class="space-y-1">
+                    <label class="text-[10px] text-gray-500 font-semibold uppercase">Tồn kho *</label>
+                    <input type="number" id="admin-prod-stock" placeholder="50" required value="50" class="w-full px-3 py-2 border border-gray-200 rounded-xl outline-none focus:border-[#4e73df] transition text-xs">
+                  </div>
+                </div>
+                
+                <div class="space-y-1">
+                  <label class="text-[10px] text-gray-500 font-semibold uppercase">Đường dẫn ảnh Unsplash *</label>
+                  <input type="url" id="admin-prod-image" placeholder="https://images.unsplash.com/..." class="w-full px-3 py-2 border border-gray-200 rounded-xl outline-none focus:border-[#4e73df] transition text-xs">
+                </div>
+                
+                <div class="grid grid-cols-2 gap-3">
+                  <div class="space-y-1">
+                    <label class="text-[10px] text-gray-500 font-semibold uppercase">Các Size (Cắt bằng dấu phẩy) *</label>
+                    <input type="text" id="admin-prod-sizes" placeholder="S, M, L, XL" required value="S, M, L, XL" class="w-full px-3 py-2 border border-gray-200 rounded-xl outline-none focus:border-[#4e73df] transition text-xs">
+                  </div>
+                  <div class="space-y-1">
+                    <label class="text-[10px] text-gray-500 font-semibold uppercase">Các Màu (Cắt bằng dấu phẩy) *</label>
+                    <input type="text" id="admin-prod-colors" placeholder="Trắng, Đen, Xanh" required value="Trắng, Đen" class="w-full px-3 py-2 border border-gray-200 rounded-xl outline-none focus:border-[#4e73df] transition text-xs">
+                  </div>
+                </div>
+                
+                <div class="space-y-1">
+                  <label class="text-[10px] text-gray-500 font-semibold uppercase">Mô tả sản phẩm *</label>
+                  <textarea id="admin-prod-desc" placeholder="Chất liệu cotton co giãn nhẹ..." required rows="3" class="w-full px-3 py-2 border border-gray-200 rounded-xl outline-none focus:border-[#4e73df] transition text-xs"></textarea>
+                </div>
+                
+                <div class="flex gap-2 pt-2">
+                  <button type="submit" class="flex-1 bg-[#4e73df] hover:bg-[#2e59d9] text-white py-2.5 rounded-xl font-semibold transition text-xs" id="btn-admin-prod-submit">Lưu sản phẩm</button>
+                  <button type="button" onclick="resetAdminProductForm()" class="px-4 py-2.5 border border-gray-200 hover:bg-gray-50 rounded-xl transition text-xs text-gray-500">Hủy</button>
+                </div>
+              </form>
+            </div>
+            
+            <!-- Products list Table -->
+            <div class="lg:col-span-2 bg-white p-5 rounded-xl border border-gray-200 shadow-sm space-y-4">
+              <div class="flex items-center justify-between">
+                <h3 class="font-bold text-gray-800 text-sm">Danh Sách Sản Phẩm</h3>
+                <button onclick="restoreDefaultProducts()" class="text-xs font-semibold text-[#4e73df] hover:text-[#2e59d9] border border-[#4e73df] px-3 py-1.5 rounded-xl hover:bg-[#4e73df]/5 transition">Khôi phục mặc định</button>
+              </div>
+              <div class="overflow-x-auto">
+                <table class="w-full text-xs text-left border-collapse">
+                  <thead>
+                    <tr class="text-[10px] text-gray-400 uppercase border-b border-gray-100">
+                      <th class="py-3 px-2">Ảnh</th>
+                      <th class="py-3 px-2">Tên sản phẩm</th>
+                      <th class="py-3 px-2">Danh mục</th>
+                      <th class="py-3 px-2 text-right">Giá tiền</th>
+                      <th class="py-3 px-2 text-center">Tồn kho</th>
+                      <th class="py-3 px-2 text-center">Hành động</th>
+                    </tr>
+                  </thead>
+                  <tbody id="admin-products-tbody" class="divide-y divide-gray-100"></tbody>
+                </table>
+              </div>
+            </div>
+          </div>
+          
+          <!-- Order Management Tab -->
+          <div id="admin-tab-ord" class="admin-tab hidden bg-white p-5 rounded-xl border border-gray-200 shadow-sm space-y-4">
+            <h3 class="font-bold text-gray-800 text-sm">Danh Sách Đơn Hàng Đã Đặt</h3>
+            <div class="overflow-x-auto">
+              <table class="w-full text-xs text-left border-collapse">
+                <thead>
+                  <tr class="text-[10px] text-gray-400 uppercase border-b border-gray-100">
+                    <th class="py-3 px-2">Mã Đơn</th>
+                    <th class="py-3 px-2">Ngày Đặt</th>
+                    <th class="py-3 px-2">Khách Hàng</th>
+                    <th class="py-3 px-2">Địa Chỉ</th>
+                    <th class="py-3 px-2 text-right">Tổng Tiền</th>
+                    <th class="py-3 px-2 text-center">Trạng Thái</th>
+                    <th class="py-3 px-2 text-center">Hành Động</th>
+                  </tr>
+                </thead>
+                <tbody id="admin-orders-tbody" class="divide-y divide-gray-100"></tbody>
+              </table>
+            </div>
+            <div id="admin-orders-empty" class="hidden text-center py-12 text-gray-400">
+              Chưa có đơn hàng nào được đặt trên hệ thống.
+            </div>
+          </div>
+
+          <!-- Voucher Management Tab -->
+          <div id="admin-tab-voucher" class="admin-tab hidden grid grid-cols-1 lg:grid-cols-3 gap-6">
+            <!-- Add/Edit Voucher Form -->
+            <div class="bg-white p-5 rounded-xl border border-gray-200 shadow-sm h-fit text-xs">
+              <h3 class="font-bold text-gray-800 text-sm mb-4" id="admin-voucher-form-title">Thêm Voucher Mới</h3>
+              <form id="admin-voucher-form" class="space-y-3" onsubmit="handleAdminVoucherSubmit(event)">
+                <input type="hidden" id="admin-voucher-id">
+                
+                <div class="space-y-1">
+                  <label class="text-[10px] text-gray-500 font-semibold uppercase">Mã Voucher *</label>
+                  <input type="text" id="admin-voucher-code" placeholder="BEESTYLE50" required class="w-full px-3 py-2 border border-gray-200 rounded-xl outline-none focus:border-[#4e73df] transition text-xs">
+                </div>
+
+                <div class="grid grid-cols-2 gap-3">
+                  <div class="space-y-1">
+                    <label class="text-[10px] text-gray-500 font-semibold uppercase">Phần trăm giảm (%) *</label>
+                    <input type="number" id="admin-voucher-percent" placeholder="10" min="1" max="100" required class="w-full px-3 py-2 border border-gray-200 rounded-xl outline-none focus:border-[#4e73df] transition text-xs">
+                  </div>
+                  <div class="space-y-1">
+                    <label class="text-[10px] text-gray-500 font-semibold uppercase">Giảm tối đa (₫)</label>
+                    <input type="number" id="admin-voucher-max-discount" placeholder="50000" class="w-full px-3 py-2 border border-gray-200 rounded-xl outline-none focus:border-[#4e73df] transition text-xs">
+                  </div>
+                </div>
+
+                <div class="grid grid-cols-2 gap-3">
+                  <div class="space-y-1">
+                    <label class="text-[10px] text-gray-500 font-semibold uppercase">Giới hạn sử dụng</label>
+                    <input type="number" id="admin-voucher-limit" placeholder="100" class="w-full px-3 py-2 border border-gray-200 rounded-xl outline-none focus:border-[#4e73df] transition text-xs">
+                  </div>
+                  <div class="space-y-1">
+                    <label class="text-[10px] text-gray-500 font-semibold uppercase">Ngày hết hạn *</label>
+                    <input type="date" id="admin-voucher-expiry" required class="w-full px-3 py-2 border border-gray-200 rounded-xl outline-none focus:border-[#4e73df] transition text-xs bg-white">
+                  </div>
+                </div>
+
+                <div class="flex gap-2 pt-2">
+                  <button type="submit" class="flex-1 bg-[#4e73df] hover:bg-[#2e59d9] text-white py-2 rounded-xl font-semibold transition text-xs" id="btn-admin-voucher-submit">Lưu Voucher</button>
+                  <button type="button" onclick="resetAdminVoucherForm()" class="px-4 py-2 border border-gray-200 hover:bg-gray-50 rounded-xl transition text-xs text-gray-500">Hủy</button>
+                </div>
+              </form>
+            </div>
+
+            <!-- Vouchers List Table -->
+            <div class="lg:col-span-2 bg-white p-5 rounded-xl border border-gray-200 shadow-sm space-y-4">
+              <h3 class="font-bold text-gray-800 text-sm">Danh Sách Mã Giảm Giá</h3>
+              <div class="overflow-x-auto">
+                <table class="w-full text-xs text-left border-collapse">
+                  <thead>
+                    <tr class="text-[10px] text-gray-400 uppercase border-b border-gray-100">
+                      <th class="py-3 px-2">Mã code</th>
+                      <th class="py-3 px-2 text-center">Giảm %</th>
+                      <th class="py-3 px-2 text-right">Giảm tối đa</th>
+                      <th class="py-3 px-2 text-center">Lượt dùng</th>
+                      <th class="py-3 px-2 text-center">Hết hạn</th>
+                      <th class="py-3 px-2 text-center">Hành động</th>
+                    </tr>
+                  </thead>
+                  <tbody id="admin-vouchers-tbody" class="divide-y divide-gray-100"></tbody>
+                </table>
+              </div>
+            </div>
+          </div>
+
+          <!-- User Management Tab -->
+          <div id="admin-tab-user" class="admin-tab hidden grid grid-cols-1 lg:grid-cols-3 gap-6">
+            <!-- Edit User Form -->
+            <div class="bg-white p-5 rounded-xl border border-gray-200 shadow-sm h-fit text-xs">
+              <h3 class="font-bold text-gray-800 text-sm mb-4" id="admin-user-form-title">Cập Nhật Người Dùng</h3>
+              <form id="admin-user-form" class="space-y-3" onsubmit="handleAdminUserSubmit(event)">
+                <input type="hidden" id="admin-user-id">
+                
+                <div class="space-y-1">
+                  <label class="text-[10px] text-gray-500 font-semibold uppercase">Họ và tên *</label>
+                  <input type="text" id="admin-user-name" placeholder="Nguyễn Văn A" required class="w-full px-3 py-2 border border-gray-200 rounded-xl outline-none focus:border-[#4e73df] transition text-xs">
+                </div>
+
+                <div class="space-y-1">
+                  <label class="text-[10px] text-gray-500 font-semibold uppercase">Email *</label>
+                  <input type="email" id="admin-user-email" placeholder="email@beestyle.vn" required class="w-full px-3 py-2 border border-gray-200 rounded-xl outline-none focus:border-[#4e73df] transition text-xs">
+                </div>
+
+                <div class="grid grid-cols-2 gap-3">
+                  <div class="space-y-1">
+                    <label class="text-[10px] text-gray-500 font-semibold uppercase">Số điện thoại</label>
+                    <input type="text" id="admin-user-phone" placeholder="0901234567" class="w-full px-3 py-2 border border-gray-200 rounded-xl outline-none focus:border-[#4e73df] transition text-xs">
+                  </div>
+                  <div class="space-y-1">
+                    <label class="text-[10px] text-gray-500 font-semibold uppercase">Vai trò *</label>
+                    <select id="admin-user-role" required class="w-full px-3 py-2 border border-gray-200 rounded-xl outline-none focus:border-[#4e73df] transition text-xs bg-white cursor-pointer">
+                      <option value="Customer">Customer</option>
+                      <option value="Admin">Admin</option>
+                    </select>
+                  </div>
+                </div>
+
+                <div class="space-y-1">
+                  <label class="text-[10px] text-gray-500 font-semibold uppercase">Mật khẩu mới (Bỏ trống nếu giữ nguyên)</label>
+                  <input type="password" id="admin-user-password" placeholder="••••••••" class="w-full px-3 py-2 border border-gray-200 rounded-xl outline-none focus:border-[#4e73df] transition text-xs">
+                </div>
+
+                <div class="flex gap-2 pt-2">
+                  <button type="submit" class="flex-1 bg-[#4e73df] hover:bg-[#2e59d9] text-white py-2 rounded-xl font-semibold transition text-xs" id="btn-admin-user-submit">Cập nhật tài khoản</button>
+                  <button type="button" onclick="resetAdminUserForm()" class="px-4 py-2 border border-gray-200 hover:bg-gray-50 rounded-xl transition text-xs text-gray-500">Hủy</button>
+                </div>
+              </form>
+            </div>
+
+            <!-- Users List Table -->
+            <div class="lg:col-span-2 bg-white p-5 rounded-xl border border-gray-200 shadow-sm space-y-4">
+              <h3 class="font-bold text-gray-800 text-sm">Danh Sách Người Dùng</h3>
+              <div class="overflow-x-auto">
+                <table class="w-full text-xs text-left border-collapse">
+                  <thead>
+                    <tr class="text-[10px] text-gray-400 uppercase border-b border-gray-100">
+                      <th class="py-3 px-2">Họ và tên</th>
+                      <th class="py-3 px-2">Email</th>
+                      <th class="py-3 px-2">Số điện thoại</th>
+                      <th class="py-3 px-2 text-center">Vai trò</th>
+                      <th class="py-3 px-2 text-center">Hành động</th>
+                    </tr>
+                  </thead>
+                  <tbody id="admin-users-tbody" class="divide-y divide-gray-100"></tbody>
+                </table>
+              </div>
+            </div>
+          </div>
+
+          <!-- Review Moderation Tab -->
+          <div id="admin-tab-review" class="admin-tab hidden bg-white p-5 rounded-xl border border-gray-200 shadow-sm space-y-4">
+            <h3 class="font-bold text-gray-800 text-sm">Kiểm Duyệt Bình Luận & Đánh Giá</h3>
+            <div class="overflow-x-auto">
+              <table class="w-full text-xs text-left border-collapse">
+                <thead>
+                  <tr class="text-[10px] text-gray-400 uppercase border-b border-gray-100">
+                    <th class="py-3 px-2">Sản phẩm</th>
+                    <th class="py-3 px-2">Người đánh giá</th>
+                    <th class="py-3 px-2 text-center">Số sao</th>
+                    <th class="py-3 px-2">Nội dung bình luận</th>
+                    <th class="py-3 px-2 text-center">Ngày đánh giá</th>
+                    <th class="py-3 px-2 text-center">Hành động</th>
+                  </tr>
+                </thead>
+                <tbody id="admin-reviews-tbody" class="divide-y divide-gray-100"></tbody>
+              </table>
+            </div>
+            <div id="admin-reviews-empty" class="hidden text-center py-12 text-gray-400">
+              Chưa có đánh giá nào trên hệ thống.
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+  </main>
+
+  <!-- Footer -->
+  <footer class="bg-[#1a1a1a] text-white mt-16 border-t border-white/10 shrink-0">
+   <div class="max-w-7xl mx-auto px-4 py-12 grid grid-cols-1 md:grid-cols-4 gap-8">
+    <div>
+     <h4 class="font-heading text-xl font-bold mb-4 tracking-wider flex items-center gap-2"><span class="text-2xl">🐝</span>Beestyle</h4>
+     <p class="text-gray-400 text-sm leading-relaxed font-light">Thời trang hiện đại cho cuộc sống năng động. Tinh hoa dệt may Việt Nam kết hợp phong cách tối giản quốc tế.</p>
+    </div>
+    <div>
+     <h5 class="font-semibold mb-4 text-sm tracking-widest uppercase">Trang mua sắm</h5>
+     <ul class="space-y-2 text-sm text-gray-400">
+      <li><a href="#/" class="hover:text-white transition">Trang chủ</a></li>
+      <li><a href="#/shop" class="hover:text-white transition">Cửa hàng sản phẩm</a></li>
+      <li><a href="#/orders" class="hover:text-white transition">Đơn hàng của bạn</a></li>
+      <li><a href="#/admin" class="text-[#c45e3a] hover:underline font-semibold transition">Trang quản trị Admin</a></li>
+     </ul>
+    </div>
+    <div>
+     <h5 class="font-semibold mb-4 text-sm tracking-widest uppercase">Hỗ trợ khách hàng</h5>
+     <ul class="space-y-2 text-sm text-gray-400">
+      <li><a href="#/" class="hover:text-white transition">Chính sách đổi trả 7 ngày</a></li>
+      <li><a href="#/" class="hover:text-white transition">Chính sách vận chuyển &amp; COD</a></li>
+      <li><a href="#/" class="hover:text-white transition">Hướng dẫn chọn size chi tiết</a></li>
+      <li><a href="#/" class="hover:text-white transition">Câu hỏi thường gặp FAQ</a></li>
+     </ul>
+    </div>
+    <div>
+     <h5 class="font-semibold mb-4 text-sm tracking-widest uppercase">Thông tin liên hệ</h5>
+     <ul class="space-y-2 text-sm text-gray-400 font-light">
+      <li>📍 123 Nguyễn Huệ, Quận 1, TP. Hồ Chí Minh</li>
+      <li>📞 Hotline: 0909 123 456 (8h00 - 21h00)</li>
+      <li>✉️ Email: hello@beestyle.vn</li>
+     </ul>
+     <div class="flex gap-3 mt-4">
+       <a href="#" class="w-9 h-9 bg-white/10 rounded-full flex items-center justify-center hover:bg-[#c45e3a] hover:scale-105 transition"><i data-lucide="facebook" style="width:16px;height:16px;"></i></a> 
+       <a href="#" class="w-9 h-9 bg-white/10 rounded-full flex items-center justify-center hover:bg-[#c45e3a] hover:scale-105 transition"><i data-lucide="instagram" style="width:16px;height:16px;"></i></a> 
+       <a href="#" class="w-9 h-9 bg-white/10 rounded-full flex items-center justify-center hover:bg-[#c45e3a] hover:scale-105 transition"><i data-lucide="twitter" style="width:16px;height:16px;"></i></a>
+     </div>
+    </div>
+   </div>
+   <div class="border-t border-white/5 text-center py-6 text-xs text-gray-500 font-light">
+    © 2026 Beestyle Fashion &amp; E-commerce. Powered by Laravel &amp; SQLite.
+   </div>
+  </footer>
+
+  <!-- Admin Order Details Modal -->
+  <div id="admin-order-detail-modal" class="fixed inset-0 z-[70] hidden flex items-center justify-center p-4">
+    <div class="absolute inset-0 bg-black/60 backdrop-blur-sm" onclick="closeAdminOrderDetailModal()"></div>
+    <div class="bg-white rounded-3xl p-6 md:p-8 w-full max-w-3xl shadow-2xl relative z-10 border border-gray-100 space-y-6 max-h-[90vh] overflow-y-auto">
+      <div class="flex items-center justify-between border-b border-gray-100 pb-3">
+        <h3 class="font-heading text-lg font-bold text-gray-800">Chi Tiết Đơn Hàng <span class="font-mono text-[#4e73df]" id="admin-modal-order-id"></span></h3>
+        <button onclick="closeAdminOrderDetailModal()" class="p-2 hover:bg-gray-100 rounded-full transition text-gray-400 hover:text-black">
+          <i data-lucide="x" class="w-5 h-5"></i>
+        </button>
+      </div>
+
+      <div class="grid grid-cols-1 md:grid-cols-2 gap-6 text-xs">
+        <div class="space-y-1.5 bg-[#faf9f7] p-4 rounded-2xl border border-gray-100">
+          <p class="font-bold text-gray-700 uppercase tracking-wider text-[10px]">Thông tin khách hàng</p>
+          <p class="text-gray-600 mt-2">👤 Tên người nhận: <span class="font-semibold text-gray-800" id="admin-modal-cust-name"></span></p>
+          <p class="text-gray-600">📞 Số điện thoại: <span class="font-semibold text-gray-800" id="admin-modal-cust-phone"></span></p>
+          <p class="text-gray-600">🏠 Địa chỉ: <span class="font-semibold text-gray-800" id="admin-modal-cust-address"></span></p>
+          <p class="text-gray-600">✉️ Ghi chú: <span class="font-semibold text-gray-800" id="admin-modal-cust-note"></span></p>
+        </div>
+
+        <div class="space-y-1.5 bg-[#faf9f7] p-4 rounded-2xl border border-gray-100">
+          <p class="font-bold text-gray-700 uppercase tracking-wider text-[10px]">Thông tin đơn hàng</p>
+          <p class="text-gray-600 mt-2">📅 Ngày đặt: <span class="font-semibold text-gray-800" id="admin-modal-order-date"></span></p>
+          <p class="text-gray-600">💳 Phương thức: <span class="font-semibold text-gray-800 uppercase" id="admin-modal-order-method"></span></p>
+          <p class="text-gray-600">💸 Trạng thái TT: <span class="font-semibold text-gray-800" id="admin-modal-order-payment-status"></span></p>
+          <div class="flex items-center gap-1.5 mt-2">
+            <span class="text-gray-600 font-bold">Trạng thái đơn:</span>
+            <select id="admin-modal-order-status-select" onchange="updateAdminOrderStatusFromModal(this.value)" class="border rounded px-2.5 py-1 bg-white cursor-pointer outline-none font-bold text-[11px]"></select>
+          </div>
+        </div>
+      </div>
+
+      <!-- Items List -->
+      <div class="space-y-2">
+        <p class="text-xs font-bold text-gray-700 uppercase tracking-wider text-[10px]">Sản phẩm trong đơn</p>
+        <div class="overflow-x-auto border border-gray-100 rounded-2xl">
+          <table class="w-full text-xs text-left border-collapse bg-[#faf9f7]">
+            <thead>
+              <tr class="text-[10px] text-gray-400 uppercase border-b border-gray-100 bg-gray-50/50">
+                <th class="py-2.5 px-3">Ảnh</th>
+                <th class="py-2.5 px-3">Sản phẩm</th>
+                <th class="py-2.5 px-3">Phân loại</th>
+                <th class="py-2.5 px-3 text-right">Đơn giá</th>
+                <th class="py-2.5 px-3 text-center">SL</th>
+                <th class="py-2.5 px-3 text-right">Thành tiền</th>
+              </tr>
+            </thead>
+            <tbody id="admin-modal-order-items-tbody"></tbody>
+          </table>
+        </div>
+      </div>
+
+      <div class="border-t border-gray-100 pt-4 flex flex-col items-end space-y-1 text-xs">
+        <div class="flex justify-between w-full max-w-[280px] text-gray-500">
+          <span>Giảm giá (Voucher):</span>
+          <span class="font-bold text-gray-800" id="admin-modal-order-discount"></span>
+        </div>
+        <div class="flex justify-between w-full max-w-[280px] text-sm font-bold text-gray-800 border-t border-gray-100 pt-2">
+          <span>Tổng cộng:</span>
+          <span class="text-base text-[#4e73df]" id="admin-modal-order-total"></span>
+        </div>
+      </div>
+
+      <div class="flex justify-between pt-2 border-t border-gray-100">
+        <button id="admin-modal-delete-btn" onclick="deleteAdminOrderFromModal()" class="text-xs text-red-500 hover:text-red-700 font-bold border border-red-100 hover:bg-red-50 px-4 py-2.5 rounded-xl transition">Xóa Đơn Hàng</button>
+        <button onclick="closeAdminOrderDetailModal()" class="bg-[#1a1a1a] hover:bg-[#c45e3a] text-white py-2.5 px-6 rounded-xl text-xs font-bold transition">Đóng</button>
+      </div>
+    </div>
+  </div>
+
+  <!-- Online Payment Simulation Modal -->
+  <div id="online-payment-modal" class="fixed inset-0 z-[80] hidden flex items-center justify-center p-4">
+    <div class="absolute inset-0 bg-black/60 backdrop-blur-sm" onclick="closeOnlinePaymentModal()"></div>
+    <div class="bg-white rounded-3xl p-6 md:p-8 w-full max-w-md shadow-2xl relative z-10 border border-gray-100 text-center space-y-6">
+      <div>
+        <span class="text-4xl block animate-bounce mb-2">⚡</span>
+        <h3 class="font-heading text-xl font-bold text-gray-800">Cổng Thanh Toán Giả Lập</h3>
+        <p class="text-xs text-gray-400 mt-1">Hệ thống mô phỏng giao dịch VNPAY / MoMo</p>
+      </div>
+
+      <div class="bg-[#faf9f7] p-5 rounded-2xl border border-gray-200/80 space-y-3">
+        <div class="flex justify-between text-xs text-gray-500">
+          <span>Đơn hàng tại Beestyle</span>
+          <span class="font-semibold text-gray-800" id="online-payment-order-id">#temp</span>
+        </div>
+        <div class="flex justify-between text-xs text-gray-500 border-t border-gray-200/50 pt-2">
+          <span>Số tiền cần thanh toán:</span>
+          <span class="text-base font-bold text-[#c45e3a]" id="online-payment-amount">0₫</span>
+        </div>
+      </div>
+
+      <!-- QR Code Simulation -->
+      <div class="flex flex-col items-center justify-center p-4 bg-white border border-gray-100 rounded-2xl shadow-inner w-56 h-56 mx-auto relative group">
+        <img src="https://images.unsplash.com/photo-1595079676339-1534801ad6cf?w=400&auto=format&fit=crop&q=80" alt="QR Code" class="w-44 h-44 object-cover filter blur-[0.5px] group-hover:blur-0 transition duration-300">
+        <div class="absolute inset-0 bg-black/5 rounded-2xl pointer-events-none"></div>
+      </div>
+
+      <p class="text-xs text-gray-500 leading-relaxed font-light font-sans">Vui lòng bấm <strong>Xác nhận thanh toán</strong> để giả lập giao dịch thành công. Hoặc <strong>Hủy giao dịch</strong> để quay lại trang thanh toán.</p>
+
+      <div class="text-xs text-amber-600 font-semibold bg-amber-50 py-2 rounded-xl" id="online-payment-timer">
+        Giao dịch hết hạn sau: 05:00
+      </div>
+
+      <div class="grid grid-cols-2 gap-3 pt-2">
+        <button onclick="confirmOnlinePayment()" class="bg-[#1a1a1a] hover:bg-emerald-600 text-white py-3 rounded-full text-xs font-bold shadow-lg transition">Xác nhận thanh toán</button>
+        <button onclick="closeOnlinePaymentModal()" class="border border-gray-200 hover:bg-gray-50 text-gray-500 py-3 rounded-full text-xs font-bold transition">Hủy giao dịch</button>
+      </div>
+    </div>
+  </div>
+
+  <!-- Auth Modal -->
+  <div id="auth-modal" class="fixed inset-0 z-[70] hidden flex items-center justify-center p-4 transition-all duration-300">
+    <div class="absolute inset-0 bg-black/60 backdrop-blur-sm" onclick="closeAuthModal()"></div>
+    <div class="bg-white/95 backdrop-blur-md rounded-3xl p-6 md:p-8 w-full max-w-md shadow-2xl relative z-10 border border-white/20 transform scale-95 opacity-0 transition-all duration-300" id="auth-modal-box">
+      <!-- Close button -->
+      <button onclick="closeAuthModal()" class="absolute top-4 right-4 p-2 hover:bg-gray-100 rounded-full transition text-gray-400 hover:text-black">
+        <i data-lucide="x" class="w-5 h-5"></i>
+      </button>
+
+      <!-- Tabs -->
+      <div class="flex border-b border-gray-100 pb-3 mb-6">
+        <button onclick="switchAuthTab('login')" id="tab-login-btn" class="flex-1 text-center py-2 text-sm font-bold border-b-2 border-[#c45e3a] text-black transition">Đăng Nhập</button>
+        <button onclick="switchAuthTab('register')" id="tab-register-btn" class="flex-1 text-center py-2 text-sm font-semibold border-b-2 border-transparent text-gray-400 hover:text-black transition">Đăng Ký</button>
+      </div>
+
+      <!-- Login Form -->
+      <form id="login-form" class="space-y-4" onsubmit="handleLoginSubmit(event)">
+        <div class="space-y-1">
+          <label class="text-xs font-bold text-gray-500">Email *</label>
+          <input type="email" id="login-email" required placeholder="admin@beestyle.vn" class="w-full px-4 py-2.5 border border-gray-200 rounded-xl outline-none focus:border-[#c45e3a] transition text-sm">
+        </div>
+        <div class="space-y-1">
+          <label class="text-xs font-bold text-gray-500">Mật khẩu *</label>
+          <input type="password" id="login-password" required placeholder="••••••••" class="w-full px-4 py-2.5 border border-gray-200 rounded-xl outline-none focus:border-[#c45e3a] transition text-sm">
+        </div>
+        <button type="submit" class="w-full bg-[#1a1a1a] hover:bg-[#c45e3a] text-white py-3 rounded-full text-sm font-bold shadow-lg transition">Đăng Nhập</button>
+
+        <!-- Quick Login Shortcuts -->
+        <div class="bg-[#faf9f7] border border-gray-200/80 rounded-2xl p-4 mt-4 space-y-2">
+          <p class="text-[9px] uppercase font-bold text-gray-400 tracking-wider">Đăng nhập nhanh để test</p>
+          <div class="grid grid-cols-2 gap-2">
+            <button type="button" onclick="fillQuickAuth('admin@beestyle.vn', 'admin123')" class="bg-blue-50 text-blue-700 hover:bg-blue-100 border border-blue-200 py-2 px-3 rounded-xl text-[10px] font-bold transition text-center truncate">
+              🔑 Admin (Quản trị)
+            </button>
+            <button type="button" onclick="fillQuickAuth('customer@beestyle.vn', 'customer123')" class="bg-amber-50 text-amber-700 hover:bg-amber-100 border border-amber-200 py-2 px-3 rounded-xl text-[10px] font-bold transition text-center truncate">
+              👤 Customer (Khách)
+            </button>
+          </div>
+        </div>
+      </form>
+
+      <!-- Register Form -->
+      <form id="register-form" class="space-y-4 hidden" onsubmit="handleRegisterSubmit(event)">
+        <div class="space-y-1">
+          <label class="text-xs font-bold text-gray-500">Họ và tên *</label>
+          <input type="text" id="register-name" required placeholder="Nguyễn Văn A" class="w-full px-4 py-2.5 border border-gray-200 rounded-xl outline-none focus:border-[#c45e3a] transition text-sm">
+        </div>
+        <div class="space-y-1">
+          <label class="text-xs font-bold text-gray-500">Email *</label>
+          <input type="email" id="register-email" required placeholder="nguyenvana@gmail.com" class="w-full px-4 py-2.5 border border-gray-200 rounded-xl outline-none focus:border-[#c45e3a] transition text-sm">
+        </div>
+        <div class="space-y-1">
+          <label class="text-xs font-bold text-gray-500">Số điện thoại</label>
+          <input type="tel" id="register-phone" placeholder="0901234567" class="w-full px-4 py-2.5 border border-gray-200 rounded-xl outline-none focus:border-[#c45e3a] transition text-sm">
+        </div>
+        <div class="space-y-1">
+          <label class="text-xs font-bold text-gray-500">Mật khẩu *</label>
+          <input type="password" id="register-password" required placeholder="Tối thiểu 6 ký tự" class="w-full px-4 py-2.5 border border-gray-200 rounded-xl outline-none focus:border-[#c45e3a] transition text-sm">
+        </div>
+        <button type="submit" class="w-full bg-[#1a1a1a] hover:bg-[#c45e3a] text-white py-3 rounded-full text-sm font-bold shadow-lg transition">Đăng Ký Tài Khoản</button>
+      </form>
+    </div>
+  </div>
+  <!-- Toast Notification System -->
+  <div id="toast" class="fixed bottom-6 right-6 bg-[#1a1a1a] text-white px-5 py-3 rounded-2xl shadow-2xl transform translate-y-20 opacity-0 transition-all duration-300 z-50 flex items-center gap-2 text-sm border border-white/10"></div>
+
+  <!-- Cart Drawer -->
+  <div id="cart-drawer" class="fixed inset-0 z-[60] hidden">
+   <div class="absolute inset-0 bg-black/50 backdrop-blur-sm" id="cart-backdrop"></div>
+   <div class="absolute right-0 top-0 h-full w-full max-w-md bg-[#faf9f7] shadow-2xl p-6 overflow-auto transform translate-x-full transition-transform duration-300 flex flex-col justify-between" id="cart-panel">
+    <div>
+      <div class="flex items-center justify-between mb-6">
+       <h3 class="font-heading text-xl font-bold flex items-center gap-2">Giỏ Hàng <span id="cart-title-count" class="text-sm font-body font-normal text-gray-500">(0 sản phẩm)</span></h3>
+       <button id="close-cart" class="p-2 hover:bg-gray-200 rounded-full transition"><i data-lucide="x" style="width:20px;height:20px;"></i></button>
+      </div>
+      <div class="space-y-4 max-h-[60vh] overflow-y-auto pr-1" id="cart-drawer-items"></div>
+      <div id="cart-drawer-empty" class="hidden text-center py-16 space-y-3">
+        <span class="text-5xl block">🛒</span>
+        <p class="text-sm text-gray-500">Giỏ hàng của bạn đang trống.</p>
+        <a href="#/shop" onclick="closeCart()" class="inline-block bg-[#1a1a1a] text-white text-xs font-semibold px-5 py-2 rounded-full hover:bg-[#c45e3a] transition">Khám phá sản phẩm ngay</a>
+      </div>
+    </div>
+    
+    <div class="border-t border-gray-200 pt-4 mt-6 bg-[#faf9f7]" id="cart-drawer-footer">
+      <div class="flex justify-between text-sm mb-2 text-gray-500">
+        <span>Tạm tính</span>
+        <span class="font-semibold text-black" id="cart-drawer-subtotal">0₫</span>
+      </div>
+      <div class="flex justify-between font-bold text-lg mb-4">
+        <span>Tổng số tiền</span> 
+        <span class="text-[#c45e3a]" id="cart-drawer-total">0₫</span>
+      </div>
+      <div class="grid grid-cols-2 gap-2">
+        <a href="#/cart" onclick="closeCart()" class="w-full text-center border border-gray-300 text-gray-700 py-3.5 rounded-full text-xs font-bold hover:bg-gray-50 transition">Xem Chi Tiết</a>
+        <a href="#/checkout" onclick="closeCart()" class="w-full text-center bg-[#1a1a1a] hover:bg-[#c45e3a] text-white py-3.5 rounded-full text-xs font-bold transition shadow-lg shadow-black/10">Thanh Toán</a>
+      </div>
+    </div>
+   </div>
+  </div>
+
+  <!-- JavaScript logic -->
+  <script>
+    const csrfToken = document.querySelector('meta[name="csrf-token"]').getAttribute('content');
+    const headers = {
+      'Content-Type': 'application/json',
+      'X-CSRF-TOKEN': csrfToken
+    };
+
+    let productsState = [];
+    let cartState = [];
+    let wishlistState = [];
+    let categoriesState = [];
+    let earningsAreaChartInstance = null;
+    let revenuePieChartInstance = null;
+    
+    let appliedVoucher = null;
+    let authUser = null;
+
+    let currentOrderDetailId = null;
+    let pendingOrderData = null;
+    let onlinePaymentTimerInterval = null;
+
+    function renderAuthUI() {
+      const headerContainer = document.getElementById('auth-header-container');
+      const mobileContainer = document.getElementById('mobile-auth-container');
+      const navAdmin = document.getElementById('nav-admin');
+      const navAdminMobile = document.getElementById('nav-admin-mobile');
+
+      if (authUser) {
+        // Show/hide admin navigation depending on user role
+        if (authUser.role === 'Admin') {
+          if (navAdmin) navAdmin.classList.remove('hidden');
+          if (navAdminMobile) navAdminMobile.classList.remove('hidden');
+        } else {
+          if (navAdmin) navAdmin.classList.add('hidden');
+          if (navAdminMobile) navAdminMobile.classList.add('hidden');
+        }
+
+        // Render desktop header user menu
+        if (headerContainer) {
+          headerContainer.innerHTML = `
+            <div class="relative group">
+              <button class="flex items-center gap-1.5 px-3 py-1.5 border border-gray-200 hover:border-gray-300 rounded-full transition bg-white text-xs font-semibold text-gray-700">
+                <div class="w-5 h-5 bg-gradient-to-tr from-[#c45e3a] to-amber-400 text-white rounded-full flex items-center justify-center font-bold text-[10px]">
+                  ${authUser.full_name ? authUser.full_name[0].toUpperCase() : 'U'}
+                </div>
+                <span class="max-w-[80px] truncate">${authUser.full_name}</span>
+                <i data-lucide="chevron-down" class="w-3 h-3 text-gray-400"></i>
+              </button>
+              <div class="absolute right-0 mt-2 w-48 bg-white border border-gray-100 rounded-2xl shadow-xl py-2 hidden group-hover:block transition-all duration-300 z-50">
+                <div class="px-4 py-2 border-b border-gray-50">
+                  <p class="text-xs font-bold text-gray-800 line-clamp-1">${authUser.full_name}</p>
+                  <p class="text-[10px] text-gray-400 line-clamp-1">${authUser.role}</p>
+                </div>
+                ${authUser.role === 'Admin' ? `
+                  <a href="#/admin" class="flex items-center gap-2 px-4 py-2 text-xs text-gray-700 hover:bg-gray-50 transition">
+                    <i data-lucide="shield-check" class="w-3.5 h-3.5 text-[#c45e3a]"></i>
+                    <span>Quản trị Admin</span>
+                  </a>
+                ` : ''}
+                <a href="#/profile" class="flex items-center gap-2 px-4 py-2 text-xs text-gray-700 hover:bg-gray-50 transition">
+                  <i data-lucide="user" class="w-3.5 h-3.5"></i>
+                  <span>Thông tin tài khoản</span>
+                </a>
+                <a href="#/orders" class="flex items-center gap-2 px-4 py-2 text-xs text-gray-700 hover:bg-gray-50 transition">
+                  <i data-lucide="package" class="w-3.5 h-3.5"></i>
+                  <span>Đơn mua của tôi</span>
+                </a>
+                <button onclick="handleLogout()" class="w-full flex items-center gap-2 px-4 py-2 text-xs text-red-500 hover:bg-red-50 transition text-left">
+                  <i data-lucide="log-out" class="w-3.5 h-3.5"></i>
+                  <span>Đăng xuất</span>
+                </button>
+              </div>
+            </div>
+          `;
+        }
+
+        // Render mobile menu user info
+        if (mobileContainer) {
+          mobileContainer.innerHTML = `
+            <div class="border-t border-gray-100 pt-3 space-y-2">
+              <div class="flex items-center gap-2.5 px-2 py-1.5">
+                <div class="w-8 h-8 bg-gradient-to-tr from-[#c45e3a] to-amber-400 text-white rounded-full flex items-center justify-center font-bold text-sm">
+                  ${authUser.full_name ? authUser.full_name[0].toUpperCase() : 'U'}
+                </div>
+                <div>
+                  <p class="text-xs font-bold text-gray-800">${authUser.full_name}</p>
+                  <p class="text-[10px] text-gray-400">${authUser.role}</p>
+                </div>
+              </div>
+              <a href="#/profile" class="w-full flex items-center justify-center gap-2 py-2.5 bg-gray-50 text-gray-700 text-xs font-bold rounded-xl hover:bg-gray-100 transition">
+                <i data-lucide="user" class="w-4 h-4"></i>
+                Thông tin tài khoản
+              </a>
+              <button onclick="handleLogout()" class="w-full flex items-center justify-center gap-2 py-2.5 bg-red-50 text-red-500 text-xs font-bold rounded-xl hover:bg-red-100 transition">
+                <i data-lucide="log-out" class="w-4 h-4"></i>
+                Đăng xuất
+              </button>
+            </div>
+          `;
+        }
+      } else {
+        // Guest user state
+        if (navAdmin) navAdmin.classList.add('hidden');
+        if (navAdminMobile) navAdminMobile.classList.add('hidden');
+
+        if (headerContainer) {
+          headerContainer.innerHTML = `
+            <button onclick="openAuthModal()" class="flex items-center gap-1.5 px-4 py-2 bg-[#1a1a1a] hover:bg-[#c45e3a] text-white text-xs font-bold rounded-full transition shadow-md">
+              <i data-lucide="user" class="w-3.5 h-3.5"></i>
+              <span>Đăng Nhập</span>
+            </button>
+          `;
+        }
+
+        if (mobileContainer) {
+          mobileContainer.innerHTML = `
+            <button onclick="openAuthModal()" class="w-full text-center py-2.5 bg-[#1a1a1a] hover:bg-[#c45e3a] text-white text-sm font-bold rounded-xl transition">
+              Đăng Nhập
+            </button>
+          `;
+        }
+      }
+      lucide.createIcons();
+    }
+
+    function openAuthModal() {
+      const modal = document.getElementById('auth-modal');
+      const box = document.getElementById('auth-modal-box');
+      if (modal && box) {
+        modal.classList.remove('hidden');
+        modal.classList.add('flex');
+        void modal.offsetWidth; // force layout reflow
+        box.classList.remove('scale-95', 'opacity-0');
+      }
+    }
+
+    function closeAuthModal() {
+      const modal = document.getElementById('auth-modal');
+      const box = document.getElementById('auth-modal-box');
+      if (modal && box) {
+        box.classList.add('scale-95', 'opacity-0');
+        setTimeout(() => {
+          modal.classList.add('hidden');
+          modal.classList.remove('flex');
+        }, 300);
+      }
+    }
+
+    function switchAuthTab(tab) {
+      const loginForm = document.getElementById('login-form');
+      const registerForm = document.getElementById('register-form');
+      const loginBtn = document.getElementById('tab-login-btn');
+      const registerBtn = document.getElementById('tab-register-btn');
+      
+      if (tab === 'login') {
+        loginForm.classList.remove('hidden');
+        registerForm.classList.add('hidden');
+        loginBtn.className = "flex-1 text-center py-2 text-sm font-bold border-b-2 border-[#c45e3a] text-black transition";
+        registerBtn.className = "flex-1 text-center py-2 text-sm font-semibold border-b-2 border-transparent text-gray-400 hover:text-black transition";
+      } else {
+        loginForm.classList.add('hidden');
+        registerForm.classList.remove('hidden');
+        registerBtn.className = "flex-1 text-center py-2 text-sm font-bold border-b-2 border-[#c45e3a] text-black transition";
+        loginBtn.className = "flex-1 text-center py-2 text-sm font-semibold border-b-2 border-transparent text-gray-400 hover:text-black transition";
+      }
+    }
+
+    function fillQuickAuth(email, password) {
+      const emailInput = document.getElementById('login-email');
+      const passInput = document.getElementById('login-password');
+      if (emailInput) emailInput.value = email;
+      if (passInput) passInput.value = password;
+    }
+
+    async function handleLoginSubmit(event) {
+      event.preventDefault();
+      const email = document.getElementById('login-email').value;
+      const password = document.getElementById('login-password').value;
+      
+      try {
+        const res = await fetch('/api/login', {
+          method: 'POST',
+          headers: headers,
+          body: JSON.stringify({ email, password })
+        });
+        const data = await res.json();
+        if (res.ok) {
+          authUser = data.user;
+          showToast('Đăng nhập thành công!', 'success');
+          closeAuthModal();
+          renderAuthUI();
+          
+          document.getElementById('login-email').value = '';
+          document.getElementById('login-password').value = '';
+          
+          await router();
+        } else {
+          showToast(data.message || 'Đăng nhập thất bại!', 'info');
+        }
+      } catch (err) {
+        console.error("Login error:", err);
+        showToast('Lỗi kết nối máy chủ', 'info');
+      }
+    }
+
+    async function handleRegisterSubmit(event) {
+      event.preventDefault();
+      const full_name = document.getElementById('register-name').value;
+      const email = document.getElementById('register-email').value;
+      const phone = document.getElementById('register-phone').value;
+      const password = document.getElementById('register-password').value;
+      
+      try {
+        const res = await fetch('/api/register', {
+          method: 'POST',
+          headers: headers,
+          body: JSON.stringify({ full_name, email, phone, password })
+        });
+        const data = await res.json();
+        if (res.ok) {
+          authUser = data.user;
+          showToast('Đăng ký thành công!', 'success');
+          closeAuthModal();
+          renderAuthUI();
+          
+          document.getElementById('register-name').value = '';
+          document.getElementById('register-email').value = '';
+          document.getElementById('register-phone').value = '';
+          document.getElementById('register-password').value = '';
+          
+          await router();
+        } else {
+          showToast(data.message || 'Đăng ký thất bại!', 'info');
+        }
+      } catch (err) {
+        console.error("Register error:", err);
+        showToast('Lỗi kết nối máy chủ', 'info');
+      }
+    }
+
+    async function handleLogout() {
+      try {
+        const res = await fetch('/api/logout', {
+          method: 'POST',
+          headers: headers
+        });
+        const data = await res.json();
+        if (res.ok) {
+          authUser = null;
+          showToast('Đăng xuất thành công!', 'info');
+          renderAuthUI();
+          if (window.location.hash === '#/admin') {
+            window.location.hash = '#/';
+          } else {
+            await router();
+          }
+        } else {
+          showToast(data.message || 'Lỗi đăng xuất', 'info');
+        }
+      } catch (err) {
+        console.error("Logout error:", err);
+        showToast('Lỗi kết nối máy chủ', 'info');
+      }
+    }
+
+    async function initData() {
+      cartState = JSON.parse(localStorage.getItem('beestyle_cart') || '[]');
+      wishlistState = JSON.parse(localStorage.getItem('beestyle_wishlist') || '[]');
+      
+      try {
+        const authRes = await fetch('/api/auth/status');
+        const authData = await authRes.json();
+        if (authData.logged_in) {
+          authUser = authData.user;
+        } else {
+          authUser = null;
+        }
+      } catch (err) {
+        console.error("Error checking auth status:", err);
+      }
+      
+      renderAuthUI();
+
+      try {
+        const catRes = await fetch('/api/categories');
+        categoriesState = await catRes.json();
+      } catch (err) {
+        console.error("Error loading categories:", err);
+      }
+
+      await ensureProductsLoaded();
+      updateCartBadge();
+      updateWishlistBadge();
+    }
+
+    async function ensureProductsLoaded() {
+      if (productsState.length === 0) {
+        try {
+          const res = await fetch('/api/products');
+          productsState = await res.json();
+        } catch (err) {
+          console.error("Error loading products cache:", err);
+        }
+      }
+    }
+
+    // -------------------------------------------------------------
+    // Router Implementation
+    // -------------------------------------------------------------
+    async function router() {
+      const hash = window.location.hash || '#/';
+      
+      // Hide all pages
+      document.querySelectorAll('.page-view').forEach(view => view.classList.add('hidden'));
+      // Remove all active header nav highlights
+      document.querySelectorAll('header nav a').forEach(link => link.classList.remove('text-[#c45e3a]', 'font-bold'));
+      
+      // Close mobile menu on navigate
+      document.getElementById('mobile-menu').classList.add('hidden');
+      
+      if (hash === '#/' || hash === '') {
+        showPage('home-view');
+        document.getElementById('nav-home').classList.add('text-[#c45e3a]', 'font-bold');
+        await renderHomePage();
+      } else if (hash.startsWith('#/shop')) {
+        showPage('shop-view');
+        document.getElementById('nav-shop').classList.add('text-[#c45e3a]', 'font-bold');
+        
+        const queryParams = new URLSearchParams(hash.includes('?') ? hash.split('?')[1] : '');
+        await renderShopPage(queryParams);
+      } else if (hash.startsWith('#/product/')) {
+        const id = hash.split('#/product/')[1].split('?')[0]; // Extract ID
+        showPage('product-detail-view');
+        await renderProductDetailPage(id);
+      } else if (hash === '#/cart') {
+        showPage('cart-view');
+        await renderCartPage();
+      } else if (hash === '#/checkout') {
+        if (!authUser) {
+          showToast('Vui lòng đăng nhập để tiến hành thanh toán!', 'info');
+          window.location.hash = '#/';
+          openAuthModal();
+          return;
+        }
+        showPage('checkout-view');
+        await renderCheckoutPage();
+      } else if (hash === '#/orders') {
+        if (!authUser) {
+          showToast('Vui lòng đăng nhập để xem đơn hàng của bạn!', 'info');
+          window.location.hash = '#/';
+          openAuthModal();
+          return;
+        }
+        showPage('orders-view');
+        document.getElementById('nav-orders').classList.add('text-[#c45e3a]', 'font-bold');
+        await renderOrdersPage();
+      } else if (hash === '#/profile') {
+        if (!authUser) {
+          showToast('Vui lòng đăng nhập để chỉnh sửa thông tin cá nhân!', 'info');
+          window.location.hash = '#/';
+          openAuthModal();
+          return;
+        }
+        showPage('profile-view');
+        renderProfilePage();
+      } else if (hash.startsWith('#/order-detail/')) {
+        if (!authUser) {
+          showToast('Vui lòng đăng nhập để xem chi tiết đơn hàng!', 'info');
+          window.location.hash = '#/';
+          openAuthModal();
+          return;
+        }
+        const id = hash.split('#/order-detail/')[1].split('?')[0];
+        showPage('order-detail-view');
+        await renderOrderDetailPage(id);
+      } else if (hash === '#/admin') {
+        if (!authUser || authUser.role !== 'Admin') {
+          showToast('Bạn không có quyền truy cập trang quản trị!', 'info');
+          window.location.hash = '#/';
+          openAuthModal();
+          return;
+        }
+        showPage('admin-view');
+        document.getElementById('nav-admin').classList.add('text-[#c45e3a]', 'font-bold');
+        await renderAdminPage();
+      }
+      
+      window.scrollTo(0, 0);
+    }
+
+    function showPage(viewId) {
+      const page = document.getElementById(viewId);
+      if (page) page.classList.remove('hidden');
+      lucide.createIcons();
+    }
+
+    window.addEventListener('hashchange', router);
+    window.addEventListener('load', async () => {
+      await initData();
+      await router();
+    });
+
+    // -------------------------------------------------------------
+    // UI Helpers (Toast, Dialog, Badges)
+    // -------------------------------------------------------------
+    function showToast(message, type = 'success') {
+      const t = document.getElementById('toast');
+      const icon = type === 'success' ? '✨' : type === 'info' ? 'ℹ️' : '❤️';
+      t.innerHTML = `<span>${icon}</span> <span>${message}</span>`;
+      t.classList.remove('translate-y-20', 'opacity-0');
+      
+      setTimeout(() => {
+        t.classList.add('translate-y-20', 'opacity-0');
+      }, 3000);
+    }
+
+    function updateCartBadge() {
+      const totalItems = cartState.reduce((sum, item) => sum + item.quantity, 0);
+      document.getElementById('cart-count').textContent = totalItems;
+      document.getElementById('cart-title-count').textContent = `(${totalItems} sản phẩm)`;
+    }
+
+    function updateWishlistBadge() {
+      const count = wishlistState.length;
+      const badge = document.getElementById('wishlist-count');
+      if (count > 0) {
+        badge.classList.remove('hidden');
+        badge.textContent = count;
+      } else {
+        badge.classList.add('hidden');
+      }
+    }
+
+    function formatVND(amount) {
+      return new Intl.NumberFormat('vi-VN', { style: 'currency', currency: 'VND' }).format(amount);
+    }
+
+    // -------------------------------------------------------------
+    // Wishlist Logic
+    // -------------------------------------------------------------
+    function toggleWishlist(prodId, event) {
+      if (event) event.stopPropagation();
+      if (!authUser) {
+        showToast('Vui lòng đăng nhập để sử dụng tính năng yêu thích!', 'info');
+        openAuthModal();
+        return;
+      }
+      const idStr = prodId.toString();
+      const index = wishlistState.indexOf(idStr);
+      if (index === -1) {
+        wishlistState.push(idStr);
+        showToast('Đã thêm sản phẩm vào danh sách yêu thích!', 'heart');
+      } else {
+        wishlistState.splice(index, 1);
+        showToast('Đã xóa sản phẩm khỏi danh sách yêu thích!', 'info');
+      }
+      localStorage.setItem('beestyle_wishlist', JSON.stringify(wishlistState));
+      updateWishlistBadge();
+      
+      const hash = window.location.hash || '#/';
+      if (hash.startsWith('#/shop')) {
+        const queryParams = new URLSearchParams(hash.includes('?') ? hash.split('?')[1] : '');
+        renderShopPage(queryParams);
+      } else if (hash === '#/' || hash === '') {
+        renderHomePage();
+      } else if (hash.startsWith('#/product/')) {
+        const id = hash.split('#/product/')[1].split('?')[0];
+        renderProductDetailPage(id);
+      }
+    }
+
+    // -------------------------------------------------------------
+    // Page Rendering: HOME
+    // -------------------------------------------------------------
+    async function renderHomePage() {
+      const grid = document.getElementById('home-product-grid');
+      grid.innerHTML = '<div class="col-span-4 text-center py-10 text-gray-400">Đang tải sản phẩm nổi bật...</div>';
+      
+      try {
+        const res = await fetch('/api/products');
+        productsState = await res.json();
+        
+        grid.innerHTML = '';
+        const featured = productsState.slice(0, 4);
+        
+        if (featured.length === 0) {
+          grid.innerHTML = '<div class="col-span-4 text-center py-10 text-gray-400">Chưa có sản phẩm nổi bật nào.</div>';
+          return;
+        }
+        
+        featured.forEach((p) => {
+          const isFav = wishlistState.includes(p.id.toString());
+          const favIconClass = isFav ? 'text-red-500 fill-current' : 'text-gray-400 fill-transparent hover:text-red-500';
+          
+          grid.innerHTML += `
+            <div class="product-card group cursor-pointer bg-white p-4 rounded-2xl border border-gray-100 hover:shadow-xl transition-all duration-300 relative flex flex-col justify-between" onclick="window.location.hash = '#/product/${p.id}'">
+              <button onclick="toggleWishlist('${p.id}', event)" class="absolute top-6 right-6 z-10 w-9 h-9 bg-white/90 rounded-full flex items-center justify-center shadow-md hover:scale-110 transition-transform">
+                <i data-lucide="heart" class="w-4 h-4 ${favIconClass}"></i>
+              </button>
+              
+              <div class="relative bg-[#faf9f7] rounded-xl overflow-hidden mb-3 aspect-[3/4] flex items-center justify-center">
+                <img src="${p.thumbnail_url}" alt="${p.name}" class="product-img w-full h-full object-cover">
+                ${p.tag ? `<span class="absolute top-3 left-3 bg-[#c45e3a] text-white text-[10px] px-2.5 py-1 rounded-full font-bold uppercase tracking-wider">${p.tag}</span>` : ''}
+                
+                <div class="absolute inset-0 bg-black/5 opacity-0 group-hover:opacity-100 transition duration-300 flex items-end justify-center pb-4">
+                  <button class="bg-[#1a1a1a] text-white text-[10px] font-bold px-4 py-2.5 rounded-full shadow-lg hover:bg-[#c45e3a] transition transform translate-y-2 group-hover:translate-y-0 duration-300" onclick="event.stopPropagation(); quickAddToCart('${p.id}')">
+                    + Thêm nhanh vào giỏ
+                  </button>
+                </div>
+              </div>
+              <div>
+                <div class="flex items-center gap-1 mb-1 text-yellow-500">
+                  <i data-lucide="star" class="w-3.5 h-3.5 fill-current"></i>
+                  <span class="text-xs font-bold text-gray-700">${p.rating}</span>
+                </div>
+                <h3 class="font-bold text-sm text-gray-800 line-clamp-1 group-hover:text-[#c45e3a] transition">${p.name}</h3>
+                <div class="flex items-center gap-2 mt-1">
+                  <span class="font-bold text-sm text-[#c45e3a]">${formatVND(p.price)}</span>
+                  ${p.old_price ? `<span class="text-xs text-gray-400 line-through">${formatVND(p.old_price)}</span>` : ''}
+                </div>
+              </div>
+            </div>`;
+        });
+        lucide.createIcons();
+      } catch (err) {
+        grid.innerHTML = '<div class="col-span-4 text-center py-10 text-red-500">Lỗi kết nối máy chủ khi tải sản phẩm.</div>';
+      }
+    }
+
+    // -------------------------------------------------------------
+    // Page Rendering: SHOP (Product List, Filtering & Sorting)
+    // -------------------------------------------------------------
+    let currentCategoryFilter = 'all';
+    let currentMaxPrice = 1500000;
+    let currentSearchQuery = '';
+    let selectedActiveTag = null;
+    let showWishlistOnly = false;
+
+    async function renderShopPage(queryParams) {
+      if (queryParams) {
+        if (queryParams.has('category')) currentCategoryFilter = queryParams.get('category');
+        if (queryParams.has('tag')) selectedActiveTag = queryParams.get('tag');
+        if (queryParams.has('wishlist')) showWishlistOnly = queryParams.get('wishlist') === 'true';
+        if (queryParams.has('search')) currentSearchQuery = queryParams.get('search');
+      }
+
+      // Sync form controls on UI
+      const categoryInputs = document.querySelectorAll('input[name="category"]');
+      categoryInputs.forEach(input => {
+        input.checked = input.value === currentCategoryFilter;
+      });
+      
+      const priceSlider = document.getElementById('price-range');
+      priceSlider.value = currentMaxPrice;
+      document.getElementById('price-range-val').textContent = `Dưới ${formatVND(currentMaxPrice)}`;
+      
+      const searchBoxInput = document.getElementById('shop-search-input');
+      searchBoxInput.value = currentSearchQuery;
+
+      const grid = document.getElementById('shop-product-grid');
+      const emptyState = document.getElementById('shop-empty-state');
+      grid.innerHTML = '<div class="col-span-3 text-center py-20 text-gray-400">Đang tải sản phẩm...</div>';
+      emptyState.classList.add('hidden');
+      grid.classList.remove('hidden');
+
+      try {
+        const params = new URLSearchParams();
+        if (currentCategoryFilter && currentCategoryFilter !== 'all') params.set('category', currentCategoryFilter);
+        if (currentSearchQuery.trim() !== '') params.set('search', currentSearchQuery);
+        if (selectedActiveTag) params.set('tag', selectedActiveTag);
+        params.set('max_price', currentMaxPrice);
+        
+        const sortBy = document.getElementById('sort-select').value;
+        params.set('sort', sortBy);
+
+        const res = await fetch('/api/products?' + params.toString());
+        let filtered = await res.json();
+
+        // client-side wishlist filter
+        if (showWishlistOnly) {
+          filtered = filtered.filter(p => wishlistState.includes(p.id.toString()));
+          document.getElementById('filter-wishlist').classList.add('bg-red-500', 'text-white');
+        } else {
+          document.getElementById('filter-wishlist').classList.remove('bg-red-500', 'text-white');
+        }
+
+        if (selectedActiveTag) {
+          document.getElementById('filter-tag-new').classList.toggle('bg-[#c45e3a]', selectedActiveTag === 'Mới');
+          document.getElementById('filter-tag-new').classList.toggle('text-white', selectedActiveTag === 'Mới');
+          document.getElementById('filter-tag-sale').classList.toggle('bg-[#c45e3a]', selectedActiveTag === 'Sale');
+          document.getElementById('filter-tag-sale').classList.toggle('text-white', selectedActiveTag === 'Sale');
+        } else {
+          document.getElementById('filter-tag-new').classList.remove('bg-[#c45e3a]', 'text-white');
+          document.getElementById('filter-tag-sale').classList.remove('bg-[#c45e3a]', 'text-white');
+        }
+
+        document.getElementById('product-count-text').textContent = `Hiển thị ${filtered.length} sản phẩm`;
+        
+        grid.innerHTML = '';
+        if (filtered.length === 0) {
+          grid.classList.add('hidden');
+          emptyState.classList.remove('hidden');
+        } else {
+          grid.classList.remove('hidden');
+          emptyState.classList.add('hidden');
+
+          filtered.forEach(p => {
+            const isFav = wishlistState.includes(p.id.toString());
+            const favIconClass = isFav ? 'text-red-500 fill-current' : 'text-gray-400 fill-transparent hover:text-red-500';
+            
+            grid.innerHTML += `
+              <div class="product-card group cursor-pointer bg-white p-4 rounded-2xl border border-gray-100 hover:shadow-xl transition-all duration-300 relative flex flex-col justify-between" onclick="window.location.hash = '#/product/${p.id}'">
+                <button onclick="toggleWishlist('${p.id}', event)" class="absolute top-6 right-6 z-10 w-9 h-9 bg-white/90 rounded-full flex items-center justify-center shadow-md hover:scale-110 transition-transform">
+                  <i data-lucide="heart" class="w-4 h-4 ${favIconClass}"></i>
+                </button>
+                
+                <div class="relative bg-[#faf9f7] rounded-xl overflow-hidden mb-3 aspect-[3/4] flex items-center justify-center">
+                  <img src="${p.thumbnail_url}" alt="${p.name}" class="product-img w-full h-full object-cover">
+                  ${p.tag ? `<span class="absolute top-3 left-3 bg-[#c45e3a] text-white text-[10px] px-2.5 py-1 rounded-full font-bold uppercase tracking-wider">${p.tag}</span>` : ''}
+                  
+                  <div class="absolute inset-0 bg-black/5 opacity-0 group-hover:opacity-100 transition duration-300 flex items-end justify-center pb-4">
+                    <button class="bg-[#1a1a1a] text-white text-[10px] font-bold px-4 py-2.5 rounded-full shadow-lg hover:bg-[#c45e3a] transition transform translate-y-2 group-hover:translate-y-0 duration-300" onclick="event.stopPropagation(); quickAddToCart('${p.id}')">
+                      + Thêm nhanh vào giỏ
+                    </button>
+                  </div>
+                </div>
+                <div>
+                  <div class="flex items-center gap-1 mb-1 text-yellow-500">
+                    <i data-lucide="star" class="w-3.5 h-3.5 fill-current"></i>
+                    <span class="text-xs font-bold text-gray-700">${p.rating}</span>
+                  </div>
+                  <h3 class="font-bold text-sm text-gray-800 line-clamp-2 group-hover:text-[#c45e3a] transition h-10">${p.name}</h3>
+                  <div class="flex items-center gap-2 mt-1">
+                    <span class="font-bold text-sm text-[#c45e3a]">${formatVND(p.price)}</span>
+                    ${p.old_price ? `<span class="text-xs text-gray-400 line-through">${formatVND(p.old_price)}</span>` : ''}
+                  </div>
+                </div>
+              </div>`;
+          });
+        }
+        lucide.createIcons();
+      } catch (err) {
+        grid.innerHTML = '<div class="col-span-3 text-center py-20 text-red-500">Lỗi kết nối máy chủ.</div>';
+      }
+    }
+
+    document.getElementById('category-filter-list').addEventListener('change', (e) => {
+      if (e.target.name === 'category') {
+        currentCategoryFilter = e.target.value;
+        updateUrlParams();
+      }
+    });
+
+    document.getElementById('price-range').addEventListener('input', (e) => {
+      currentMaxPrice = parseInt(e.target.value);
+      document.getElementById('price-range-val').textContent = `Dưới ${formatVND(currentMaxPrice)}`;
+    });
+    
+    document.getElementById('price-range').addEventListener('change', () => {
+      updateUrlParams();
+    });
+
+    let searchTimeout = null;
+    document.getElementById('shop-search-input').addEventListener('input', (e) => {
+      currentSearchQuery = e.target.value;
+      if (searchTimeout) clearTimeout(searchTimeout);
+      searchTimeout = setTimeout(() => {
+        updateUrlParams();
+      }, 400);
+    });
+
+    document.getElementById('sort-select').addEventListener('change', () => {
+      renderShopPage();
+    });
+
+    document.getElementById('filter-tag-new').onclick = () => {
+      selectedActiveTag = selectedActiveTag === 'Mới' ? null : 'Mới';
+      updateUrlParams();
+    };
+
+    document.getElementById('filter-tag-sale').onclick = () => {
+      selectedActiveTag = selectedActiveTag === 'Sale' ? null : 'Sale';
+      updateUrlParams();
+    };
+
+    document.getElementById('filter-wishlist').onclick = () => {
+      showWishlistOnly = !showWishlistOnly;
+      updateUrlParams();
+    };
+
+    document.getElementById('reset-filters').onclick = resetAllFilters;
+
+    function resetAllFilters() {
+      currentCategoryFilter = 'all';
+      currentMaxPrice = 1500000;
+      currentSearchQuery = '';
+      selectedActiveTag = null;
+      showWishlistOnly = false;
+      document.getElementById('sort-select').value = 'default';
+      window.location.hash = '#/shop';
+      renderShopPage();
+    }
+
+    function updateUrlParams() {
+      const params = new URLSearchParams();
+      if (currentCategoryFilter !== 'all') params.set('category', currentCategoryFilter);
+      if (currentSearchQuery.trim() !== '') params.set('search', currentSearchQuery);
+      if (selectedActiveTag) params.set('tag', selectedActiveTag);
+      if (showWishlistOnly) params.set('wishlist', 'true');
+      
+      const searchStr = params.toString();
+      window.location.hash = `#/shop${searchStr ? '?' + searchStr : ''}`;
+    }
+
+    // -------------------------------------------------------------
+    // Page Rendering: PRODUCT DETAIL PAGE & REVIEWS
+    // -------------------------------------------------------------
+    let currentSelectedSize = '';
+    let currentSelectedColor = '';
+    let currentDetailProductId = '';
+    let userReviewRating = 5;
+    let currentSelectedPrice = 0;
+    let currentProductDetails = null;
+
+    const colorMap = {
+      'trắng': '#ffffff',
+      'đen': '#1a1a1a',
+      'xám': '#8e8e93',
+      'be': '#f5f5dc',
+      'xanh bơ': '#a3b899',
+      'hồng nhạt': '#ffb6c1',
+      'xanh đậm': '#1e293b',
+      'xanh sáng': '#7dd3fc',
+      'xanh navy': '#1e3a8a',
+      'xanh rêu': '#3f6212',
+      'kem': '#fffdd0',
+      'nâu hạt dẻ': '#8b5a2b',
+      'kem sữa': '#fdf5e6',
+      'đen nhám': '#2d2d2d',
+      'mặc định': '#e2e8f0'
+    };
+
+    async function renderProductDetailPage(prodId) {
+      currentDetailProductId = prodId;
+      const detailContainer = document.getElementById('product-detail-content');
+      detailContainer.innerHTML = '<div class="text-center py-20 text-gray-400">Đang tải thông tin sản phẩm...</div>';
+      
+      try {
+        const res = await fetch('/api/products/' + prodId);
+        if (res.status === 404) {
+          detailContainer.innerHTML = `
+            <div class="text-center py-20">
+              <span class="text-6xl block mb-4">⚠️</span>
+              <h3 class="font-heading text-2xl font-bold">Không tìm thấy sản phẩm</h3>
+              <a href="#/shop" class="text-[#c45e3a] hover:underline text-sm font-semibold mt-2 inline-block">Trở lại cửa hàng</a>
+            </div>`;
+          return;
+        }
+
+        const product = await res.json();
+        currentProductDetails = product;
+        reviewsState = product.reviews || [];
+
+        const sizesArr = product.sizes ? product.sizes.split(',').map(s => s.trim()) : ['Free Size'];
+        const colorsArr = product.colors ? product.colors.split(',').map(c => c.trim()) : ['Mặc định'];
+
+        currentSelectedSize = sizesArr[0];
+        currentSelectedColor = colorsArr[0];
+        currentSelectedPrice = product.price;
+
+        const isFav = wishlistState.includes(product.id.toString());
+        const favBtnLabel = isFav ? 'Đã yêu thích' : 'Thêm vào yêu thích';
+        const favIconClass = isFav ? 'text-red-500 fill-current' : 'text-gray-500 fill-transparent hover:text-red-500';
+
+        // Dynamic Interactive Gallery Images
+        const galleryImages = [
+          { url: product.thumbnail_url, label: 'Bản chính', style: '' },
+          { url: product.thumbnail_url, label: 'Cận cảnh', style: 'object-position: center 20%; transform: scale(1.15);' },
+          { url: product.thumbnail_url, label: 'Phối màu', style: 'filter: hue-rotate(15deg) brightness(1.05);' }
+        ];
+
+        detailContainer.innerHTML = `
+          <div class="grid grid-cols-1 md:grid-cols-2 gap-12">
+            <!-- Gallery -->
+            <div class="space-y-4">
+              <div class="bg-white rounded-3xl overflow-hidden border border-gray-100 aspect-[3/4] shadow-md relative group">
+                <img id="detail-main-img" src="${product.thumbnail_url}" alt="${product.name}" class="w-full h-full object-cover transition-all duration-500">
+                <div class="absolute inset-0 bg-black/5 opacity-0 group-hover:opacity-100 transition-opacity pointer-events-none"></div>
+              </div>
+              <div class="grid grid-cols-3 gap-3">
+                ${galleryImages.map((img, idx) => `
+                  <button onclick="switchDetailImage('${img.url}', '${img.style}', this)" 
+                          class="aspect-[3/4] rounded-2xl overflow-hidden border-2 transition-all bg-white relative ${idx === 0 ? 'border-black ring-2 ring-offset-2 ring-black/10' : 'border-gray-100 hover:border-gray-300'}"
+                          style="outline: none;">
+                    <img src="${img.url}" class="w-full h-full object-cover" style="${img.style}">
+                    <div class="absolute inset-0 bg-black/5 hover:bg-transparent transition-all"></div>
+                  </button>
+                `).join('')}
+              </div>
+            </div>
+            
+            <!-- Product information -->
+            <div class="space-y-6">
+              <div class="space-y-2">
+                ${product.tag ? `<span class="bg-[#c45e3a] text-white text-xs font-bold px-3 py-1 rounded-full uppercase tracking-wider inline-block">${product.tag}</span>` : ''}
+                <h1 class="font-heading text-3xl font-bold text-gray-800 leading-tight">${product.name}</h1>
+                
+                <div class="flex items-center gap-4 text-sm font-semibold">
+                  <div class="flex items-center gap-1 text-yellow-500">
+                    <i data-lucide="star" class="w-4.5 h-4.5 fill-current"></i>
+                    <span class="text-gray-800">${product.rating}</span>
+                  </div>
+                  <span class="text-gray-300">|</span>
+                  <span class="text-[#c45e3a] hover:underline cursor-pointer" onclick="scrollToReviews()">${reviewsState.length} lượt nhận xét</span>
+                  <span class="text-gray-300">|</span>
+                  <span id="detail-stock-badge"></span>
+                </div>
+              </div>
+              
+              <div class="flex items-center gap-3">
+                <span id="detail-product-price" class="font-heading text-3xl font-bold text-[#c45e3a]">${formatVND(product.price)}</span>
+                ${product.old_price ? `<span class="text-lg text-gray-400 line-through font-light">${formatVND(product.old_price)}</span>` : ''}
+              </div>
+              
+              <p class="text-gray-600 font-light text-sm leading-relaxed">${product.description}</p>
+              
+              <!-- Select size -->
+              <div class="space-y-2">
+                <div class="flex items-center">
+                  <span class="text-xs font-bold uppercase text-gray-500 tracking-wider">Kích thước:</span>
+                  <span id="detail-active-size" class="text-xs font-bold text-gray-800 ml-1.5">${currentSelectedSize}</span>
+                </div>
+                <div class="flex gap-2">
+                  ${sizesArr.map(size => `
+                    <button onclick="selectDetailSize('${size}', this)" class="border px-4 py-2.5 rounded-xl text-xs font-bold transition ${size === currentSelectedSize ? 'border-black bg-black text-white shadow-sm' : 'border-gray-200 text-gray-600 bg-white hover:bg-gray-50 hover:border-black'}">${size}</button>
+                  `).join('')}
+                </div>
+              </div>
+              
+              <!-- Select color -->
+              <div class="space-y-2">
+                <div class="flex items-center">
+                  <span class="text-xs font-bold uppercase text-gray-500 tracking-wider">Màu sắc:</span>
+                  <span id="detail-active-color" class="text-xs font-bold text-gray-800 ml-1.5">${currentSelectedColor}</span>
+                </div>
+                <div class="flex gap-3 items-center">
+                  ${colorsArr.map(color => {
+                    const norm = color.toLowerCase().trim();
+                    const hex = colorMap[norm] || '#e2e8f0';
+                    const isLight = ['trắng', 'kem', 'be', 'kem sữa'].includes(norm);
+                    return `
+                      <button onclick="selectDetailColor('${color}', this)" 
+                              title="${color}"
+                              class="w-9 h-9 rounded-full border-2 transition-all duration-200 relative flex items-center justify-center ${color === currentSelectedColor ? 'border-[#c45e3a] scale-110 shadow-md ring-2 ring-offset-2 ring-[#c45e3a]/40' : 'border-gray-200 hover:border-gray-400'}"
+                              style="background-color: ${hex}; outline: none;">
+                        ${isLight ? `<span class="absolute inset-0.5 rounded-full border border-gray-200/50"></span>` : ''}
+                        ${color === currentSelectedColor ? `
+                          <span class="absolute inset-0 flex items-center justify-center">
+                            <i data-lucide="check" class="w-4 h-4 ${isLight ? 'text-black' : 'text-white'}"></i>
+                          </span>
+                        ` : ''}
+                      </button>
+                    `;
+                  }).join('')}
+                </div>
+              </div>
+
+              <!-- Trust Badges -->
+              <div class="grid grid-cols-3 gap-3 py-4 border-t border-b border-gray-100 my-6">
+                <div class="flex flex-col items-center text-center p-2 rounded-2xl bg-gray-50 border border-gray-100/50">
+                  <i data-lucide="truck" class="w-5 h-5 text-[#c45e3a] mb-1"></i>
+                  <span class="text-[10px] font-bold text-gray-800">Giao Miễn Phí</span>
+                  <span class="text-[8px] text-gray-400 mt-0.5">Đơn hàng từ 500k</span>
+                </div>
+                <div class="flex flex-col items-center text-center p-2 rounded-2xl bg-gray-50 border border-gray-100/50">
+                  <i data-lucide="rotate-ccw" class="w-5 h-5 text-[#c45e3a] mb-1"></i>
+                  <span class="text-[10px] font-bold text-gray-800">Đổi Trả 7 Ngày</span>
+                  <span class="text-[8px] text-gray-400 mt-0.5">Dễ dàng, nhanh chóng</span>
+                </div>
+                <div class="flex flex-col items-center text-center p-2 rounded-2xl bg-gray-50 border border-gray-100/50">
+                  <i data-lucide="shield-check" class="w-5 h-5 text-[#c45e3a] mb-1"></i>
+                  <span class="text-[10px] font-bold text-gray-800">Chính Hãng 100%</span>
+                  <span class="text-[8px] text-gray-400 mt-0.5">Cam kết chất lượng</span>
+                </div>
+              </div>
+              
+              <!-- Quantity and Add to Cart -->
+              <div class="pt-2 flex flex-col sm:flex-row gap-4">
+                <div class="flex border border-gray-200 rounded-full w-fit bg-white overflow-hidden self-start">
+                  <button onclick="changeDetailQty(-1)" class="px-4 py-3 hover:bg-gray-100 transition"><i data-lucide="minus" class="w-4 h-4"></i></button>
+                  <input type="number" id="detail-qty" value="1" min="1" max="99" class="w-12 text-center outline-none text-sm font-bold bg-transparent">
+                  <button onclick="changeDetailQty(1)" class="px-4 py-3 hover:bg-gray-100 transition"><i data-lucide="plus" class="w-4 h-4"></i></button>
+                </div>
+                
+                <button id="detail-cart-btn" onclick="addDetailToCart()" class="flex-1 bg-[#1a1a1a] hover:bg-[#c45e3a] text-white font-bold py-3.5 rounded-full transition flex items-center justify-center gap-2 shadow-lg shadow-black/10">
+                  <i data-lucide="shopping-bag" class="w-4 h-4"></i> Thêm vào giỏ hàng
+                </button>
+                
+                <button onclick="toggleWishlist('${product.id}')" class="border border-gray-200 p-3 rounded-full hover:bg-gray-50 transition flex items-center gap-1 text-xs font-semibold">
+                  <i data-lucide="heart" class="w-5 h-5 ${favIconClass}"></i> <span class="hidden sm:inline">${favBtnLabel}</span>
+                </button>
+              </div>
+
+              <!-- Accordions -->
+              <div class="space-y-2 pt-2">
+                <div class="border border-gray-100 rounded-2xl overflow-hidden bg-white">
+                  <button onclick="toggleAccordion('acc-spec')" class="w-full flex items-center justify-between p-4 text-xs font-bold text-gray-800 hover:bg-gray-50 transition">
+                    <span>THÔNG SỐ & CHẤT LIỆU</span>
+                    <i id="acc-spec-icon" data-lucide="chevron-down" class="w-4 h-4 text-gray-400 transition-transform"></i>
+                  </button>
+                  <div id="acc-spec" class="hidden px-4 pb-4 text-xs text-gray-600 leading-relaxed space-y-2 border-t border-gray-50 pt-3">
+                    <p>• <strong>Chất liệu:</strong> 100% Cotton tự nhiên cao cấp mềm mại, thấm hút mồ hôi và thoáng khí.</p>
+                    <p>• <strong>Kiểu dáng:</strong> Thiết kế thời trang, dễ dàng phối hợp trang phục hàng ngày.</p>
+                    <p>• <strong>Chất lượng:</strong> Đường kim mũi chỉ đạt tiêu chuẩn xuất khẩu cao cấp.</p>
+                  </div>
+                </div>
+                
+                <div class="border border-gray-100 rounded-2xl overflow-hidden bg-white">
+                  <button onclick="toggleAccordion('acc-care')" class="w-full flex items-center justify-between p-4 text-xs font-bold text-gray-800 hover:bg-gray-50 transition">
+                    <span>HƯỚNG DẪN BẢO QUẢN</span>
+                    <i id="acc-care-icon" data-lucide="chevron-down" class="w-4 h-4 text-gray-400 transition-transform"></i>
+                  </button>
+                  <div id="acc-care" class="hidden px-4 pb-4 text-xs text-gray-600 leading-relaxed space-y-2 border-t border-gray-50 pt-3">
+                    <p>• Giặt máy ở chế độ nhẹ nhàng với nước lạnh hoặc ấm.</p>
+                    <p>• Không sử dụng hóa chất tẩy rửa mạnh để giữ màu tốt hơn.</p>
+                    <p>• Phơi nơi khô ráo thoáng mát, hạn chế vắt quá kiệt nước.</p>
+                  </div>
+                </div>
+              </div>
+            </div>
+          </div>`;
+
+        renderDetailReviews(product);
+        renderRelatedProducts(product);
+        lucide.createIcons();
+
+        const stockVal = product.stock !== undefined ? product.stock : 0;
+        const badgeNode = document.getElementById('detail-stock-badge');
+        if (badgeNode) {
+          if (stockVal === 0) {
+            badgeNode.innerHTML = `<span class="text-red-500 font-bold bg-red-50 px-2 py-0.5 rounded border border-red-100 text-xs">Hết hàng</span>`;
+          } else if (stockVal <= 5) {
+            badgeNode.innerHTML = `<span class="text-amber-500 font-bold bg-amber-50 px-2 py-0.5 rounded border border-amber-100 text-xs">Sắp hết hàng (${stockVal})</span>`;
+          } else {
+            badgeNode.innerHTML = `<span class="text-emerald-600 font-bold bg-emerald-50 px-2 py-0.5 rounded border border-emerald-100 text-xs">Còn hàng (${stockVal})</span>`;
+          }
+        }
+        
+        const cartBtn = document.getElementById('detail-cart-btn');
+        if (cartBtn && stockVal === 0) {
+          cartBtn.disabled = true;
+          cartBtn.className = 'flex-1 bg-gray-300 text-gray-500 font-bold py-3.5 rounded-full cursor-not-allowed flex items-center justify-center gap-2';
+          cartBtn.innerHTML = `<i data-lucide="shopping-bag" class="w-4.5 h-4.5"></i> Hết hàng`;
+          lucide.createIcons();
+        }
+
+        updateProductDetailsPriceAndImage();
+      } catch (err) {
+        detailContainer.innerHTML = '<div class="text-center py-20 text-red-500">Lỗi tải chi tiết sản phẩm.</div>';
+      }
+    }
+
+    function switchDetailImage(url, style, btn) {
+      const mainImg = document.getElementById('detail-main-img');
+      if (mainImg) {
+        mainImg.src = url;
+        mainImg.style = style;
+      }
+      btn.parentElement.querySelectorAll('button').forEach(b => {
+        b.className = 'aspect-[3/4] rounded-2xl overflow-hidden border-2 transition-all bg-white relative border-gray-100 hover:border-gray-300';
+      });
+      btn.className = 'aspect-[3/4] rounded-2xl overflow-hidden border-2 transition-all bg-white relative border-black ring-2 ring-offset-2 ring-black/10';
+    }
+
+    function toggleAccordion(id) {
+      const element = document.getElementById(id);
+      const icon = document.getElementById(id + '-icon');
+      if (element && icon) {
+        const isHidden = element.classList.contains('hidden');
+        if (isHidden) {
+          element.classList.remove('hidden');
+          icon.classList.add('rotate-180');
+        } else {
+          element.classList.add('hidden');
+          icon.classList.remove('rotate-180');
+        }
+      }
+    }
+
+    function selectDetailSize(size, btn) {
+      currentSelectedSize = size;
+      const activeSizeLabel = document.getElementById('detail-active-size');
+      if (activeSizeLabel) activeSizeLabel.textContent = size;
+      
+      btn.parentElement.querySelectorAll('button').forEach(b => {
+        b.className = 'border px-4 py-2.5 rounded-xl text-xs font-bold transition border-gray-200 text-gray-600 bg-white hover:bg-gray-50 hover:border-black';
+      });
+      btn.className = 'border px-4 py-2.5 rounded-xl text-xs font-bold transition border-black bg-black text-white shadow-sm';
+      updateProductDetailsPriceAndImage();
+    }
+
+    function selectDetailColor(color, btn) {
+      currentSelectedColor = color;
+      const activeColorLabel = document.getElementById('detail-active-color');
+      if (activeColorLabel) activeColorLabel.textContent = color;
+      
+      btn.parentElement.querySelectorAll('button').forEach(b => {
+        b.className = 'w-9 h-9 rounded-full border-2 transition-all duration-200 relative flex items-center justify-center border-gray-200 hover:border-gray-400';
+        const check = b.querySelector('.absolute.inset-0.flex');
+        if (check) check.remove();
+      });
+      
+      btn.className = 'w-9 h-9 rounded-full border-2 transition-all duration-200 relative flex items-center justify-center border-[#c45e3a] scale-110 shadow-md ring-2 ring-offset-2 ring-[#c45e3a]/40';
+      
+      const norm = color.toLowerCase().trim();
+      const isLight = ['trắng', 'kem', 'be', 'kem sữa'].includes(norm);
+      const checkHtml = `
+        <span class="absolute inset-0 flex items-center justify-center">
+          <i data-lucide="check" class="w-4 h-4 ${isLight ? 'text-black' : 'text-white'}"></i>
+        </span>`;
+      btn.insertAdjacentHTML('beforeend', checkHtml);
+      lucide.createIcons();
+      updateProductDetailsPriceAndImage();
+    }
+
+    function changeDetailQty(amount) {
+      const input = document.getElementById('detail-qty');
+      let val = parseInt(input.value) + amount;
+      if (val < 1) val = 1;
+      input.value = val;
+    }
+
+    function addDetailToCart() {
+      if (!authUser) {
+        showToast('Vui lòng đăng nhập để thêm sản phẩm vào giỏ hàng!', 'info');
+        openAuthModal();
+        return;
+      }
+      const qty = parseInt(document.getElementById('detail-qty').value);
+      addToCartState(currentDetailProductId, qty, currentSelectedSize, currentSelectedColor);
+      showToast('Đã thêm sản phẩm vào giỏ hàng!');
+    }
+
+    function scrollToReviews() {
+      const section = document.getElementById('review-form');
+      if (section) section.scrollIntoView({ behavior: 'smooth' });
+    }
+
+    function renderDetailReviews(product) {
+      const reviews = reviewsState;
+      const list = document.getElementById('product-reviews-list');
+      
+      document.getElementById('detail-review-count').textContent = `Dựa trên ${reviews.length} đánh giá`;
+      
+      const avg = product.rating;
+      document.getElementById('detail-avg-rating').textContent = avg;
+      
+      const avgStars = document.getElementById('detail-avg-stars');
+      avgStars.innerHTML = '';
+      const roundedAvg = Math.round(parseFloat(avg));
+      for (let i = 1; i <= 5; i++) {
+        avgStars.innerHTML += `<i data-lucide="star" class="w-4 h-4 text-amber-400 ${i <= roundedAvg ? 'fill-current' : 'text-gray-300 fill-none'}"></i>`;
+      }
+
+      // Calculate rating breakdown statistics
+      const totalReviews = reviews.length;
+      const counts = { 5: 0, 4: 0, 3: 0, 2: 0, 1: 0 };
+      reviews.forEach(r => {
+        if (counts[r.rating] !== undefined) counts[r.rating]++;
+      });
+      
+      for (let star = 5; star >= 1; star--) {
+        const count = counts[star];
+        const pct = totalReviews > 0 ? Math.round((count / totalReviews) * 100) : 0;
+        const bar = document.getElementById(`bar-${star}-star`);
+        const pctText = document.getElementById(`pct-${star}-star`);
+        if (bar) bar.style.width = pct + '%';
+        if (pctText) pctText.textContent = pct + '%';
+      }
+
+      list.innerHTML = '';
+      if (reviews.length === 0) {
+        list.innerHTML = `<p class="text-sm text-gray-400 italic">Chưa có đánh giá nào cho sản phẩm này. Hãy mua sản phẩm và viết cảm nhận đầu tiên của bạn!</p>`;
+      } else {
+        reviews.forEach(r => {
+          let stars = '';
+          for (let i = 1; i <= 5; i++) {
+            stars += `<i data-lucide="star" class="w-3.5 h-3.5 text-amber-400 ${i <= r.rating ? 'fill-current' : 'text-gray-300 fill-none'}"></i>`;
+          }
+          
+          const reviewDate = r.created_at ? new Date(r.created_at).toLocaleDateString('vi-VN') : 'Vừa xong';
+          list.innerHTML += `
+            <div class="bg-gray-50 p-4 rounded-2xl space-y-2 border border-gray-100">
+              <div class="flex items-center justify-between">
+                <div>
+                  <h5 class="font-bold text-sm text-gray-800">${r.customer_name}</h5>
+                  <div class="flex items-center gap-0.5 mt-0.5">${stars}</div>
+                </div>
+                <span class="text-xs text-gray-400 font-semibold">${reviewDate}</span>
+              </div>
+              <p class="text-sm text-gray-600 font-light leading-relaxed">${r.comment}</p>
+            </div>`;
+        });
+      }
+      lucide.createIcons();
+    }
+
+    const starButtons = document.querySelectorAll('#star-rating-select button');
+    starButtons.forEach(btn => {
+      btn.onclick = () => {
+        userReviewRating = parseInt(btn.dataset.rating);
+        starButtons.forEach((b, i) => {
+          if (i < userReviewRating) {
+            b.classList.remove('text-gray-300');
+            b.classList.add('text-amber-400');
+          } else {
+            b.classList.remove('text-amber-400');
+            b.classList.add('text-gray-300');
+          }
+        });
+      };
+    });
+
+    document.getElementById('review-form').onsubmit = async (e) => {
+      e.preventDefault();
+      const name = document.getElementById('review-name').value;
+      const comment = document.getElementById('review-comment').value;
+
+      const bodyData = {
+        product_id: currentDetailProductId,
+        customer_name: name,
+        rating: userReviewRating,
+        comment
+      };
+
+      try {
+        const res = await fetch('/api/reviews', {
+          method: 'POST',
+          headers,
+          body: JSON.stringify(bodyData)
+        });
+
+        const data = await res.json();
+        
+        if (res.ok) {
+          showToast('Cảm ơn bạn đã gửi đánh giá sản phẩm!');
+          await renderProductDetailPage(currentDetailProductId);
+          
+          document.getElementById('review-name').value = '';
+          document.getElementById('review-email').value = '';
+          document.getElementById('review-comment').value = '';
+          userReviewRating = 5;
+          starButtons.forEach(b => b.classList.add('text-amber-400'));
+        } else {
+          showToast(data.message || 'Lỗi gửi đánh giá', 'info');
+        }
+      } catch (err) {
+        showToast('Lỗi gửi đánh giá, vui lòng thử lại', 'info');
+      }
+    };
+
+    function renderRelatedProducts(product) {
+      const grid = document.getElementById('related-product-grid');
+      grid.innerHTML = '';
+      
+      const related = productsState.filter(p => p.category_id === product.category_id && p.id !== product.id).slice(0, 4);
+      const displayRelated = related.length > 0 ? related : productsState.filter(p => p.id !== product.id).slice(0, 4);
+
+      displayRelated.forEach(p => {
+        const isFav = wishlistState.includes(p.id.toString());
+        const favIconClass = isFav ? 'text-red-500 fill-current' : 'text-gray-400 fill-transparent hover:text-red-500';
+        
+        grid.innerHTML += `
+          <div class="product-card group cursor-pointer bg-white p-4 rounded-2xl border border-gray-100 hover:shadow-xl transition-all duration-300 relative flex flex-col justify-between" onclick="window.location.hash = '#/product/${p.id}'">
+            <button onclick="toggleWishlist('${p.id}', event)" class="absolute top-6 right-6 z-10 w-9 h-9 bg-white/90 rounded-full flex items-center justify-center shadow-md hover:scale-110 transition-transform">
+              <i data-lucide="heart" class="w-4 h-4 ${favIconClass}"></i>
+            </button>
+            
+            <div class="relative bg-[#faf9f7] rounded-xl overflow-hidden mb-3 aspect-[3/4] flex items-center justify-center">
+              <img src="${p.thumbnail_url}" alt="${p.name}" class="product-img w-full h-full object-cover">
+              
+              <div class="absolute inset-0 bg-black/5 opacity-0 group-hover:opacity-100 transition duration-300 flex items-end justify-center pb-4">
+                <button class="bg-[#1a1a1a] text-white text-[10px] font-bold px-4 py-2.5 rounded-full shadow-lg hover:bg-[#c45e3a] transition transform translate-y-2 group-hover:translate-y-0 duration-300" onclick="event.stopPropagation(); quickAddToCart('${p.id}')">
+                  + Thêm nhanh vào giỏ
+                </button>
+              </div>
+            </div>
+            <div>
+              <h3 class="font-bold text-sm text-gray-800 line-clamp-1 group-hover:text-[#c45e3a] transition">${p.name}</h3>
+              <span class="font-bold text-sm text-[#c45e3a] mt-1 block">${formatVND(p.price)}</span>
+            </div>
+          </div>`;
+      });
+      lucide.createIcons();
+    }
+
+    // -------------------------------------------------------------
+    // Shopping Cart State & View Actions
+    // -------------------------------------------------------------
+    function addToCartState(productId, quantity, size, color, customPrice) {
+      const existing = cartState.find(item => item.productId.toString() === productId.toString() && item.size === size && item.color === color);
+      if (existing) {
+        existing.quantity += quantity;
+      } else {
+        cartState.push({ productId, quantity, size, color, price: customPrice });
+      }
+      localStorage.setItem('beestyle_cart', JSON.stringify(cartState));
+      updateCartBadge();
+      renderCartDrawer();
+    }
+
+    async function quickAddToCart(productId) {
+      if (!authUser) {
+        showToast('Vui lòng đăng nhập để thêm sản phẩm vào giỏ hàng!', 'info');
+        openAuthModal();
+        return;
+      }
+      await ensureProductsLoaded();
+      const product = productsState.find(p => p.id.toString() === productId.toString());
+      if (product) {
+        const sizes = product.sizes ? product.sizes.split(',').map(s => s.trim()) : ['Free Size'];
+        const colors = product.colors ? product.colors.split(',').map(c => c.trim()) : ['Mặc định'];
+        addToCartState(productId, 1, sizes[0], colors[0], product.price);
+        showToast('Đã thêm sản phẩm vào giỏ hàng!');
+      }
+    }
+
+    function removeCartItem(index, event) {
+      if (event) event.stopPropagation();
+      cartState.splice(index, 1);
+      localStorage.setItem('beestyle_cart', JSON.stringify(cartState));
+      updateCartBadge();
+      renderCartDrawer();
+      if (window.location.hash === '#/cart') renderCartPage();
+      showToast('Đã xóa sản phẩm khỏi giỏ hàng.', 'info');
+    }
+
+    function updateCartItemQty(index, newQty) {
+      if (newQty < 1) newQty = 1;
+      cartState[index].quantity = newQty;
+      localStorage.setItem('beestyle_cart', JSON.stringify(cartState));
+      updateCartBadge();
+      renderCartDrawer();
+      if (window.location.hash === '#/cart') renderCartPage();
+    }
+
+    // -------------------------------------------------------------
+    // Page Rendering: CART Drawer & Page
+    // -------------------------------------------------------------
+    async function renderCartDrawer() {
+      const drawerItems = document.getElementById('cart-drawer-items');
+      const drawerEmpty = document.getElementById('cart-drawer-empty');
+      const drawerFooter = document.getElementById('cart-drawer-footer');
+      
+      drawerItems.innerHTML = '';
+      
+      if (cartState.length === 0) {
+        drawerEmpty.classList.remove('hidden');
+        drawerFooter.classList.add('hidden');
+        return;
+      }
+      
+      drawerEmpty.classList.add('hidden');
+      drawerFooter.classList.remove('hidden');
+
+      await ensureProductsLoaded();
+
+      let subtotal = 0;
+
+      cartState.forEach((item, index) => {
+        const prod = productsState.find(p => p.id.toString() === item.productId.toString());
+        if (!prod) return;
+
+        const itemPrice = item.price !== undefined ? item.price : prod.price;
+        const itemTotal = itemPrice * item.quantity;
+        subtotal += itemTotal;
+
+        drawerItems.innerHTML += `
+          <div class="flex gap-4 p-3 bg-white border border-gray-100 rounded-2xl shadow-sm relative group">
+            <div class="w-16 h-20 bg-[#f5f0ea] rounded-xl overflow-hidden shrink-0 flex items-center justify-center">
+              <img src="${prod.thumbnail_url}" alt="${prod.name}" class="w-full h-full object-cover">
+            </div>
+            
+            <div class="flex-1 flex flex-col justify-between">
+              <div>
+                <h4 class="font-bold text-xs text-gray-800 line-clamp-1">${prod.name}</h4>
+                <p class="text-[10px] text-gray-400 mt-0.5">Size: ${item.size} · Màu: ${item.color}</p>
+              </div>
+              
+              <div class="flex items-center justify-between mt-1">
+                <div class="flex border border-gray-200 rounded-full bg-white overflow-hidden">
+                  <button onclick="updateCartItemQty(${index}, ${item.quantity - 1})" class="px-2 py-1 hover:bg-gray-100 transition text-xs font-semibold">-</button>
+                  <span class="w-6 text-center text-xs self-center font-bold">${item.quantity}</span>
+                  <button onclick="updateCartItemQty(${index}, ${item.quantity + 1})" class="px-2 py-1 hover:bg-gray-100 transition text-xs font-semibold">+</button>
+                </div>
+                <span class="text-xs font-bold text-[#c45e3a]">${formatVND(itemPrice)}</span>
+              </div>
+            </div>
+            
+            <button onclick="removeCartItem(${index}, event)" class="absolute top-2 right-2 text-gray-300 hover:text-red-500 transition">
+              <i data-lucide="trash-2" class="w-4 h-4"></i>
+            </button>
+          </div>`;
+      });
+
+      document.getElementById('cart-drawer-subtotal').textContent = formatVND(subtotal);
+      document.getElementById('cart-drawer-total').textContent = formatVND(subtotal);
+      lucide.createIcons();
+    }
+
+    async function renderCartPage() {
+      const wrapper = document.getElementById('cart-items-wrapper');
+      const summary = document.getElementById('cart-summary-wrapper');
+      
+      wrapper.innerHTML = '';
+      summary.innerHTML = '';
+
+      if (cartState.length === 0) {
+        wrapper.innerHTML = `
+          <div class="text-center py-20 bg-white rounded-3xl border border-gray-100 shadow-sm p-6 col-span-3">
+            <span class="text-6xl block mb-4">🛒</span>
+            <h3 class="font-heading text-2xl font-bold text-gray-800">Giỏ hàng trống</h3>
+            <p class="text-gray-400 text-sm mt-2 max-w-sm mx-auto">Chưa có sản phẩm nào được chọn. Hãy ghé qua cửa hàng thời trang Beestyle của chúng tôi để mua sắm ngay.</p>
+            <a href="#/shop" class="bg-[#1a1a1a] hover:bg-[#c45e3a] text-white text-xs font-bold px-8 py-3.5 rounded-full mt-6 inline-block transition shadow-lg">Tiếp Tục Mua Sắm</a>
+          </div>`;
+        return;
+      }
+
+      await ensureProductsLoaded();
+
+      let subtotal = 0;
+
+      let itemsHtml = `<div class="bg-white rounded-3xl p-6 border border-gray-200 shadow-sm space-y-4">`;
+      cartState.forEach((item, index) => {
+        const prod = productsState.find(p => p.id.toString() === item.productId.toString());
+        if (!prod) return;
+
+        const itemPrice = item.price !== undefined ? item.price : prod.price;
+        const itemTotal = itemPrice * item.quantity;
+        subtotal += itemTotal;
+
+        itemsHtml += `
+          <div class="flex flex-col sm:flex-row items-start sm:items-center justify-between gap-4 py-4 ${index > 0 ? 'border-t border-gray-100' : ''}">
+            <div class="flex gap-4">
+              <div class="w-16 h-20 bg-gray-50 rounded-xl overflow-hidden shrink-0">
+                <img src="${prod.thumbnail_url}" alt="${prod.name}" class="w-full h-full object-cover">
+              </div>
+              <div>
+                <h4 class="font-bold text-sm text-gray-800 hover:text-[#c45e3a] cursor-pointer" onclick="window.location.hash = '#/product/${prod.id}'">${prod.name}</h4>
+                <p class="text-xs text-gray-400 mt-1">Kích cỡ: <span class="font-bold">${item.size}</span> · Màu sắc: <span class="font-bold">${item.color}</span></p>
+                <div class="sm:hidden flex items-center gap-4 mt-2">
+                  <span class="text-sm font-bold text-[#c45e3a]">${formatVND(itemPrice)}</span>
+                </div>
+              </div>
+            </div>
+            
+            <div class="flex sm:flex-row items-center justify-between sm:justify-end gap-6 w-full sm:w-auto">
+              <div class="flex items-center gap-2">
+                <span class="text-xs text-gray-400 font-semibold sm:hidden">Số lượng:</span>
+                <div class="flex border border-gray-200 rounded-full bg-white overflow-hidden">
+                  <button onclick="updateCartItemQty(${index}, ${item.quantity - 1})" class="px-3 py-1.5 hover:bg-gray-100 transition text-sm font-semibold">-</button>
+                  <span class="w-8 text-center text-sm self-center font-bold">${item.quantity}</span>
+                  <button onclick="updateCartItemQty(${index}, ${item.quantity + 1})" class="px-3 py-1.5 hover:bg-gray-100 transition text-sm font-semibold">+</button>
+                </div>
+              </div>
+              
+              <div class="text-right hidden sm:block">
+                <p class="text-xs text-gray-400">Thành tiền</p>
+                <p class="text-sm font-bold text-gray-800">${formatVND(itemTotal)}</p>
+              </div>
+              
+              <button onclick="removeCartItem(${index}, event)" class="text-gray-300 hover:text-red-500 transition p-2 hover:bg-gray-50 rounded-full">
+                <i data-lucide="trash-2" class="w-5 h-5"></i>
+              </button>
+            </div>
+          </div>`;
+      });
+      itemsHtml += `</div>`;
+      wrapper.innerHTML = itemsHtml;
+
+      let discountAmount = 0;
+      let finalTotal = subtotal;
+
+      if (appliedVoucher) {
+        discountAmount = appliedVoucher.discount_amount;
+        finalTotal = Math.max(0, subtotal - discountAmount);
+      }
+
+      summary.innerHTML = `
+        <div class="bg-white rounded-3xl p-6 border border-gray-200 shadow-sm space-y-6">
+          <h3 class="font-bold text-lg text-gray-800 border-b border-gray-100 pb-2">Tóm tắt đơn hàng</h3>
+          
+          <div class="space-y-3 text-sm">
+            <div class="flex justify-between text-gray-500">
+              <span>Tạm tính</span>
+              <span class="font-semibold text-gray-800">${formatVND(subtotal)}</span>
+            </div>
+            ${appliedVoucher ? `
+              <div class="flex justify-between text-green-600 font-semibold">
+                <span>Voucher (${appliedVoucher.code})</span>
+                <span>-${formatVND(discountAmount)}</span>
+              </div>
+            ` : ''}
+            <div class="flex justify-between text-gray-500">
+              <span>Phí vận chuyển</span>
+              <span class="font-semibold text-green-600">Miễn phí</span>
+            </div>
+            <div class="border-t border-gray-100 pt-3 flex justify-between font-bold text-base text-gray-800">
+              <span>Tổng cộng</span>
+              <span class="text-[#c45e3a] text-lg">${formatVND(finalTotal)}</span>
+            </div>
+          </div>
+          
+          <div class="space-y-2">
+            <label class="text-xs font-bold text-gray-400 uppercase tracking-wider">Mã giảm giá</label>
+            <div class="flex gap-2">
+              <input type="text" id="voucher-input" placeholder="Nhập mã code..." value="${appliedVoucher ? appliedVoucher.code : ''}" class="flex-1 px-4 py-2 text-sm border border-gray-200 rounded-xl outline-none focus:border-[#c45e3a] uppercase font-mono">
+              <button onclick="applyVoucherCode()" class="bg-[#1a1a1a] hover:bg-[#c45e3a] text-white text-xs font-semibold px-4 py-2 rounded-xl transition">Áp dụng</button>
+            </div>
+            ${appliedVoucher ? `
+              <p class="text-xs text-green-600 font-semibold flex items-center gap-1 mt-1">
+                ✓ Đã áp dụng mã giảm giá thành công.
+                <button onclick="removeVoucher()" class="text-red-500 underline ml-2 hover:text-red-700">Hủy</button>
+              </p>
+            ` : `
+              <p class="text-[10px] text-gray-400">Gợi ý: Thử nhập mã <span class="font-bold text-gray-600">BEESTYLE30</span></p>
+            `}
+          </div>
+          
+          <a href="#/checkout" class="w-full text-center bg-[#1a1a1a] hover:bg-[#c45e3a] text-white py-4 rounded-full font-bold shadow-lg transition block text-sm">
+            Tiến Hành Thanh Toán
+          </a>
+        </div>`;
+      
+      lucide.createIcons();
+    }
+
+    async function applyVoucherCode() {
+      const code = document.getElementById('voucher-input').value.toUpperCase().trim();
+      if (code === '') return;
+
+      let subtotal = 0;
+      cartState.forEach(item => {
+        const prod = productsState.find(p => p.id.toString() === item.productId.toString());
+        if (prod) subtotal += prod.price * item.quantity;
+      });
+
+      try {
+        const res = await fetch('/api/vouchers/apply', {
+          method: 'POST',
+          headers,
+          body: JSON.stringify({ code, order_value: subtotal })
+        });
+
+        const data = await res.json();
+
+        if (res.ok) {
+          appliedVoucher = {
+            id: data.voucher_id,
+            code: data.code,
+            discount_amount: data.discount_amount
+          };
+          showToast('Áp dụng mã giảm giá ' + code + ' thành công!');
+          renderCartPage();
+        } else {
+          showToast(data.message || 'Mã giảm giá không hợp lệ', 'info');
+          appliedVoucher = null;
+          renderCartPage();
+        }
+      } catch (err) {
+        showToast('Lỗi áp dụng mã giảm giá', 'info');
+      }
+    }
+
+    function removeVoucher() {
+      appliedVoucher = null;
+      showToast('Đã hủy áp dụng mã giảm giá.', 'info');
+      renderCartPage();
+    }
+
+    // -------------------------------------------------------------
+    // Page Rendering: CHECKOUT & PLACE ORDER
+    // -------------------------------------------------------------
+    async function renderCheckoutPage() {
+      if (cartState.length === 0) {
+        window.location.hash = '#/cart';
+        return;
+      }
+
+      await ensureProductsLoaded();
+
+      const itemsList = document.getElementById('checkout-items-list');
+      const summaryCalc = document.getElementById('checkout-summary-calc');
+      
+      itemsList.innerHTML = '';
+      let subtotal = 0;
+
+      cartState.forEach(item => {
+        const prod = productsState.find(p => p.id.toString() === item.productId.toString());
+        if (!prod) return;
+
+        const itemPrice = item.price !== undefined ? item.price : prod.price;
+        const totalItemPrice = itemPrice * item.quantity;
+        subtotal += totalItemPrice;
+
+        itemsList.innerHTML += `
+          <div class="flex items-center gap-3 py-3">
+            <div class="w-12 h-14 bg-[#f5f0ea] rounded-lg overflow-hidden shrink-0 flex items-center justify-center">
+              <img src="${prod.thumbnail_url}" alt="${prod.name}" class="w-full h-full object-cover">
+            </div>
+            <div class="flex-1 text-xs">
+              <h4 class="font-bold text-gray-800 line-clamp-1">${prod.name}</h4>
+              <p class="text-gray-400 mt-0.5">${item.size} · ${item.color} · Qty: ${item.quantity}</p>
+            </div>
+            <span class="text-xs font-bold text-gray-700">${formatVND(totalItemPrice)}</span>
+          </div>`;
+      });
+
+      let discount = 0;
+      let total = subtotal;
+
+      if (appliedVoucher) {
+        discount = appliedVoucher.discount_amount;
+        total = Math.max(0, subtotal - discount);
+      }
+
+      summaryCalc.innerHTML = `
+        <div class="flex justify-between text-gray-500">
+          <span>Tạm tính</span>
+          <span class="font-semibold text-gray-700">${formatVND(subtotal)}</span>
+        </div>
+        ${appliedVoucher ? `
+          <div class="flex justify-between text-green-600 font-semibold">
+            <span>Voucher giảm giá</span>
+            <span>-${formatVND(discount)}</span>
+          </div>
+        ` : ''}
+        <div class="flex justify-between text-gray-500">
+          <span>Phí vận chuyển</span>
+          <span class="font-semibold text-green-600">Miễn phí</span>
+        </div>
+        <div class="border-t border-gray-100 pt-3 flex justify-between font-bold text-base text-gray-800">
+          <span>Tổng cộng</span>
+          <span class="text-[#c45e3a] text-lg">${formatVND(total)}</span>
+        </div>`;
+
+      const paymentRadios = document.querySelectorAll('input[name="payment-method"]');
+      const bankInfo = document.getElementById('bank-info');
+      
+      paymentRadios.forEach(radio => {
+        radio.addEventListener('change', (e) => {
+          if (e.target.value === 'bank') {
+            bankInfo.classList.remove('hidden');
+          } else {
+            bankInfo.classList.add('hidden');
+          }
+        });
+      });
+    }
+
+    document.getElementById('checkout-form').onsubmit = async (e) => {
+      e.preventDefault();
+      
+      const name = document.getElementById('checkout-name').value;
+      const phone = document.getElementById('checkout-phone').value;
+      const address = document.getElementById('checkout-address').value;
+      const note = document.getElementById('checkout-note').value;
+      const paymentMethod = document.querySelector('input[name="payment-method"]:checked').value;
+      
+      let subtotal = 0;
+      const orderItems = cartState.map(item => {
+        const prod = productsState.find(p => p.id.toString() === item.productId.toString());
+        const itemPrice = item.price !== undefined ? item.price : (prod ? prod.price : 0);
+        const itemTotal = itemPrice * item.quantity;
+        subtotal += itemTotal;
+        return {
+          product_id: item.productId,
+          price: itemPrice,
+          quantity: item.quantity,
+          size: item.size,
+          color: item.color
+        };
+      });
+
+      let discount = 0;
+      if (appliedVoucher) {
+        discount = appliedVoucher.discount_amount;
+      }
+      
+      const total = Math.max(0, subtotal - discount);
+
+      const orderData = {
+        customer_name: name,
+        customer_phone: phone,
+        customer_address: address,
+        customer_note: note,
+        payment_method: paymentMethod,
+        items: orderItems,
+        total_amount: total,
+        voucher_id: appliedVoucher ? appliedVoucher.id : null
+      };
+
+      if (paymentMethod === 'online_vnpay') {
+        pendingOrderData = orderData;
+        
+        // Show online payment modal
+        document.getElementById('online-payment-order-id').innerText = '#' + Math.floor(Math.random() * 90000 + 10000);
+        document.getElementById('online-payment-amount').innerText = formatVND(total);
+        
+        const modal = document.getElementById('online-payment-modal');
+        modal.classList.remove('hidden');
+        
+        let secondsLeft = 300;
+        const timerLabel = document.getElementById('online-payment-timer');
+        timerLabel.innerText = `Giao dịch hết hạn sau: 05:00`;
+        
+        if (onlinePaymentTimerInterval) {
+          clearInterval(onlinePaymentTimerInterval);
+        }
+        
+        onlinePaymentTimerInterval = setInterval(() => {
+          secondsLeft--;
+          if (secondsLeft <= 0) {
+            clearInterval(onlinePaymentTimerInterval);
+            onlinePaymentTimerInterval = null;
+            modal.classList.add('hidden');
+            showToast('Giao dịch trực tuyến đã hết hạn!', 'info');
+          } else {
+            const m = Math.floor(secondsLeft / 60).toString().padStart(2, '0');
+            const s = (secondsLeft % 60).toString().padStart(2, '0');
+            timerLabel.innerText = `Giao dịch hết hạn sau: ${m}:${s}`;
+          }
+        }, 1000);
+        
+        return;
+      }
+
+      try {
+        const res = await fetch('/api/orders', {
+          method: 'POST',
+          headers,
+          body: JSON.stringify(orderData)
+        });
+
+        const data = await res.json();
+
+        if (res.ok) {
+          const savedIds = JSON.parse(localStorage.getItem('beestyle_order_ids') || '[]');
+          savedIds.unshift(data.order_id);
+          localStorage.setItem('beestyle_order_ids', JSON.stringify(savedIds));
+
+          cartState = [];
+          localStorage.setItem('beestyle_cart', JSON.stringify(cartState));
+          updateCartBadge();
+          renderCartDrawer();
+          appliedVoucher = null;
+
+          showToast('Đặt hàng thành công! Cám ơn bạn đã lựa chọn Beestyle.');
+          window.location.hash = '#/orders';
+        } else {
+          showToast(data.message || 'Lỗi đặt hàng, vui lòng thử lại', 'info');
+        }
+      } catch (err) {
+        showToast('Lỗi kết nối máy chủ khi đặt hàng', 'info');
+      }
+    };
+
+    // -------------------------------------------------------------
+    // Page Rendering: ORDER PURCHASE HISTORY
+    // -------------------------------------------------------------
+    async function renderOrdersPage() {
+      const container = document.getElementById('orders-list-container');
+      container.innerHTML = '<div class="text-center py-20 text-gray-400">Đang tải lịch sử mua hàng...</div>';
+
+      const savedIds = JSON.parse(localStorage.getItem('beestyle_order_ids') || '[]');
+      
+      if (savedIds.length === 0) {
+        container.innerHTML = `
+          <div class="text-center py-20 bg-white rounded-3xl border border-gray-100 shadow-sm p-6">
+            <span class="text-6xl block mb-4">📦</span>
+            <h3 class="font-heading text-2xl font-bold text-gray-800">Chưa có đơn hàng nào</h3>
+            <p class="text-gray-400 text-sm mt-2 max-w-sm mx-auto">Bạn chưa thực hiện đơn đặt hàng nào tại cửa hàng của chúng tôi.</p>
+            <a href="#/shop" class="bg-[#1a1a1a] hover:bg-[#c45e3a] text-white text-xs font-bold px-8 py-3.5 rounded-full mt-6 inline-block transition">Mua Sắm Ngay</a>
+          </div>`;
+        return;
+      }
+
+      try {
+        const params = new URLSearchParams();
+        savedIds.forEach(id => params.append('order_ids[]', id));
+
+        const res = await fetch('/api/orders?' + params.toString());
+        const orders = await res.json();
+
+        container.innerHTML = '';
+        if (orders.length === 0) {
+          container.innerHTML = `
+            <div class="text-center py-20 bg-white rounded-3xl border border-gray-100 shadow-sm p-6">
+              <span class="text-6xl block mb-4">📦</span>
+              <h3 class="font-heading text-2xl font-bold text-gray-800">Chưa có đơn hàng nào</h3>
+              <p class="text-gray-400 text-sm mt-2 max-w-sm mx-auto">Bạn chưa thực hiện đơn đặt hàng nào tại cửa hàng của chúng tôi.</p>
+              <a href="#/shop" class="bg-[#1a1a1a] hover:bg-[#c45e3a] text-white text-xs font-bold px-8 py-3.5 rounded-full mt-6 inline-block transition">Mua Sắm Ngay</a>
+            </div>`;
+          return;
+        }
+
+        orders.forEach(order => {
+          let statusText = 'Chờ xử lý';
+          let statusBadgeClass = 'bg-yellow-50 text-yellow-600 border border-yellow-200';
+          
+          if (order.status === 'Processing') {
+            statusText = 'Đang xử lý';
+            statusBadgeClass = 'bg-yellow-100 text-yellow-700 border border-yellow-300';
+          } else if (order.status === 'Shipping') {
+            statusText = 'Đang giao hàng';
+            statusBadgeClass = 'bg-blue-50 text-blue-600 border border-blue-200';
+          } else if (order.status === 'Completed') {
+            statusText = 'Đã giao thành công';
+            statusBadgeClass = 'bg-green-50 text-green-600 border border-green-200';
+          } else if (order.status === 'Cancelled') {
+            statusText = 'Đã hủy đơn';
+            statusBadgeClass = 'bg-red-50 text-red-600 border border-red-200';
+          }
+
+          const itemsSummary = order.order_items.map(item => {
+            const prodName = item.product ? item.product.name : 'Sản phẩm đã xóa';
+            return `
+              <div class="flex justify-between items-center text-xs py-2 text-gray-600">
+                <span>${prodName} <span class="text-gray-400">(${item.size || 'Free'} · ${item.color || 'Mặc định'})</span> x${item.quantity}</span>
+                <span class="font-bold">${formatVND(item.price * item.quantity)}</span>
+              </div>
+            `;
+          }).join('');
+
+          const orderDate = new Date(order.created_at).toLocaleString('vi-VN');
+
+          container.innerHTML += `
+            <div class="bg-white rounded-3xl p-6 border border-gray-200 shadow-sm space-y-4">
+              <div class="flex flex-col sm:flex-row sm:items-center justify-between border-b border-gray-100 pb-3 gap-2">
+                <div>
+                  <span class="text-sm font-bold text-gray-800">Đơn hàng: <span class="font-mono text-[#c45e3a]">#${order.id}</span></span>
+                  <span class="text-xs text-gray-400 ml-2 font-semibold">${orderDate}</span>
+                </div>
+                <span class="text-xs px-3 py-1 rounded-full font-semibold ${statusBadgeClass}">${statusText}</span>
+              </div>
+              
+              <div class="divide-y divide-gray-50">
+                ${itemsSummary}
+              </div>
+              
+              <div class="border-t border-gray-100 pt-3 flex flex-col sm:flex-row justify-between text-xs gap-3">
+                <div class="space-y-1 text-gray-500 font-light">
+                  <p>📍 Người nhận: <span class="font-semibold text-gray-700">${order.customer_name} - ${order.customer_phone}</span></p>
+                  <p>🏠 Địa chỉ: <span class="font-semibold text-gray-700">${order.customer_address}</span></p>
+                  <p>💳 Thanh toán: <span class="font-semibold text-gray-700 uppercase">${order.payment_method === 'cod' ? 'Tiền mặt khi nhận hàng (COD)' : 'Chuyển khoản ngân hàng'}</span></p>
+                </div>
+                
+                <div class="text-right sm:self-end">
+                  <p class="text-gray-400 font-semibold">Tổng thanh toán</p>
+                  <p class="text-lg font-bold text-[#c45e3a]">${formatVND(order.total_amount)}</p>
+                </div>
+              </div>
+              
+              <div class="flex justify-between items-center pt-2">
+                <a href="#/order-detail/${order.id}" class="text-xs text-[#c45e3a] hover:underline font-semibold flex items-center gap-1">
+                  Xem chi tiết đơn hàng →
+                </a>
+                ${order.status === 'Pending' ? `
+                  <button onclick="cancelClientOrder('${order.id}')" class="text-xs text-red-500 hover:text-red-700 font-semibold border border-red-100 hover:bg-red-50 px-3.5 py-1.5 rounded-xl transition">Hủy yêu cầu đặt hàng</button>
+                ` : ''}
+              </div>
+            </div>`;
+        });
+        lucide.createIcons();
+      } catch (err) {
+        container.innerHTML = '<div class="text-center py-20 text-red-500">Lỗi tải danh sách đơn hàng. Vui lòng thử lại.</div>';
+      }
+    }
+
+    async function cancelClientOrder(orderId) {
+      if (confirm('Bạn chắc chắn muốn hủy đơn hàng #' + orderId + ' chứ?')) {
+        try {
+          const res = await fetch(`/api/orders/${orderId}/cancel`, {
+            method: 'PUT',
+            headers
+          });
+          const data = await res.json();
+          if (res.ok) {
+            await renderOrdersPage();
+            showToast('Hủy đơn hàng thành công!');
+          } else {
+            showToast(data.message || 'Không thể hủy đơn hàng lúc này', 'info');
+          }
+        } catch (err) {
+          showToast('Lỗi kết nối máy chủ', 'info');
+        }
+      }
+    }
+
+    function clearOrderHistory() {
+      if (confirm('Bạn muốn xóa toàn bộ lịch sử mua hàng trên trình duyệt này?')) {
+        localStorage.removeItem('beestyle_order_ids');
+        renderOrdersPage();
+        showToast('Đã dọn dẹp lịch sử đặt hàng.', 'info');
+      }
+    }
+
+    // -------------------------------------------------------------
+    // Page Rendering: ADMIN DASHBOARD
+    // -------------------------------------------------------------
+    let activeAdminTab = 'stat';
+    let adminProducts = [];
+    let adminOrders = [];
+
+    async function renderAdminPage() {
+      const statRevenueNode = document.getElementById('stat-revenue');
+      const statOrdersNode = document.getElementById('stat-orders-count');
+      const statProdsNode = document.getElementById('stat-products-count');
+      const statReviewsNode = document.getElementById('stat-reviews-count');
+
+      try {
+        const statsRes = await fetch('/api/admin/stats');
+        const stats = await statsRes.json();
+
+        statRevenueNode.textContent = formatVND(stats.total_revenue);
+        statOrdersNode.textContent = stats.order_count;
+        statProdsNode.textContent = stats.product_count;
+        statReviewsNode.textContent = stats.review_count;
+
+        const recentOrdersList = document.getElementById('recent-orders-list');
+        recentOrdersList.innerHTML = '';
+        if (stats.activities.length === 0) {
+          recentOrdersList.innerHTML = `<p class="text-xs text-gray-400 italic">Chưa có hoạt động nào gần đây.</p>`;
+        } else {
+          stats.activities.forEach(act => {
+            const icon = act.type === 'order' ? '📦' : '⭐';
+            recentOrdersList.innerHTML += `
+              <div class="flex items-start gap-2.5 text-xs p-3 bg-gray-50 rounded-xl border border-gray-100">
+                <span class="text-sm mt-0.5">${icon}</span>
+                <div class="flex-1">
+                  <p class="text-gray-700 leading-relaxed font-medium">${act.description}</p>
+                  <p class="text-[10px] text-gray-400 mt-1">${act.time}</p>
+                </div>
+              </div>`;
+          });
+        }
+
+        // Setup monthly revenue chart
+        const months = stats.monthly_revenue.map(item => item.month);
+        const revenues = stats.monthly_revenue.map(item => item.revenue);
+
+        const ctxArea = document.getElementById('earningsAreaChart');
+        if (ctxArea) {
+          if (earningsAreaChartInstance) {
+            earningsAreaChartInstance.destroy();
+          }
+          earningsAreaChartInstance = new Chart(ctxArea, {
+            type: 'line',
+            data: {
+              labels: months,
+              datasets: [{
+                label: 'Doanh thu',
+                data: revenues,
+                backgroundColor: 'rgba(196, 94, 58, 0.05)',
+                borderColor: '#c45e3a',
+                borderWidth: 2.5,
+                pointBackgroundColor: '#c45e3a',
+                pointBorderColor: '#ffffff',
+                pointBorderWidth: 1.5,
+                pointRadius: 4,
+                pointHoverRadius: 6,
+                tension: 0.35,
+                fill: true
+              }]
+            },
+            options: {
+              responsive: true,
+              maintainAspectRatio: false,
+              plugins: {
+                legend: {
+                  display: false
+                },
+                tooltip: {
+                  callbacks: {
+                    label: function(context) {
+                      return 'Doanh thu: ' + formatVND(context.raw);
+                    }
+                  }
+                }
+              },
+              scales: {
+                x: {
+                  grid: {
+                    display: false
+                  },
+                  ticks: {
+                    color: '#8e8e93',
+                    font: {
+                      size: 10
+                    }
+                  }
+                },
+                y: {
+                  grid: {
+                    color: '#f3f4f6'
+                  },
+                  ticks: {
+                    color: '#8e8e93',
+                    font: {
+                      size: 10
+                    },
+                    callback: function(value) {
+                      return formatVND(value);
+                    }
+                  }
+                }
+              }
+            }
+          });
+        }
+
+        // Setup category revenue doughnut chart
+        const categories = stats.category_revenue.map(item => item.category);
+        const catRevenues = stats.category_revenue.map(item => item.revenue);
+        const pieColors = ['#c45e3a', '#1e293b', '#a3b899', '#8e8e93', '#ffb6c1', '#f5f5dc'];
+
+        const ctxPie = document.getElementById('revenuePieChart');
+        if (ctxPie) {
+          if (revenuePieChartInstance) {
+            revenuePieChartInstance.destroy();
+          }
+          
+          revenuePieChartInstance = new Chart(ctxPie, {
+            type: 'doughnut',
+            data: {
+              labels: categories,
+              datasets: [{
+                data: catRevenues,
+                backgroundColor: pieColors.slice(0, categories.length),
+                borderWidth: 2,
+                borderColor: '#ffffff'
+              }]
+            },
+            options: {
+              responsive: true,
+              maintainAspectRatio: false,
+              plugins: {
+                legend: {
+                  display: false
+                },
+                tooltip: {
+                  callbacks: {
+                    label: function(context) {
+                      const total = context.dataset.data.reduce((a, b) => a + b, 0);
+                      const val = context.raw;
+                      const pct = total > 0 ? Math.round((val / total) * 100) : 0;
+                      return `${context.label}: ${formatVND(val)} (${pct}%)`;
+                    }
+                  }
+                }
+              },
+              cutout: '70%'
+            }
+          });
+
+          // Build custom legend under the pie chart
+          const legendNode = document.getElementById('pie-chart-legend');
+          if (legendNode) {
+            legendNode.innerHTML = '';
+            categories.forEach((cat, idx) => {
+              const val = catRevenues[idx];
+              const total = catRevenues.reduce((a, b) => a + b, 0);
+              const pct = total > 0 ? Math.round((val / total) * 100) : 0;
+              legendNode.innerHTML += `
+                <div class="flex items-center gap-1.5">
+                  <span class="w-2.5 h-2.5 rounded-full inline-block" style="background-color: ${pieColors[idx % pieColors.length]}"></span>
+                  <span class="text-gray-600 font-medium">${cat} (${pct}%)</span>
+                </div>`;
+            });
+          }
+        }
+
+      } catch (err) {
+        console.error("Error rendering admin stats:", err);
+      }
+
+      const topProductsTbody = document.getElementById('top-products-tbody');
+      topProductsTbody.innerHTML = '';
+      
+      const adminProductsTbody = document.getElementById('admin-products-tbody');
+      adminProductsTbody.innerHTML = '<td colspan="5" class="text-center py-4 text-gray-400">Đang tải sản phẩm...</td>';
+
+      try {
+        const prodRes = await fetch('/api/admin/products');
+        adminProducts = await prodRes.json();
+
+        const topProducts = [...adminProducts].sort((a, b) => b.price - a.price).slice(0, 5);
+        topProductsTbody.innerHTML = '';
+        topProducts.forEach(p => {
+          topProductsTbody.innerHTML += `
+            <tr class="border-b border-gray-50 text-xs">
+              <td class="py-2.5 font-semibold text-gray-800 flex items-center gap-2">
+                <span class="w-6 h-8 rounded overflow-hidden shrink-0 inline-block bg-gray-100">
+                  <img src="${p.thumbnail_url}" class="w-full h-full object-cover">
+                </span>
+                <span class="line-clamp-1">${p.name}</span>
+              </td>
+              <td class="py-2.5 text-right font-bold text-gray-700">${formatVND(p.price)}</td>
+              <td class="py-2.5 text-right text-yellow-500 font-bold">★ ${p.rating}</td>
+            </tr>`;
+        });
+
+        adminProductsTbody.innerHTML = '';
+        adminProducts.forEach(p => {
+          const catText = p.category ? p.category.name : 'Khác';
+          const stockVal = p.stock !== undefined ? p.stock : 0;
+          let stockBadge = '';
+          if (stockVal === 0) {
+            stockBadge = `<span class="px-2.5 py-1 rounded-full text-[10px] font-bold bg-rose-50 text-rose-600 border border-rose-100">Hết hàng</span>`;
+          } else if (stockVal <= 10) {
+            stockBadge = `<span class="px-2.5 py-1 rounded-full text-[10px] font-bold bg-amber-50 text-amber-600 border border-amber-100">Sắp hết (${stockVal})</span>`;
+          } else {
+            stockBadge = `<span class="px-2.5 py-1 rounded-full text-[10px] font-bold bg-emerald-50 text-emerald-600 border border-emerald-100">${stockVal} chiếc</span>`;
+          }
+
+          adminProductsTbody.innerHTML += `
+            <tr class="text-xs border-b border-gray-100 hover:bg-gray-50/50 transition">
+              <td class="py-3 px-2">
+                <div class="w-9 h-12 rounded overflow-hidden shadow-sm bg-[#faf9f7] flex items-center justify-center">
+                  <img src="${p.thumbnail_url}" class="w-full h-full object-cover">
+                </div>
+              </td>
+              <td class="py-3 px-2 font-semibold text-gray-800">${p.name}</td>
+              <td class="py-3 px-2 text-gray-500">${catText}</td>
+              <td class="py-3 px-2 text-right font-bold text-gray-700">${formatVND(p.price)}</td>
+              <td class="py-3 px-2 text-center">${stockBadge}</td>
+              <td class="py-3 px-2 text-center">
+                <div class="flex items-center justify-center gap-1.5">
+                  <button onclick="editAdminProduct('${p.id}')" class="p-1 text-gray-400 hover:text-blue-600 transition" title="Sửa"><i data-lucide="edit-3" class="w-4 h-4"></i></button>
+                  <button onclick="deleteAdminProduct('${p.id}')" class="p-1 text-gray-400 hover:text-red-500 transition" title="Xóa"><i data-lucide="trash-2" class="w-4 h-4"></i></button>
+                </div>
+              </td>
+            </tr>`;
+        });
+      } catch (err) {
+        adminProductsTbody.innerHTML = '<td colspan="5" class="text-center py-4 text-red-500">Lỗi tải danh sách sản phẩm.</td>';
+      }
+
+      const adminOrdersTbody = document.getElementById('admin-orders-tbody');
+      const adminOrdersEmpty = document.getElementById('admin-orders-empty');
+      adminOrdersTbody.innerHTML = '<td colspan="7" class="text-center py-4 text-gray-400">Đang tải đơn hàng...</td>';
+      adminOrdersEmpty.classList.add('hidden');
+
+      try {
+        const ordRes = await fetch('/api/admin/orders');
+        adminOrders = await ordRes.json();
+
+        adminOrdersTbody.innerHTML = '';
+        if (adminOrders.length === 0) {
+          adminOrdersEmpty.classList.remove('hidden');
+        } else {
+          adminOrders.forEach(o => {
+            const orderDate = new Date(o.created_at).toLocaleString('vi-VN');
+            adminOrdersTbody.innerHTML += `
+              <tr class="text-xs border-b border-gray-100 hover:bg-gray-50/50 transition">
+                <td class="py-3 px-2 font-mono font-bold text-[#c45e3a]">#${o.id}</td>
+                <td class="py-3 px-2 text-gray-400">${orderDate}</td>
+                <td class="py-3 px-2">
+                  <p class="font-bold text-gray-800">${o.customer_name}</p>
+                  <p class="text-[10px] text-gray-400">${o.customer_phone}</p>
+                </td>
+                <td class="py-3 px-2 text-gray-500 max-w-xs truncate" title="${o.customer_address}">${o.customer_address}</td>
+                <td class="py-3 px-2 text-right font-bold text-gray-700">${formatVND(o.total_amount)}</td>
+                <td class="py-3 px-2 text-center font-bold">
+                  <select ${o.status === 'Completed' || o.status === 'Cancelled' ? 'disabled' : ''} onchange="updateAdminOrderStatus('${o.id}', this.value)" class="border rounded px-2 py-1 text-[11px] bg-white cursor-pointer outline-none ${
+                    o.status === 'Pending' ? 'border-yellow-300 text-yellow-600' :
+                    o.status === 'Processing' ? 'border-yellow-500 text-yellow-800' :
+                    o.status === 'Shipping' ? 'border-blue-300 text-blue-600' :
+                    o.status === 'Completed' ? 'border-green-300 text-green-600' :
+                    'border-red-300 text-red-500'
+                  }">
+                    ${o.status === 'Completed' ? `
+                      <option value="Completed" selected>Đã giao</option>
+                    ` : o.status === 'Cancelled' ? `
+                      <option value="Cancelled" selected>Đã hủy</option>
+                    ` : `
+                      <option value="Pending" ${o.status === 'Pending' ? 'selected' : ''}>Chờ xử lý</option>
+                      <option value="Processing" ${o.status === 'Processing' ? 'selected' : ''}>Đang xử lý</option>
+                      <option value="Shipping" ${o.status === 'Shipping' ? 'selected' : ''}>Đang giao</option>
+                      <option value="Completed" ${o.status === 'Completed' ? 'selected' : ''}>Đã giao</option>
+                      <option value="Cancelled" ${o.status === 'Cancelled' ? 'selected' : ''}>Đã hủy</option>
+                    `}
+                  </select>
+                </td>
+                <td class="py-3 px-2 text-center">
+                  <button onclick="viewAdminOrderDetails('${o.id}')" class="text-xs text-[#c45e3a] hover:underline font-semibold">Chi tiết</button>
+                </td>
+              </tr>`;
+          });
+        }
+      } catch (err) {
+        adminOrdersTbody.innerHTML = '<td colspan="7" class="text-center py-4 text-red-500">Lỗi tải danh sách đơn hàng.</td>';
+      }
+
+      switchAdminTab(activeAdminTab);
+      lucide.createIcons();
+    }
+
+    function switchAdminTab(tabName) {
+      activeAdminTab = tabName;
+      document.querySelectorAll('.admin-tab').forEach(tab => tab.classList.add('hidden'));
+      document.getElementById('admin-tab-' + tabName).classList.remove('hidden');
+
+      // Update sidebar buttons styling
+      const adminTabs = ['stat', 'prod', 'ord', 'voucher', 'user', 'review'];
+      adminTabs.forEach(tab => {
+        const btn = document.getElementById('btn-admin-sidebar-' + tab);
+        if (btn) {
+          if (tab === tabName) {
+            btn.className = 'w-full flex items-center gap-3 px-6 py-3 text-sm font-semibold transition text-white border-l-4 border-white bg-white/10 text-left outline-none';
+          } else {
+            btn.className = 'w-full flex items-center gap-3 px-6 py-3 text-sm font-semibold transition text-white/60 hover:text-white hover:bg-white/5 border-l-4 border-transparent text-left outline-none';
+          }
+        }
+      });
+
+      const btnStat = document.getElementById('btn-admin-tab-stat');
+      if (btnStat) btnStat.className = tabName === 'stat' ? 'px-4 py-2 text-xs font-bold rounded-lg bg-white shadow-sm text-black transition' : 'px-4 py-2 text-xs font-bold rounded-lg text-gray-500 hover:text-black transition';
+      const btnProd = document.getElementById('btn-admin-tab-prod');
+      if (btnProd) btnProd.className = tabName === 'prod' ? 'px-4 py-2 text-xs font-bold rounded-lg bg-white shadow-sm text-black transition' : 'px-4 py-2 text-xs font-bold rounded-lg text-gray-500 hover:text-black transition';
+      const btnOrd = document.getElementById('btn-admin-tab-ord');
+      if (btnOrd) btnOrd.className = tabName === 'ord' ? 'px-4 py-2 text-xs font-bold rounded-lg bg-white shadow-sm text-black transition' : 'px-4 py-2 text-xs font-bold rounded-lg text-gray-500 hover:text-black transition';
+
+      // Lazy load tab data
+      if (tabName === 'voucher') {
+        loadAdminVouchers();
+      } else if (tabName === 'user') {
+        loadAdminUsers();
+      } else if (tabName === 'review') {
+        loadAdminReviews();
+      }
+      lucide.createIcons();
+    }
+
+    // --- VOUCHERS MANAGEMENT TAB ---
+    let adminVouchers = [];
+    async function loadAdminVouchers() {
+      const tbody = document.getElementById('admin-vouchers-tbody');
+      tbody.innerHTML = '<tr><td colspan="6" class="text-center py-4 text-gray-400">Đang tải voucher...</td></tr>';
+      try {
+        const res = await fetch('/api/admin/vouchers');
+        adminVouchers = await res.json();
+        tbody.innerHTML = '';
+        if (adminVouchers.length === 0) {
+          tbody.innerHTML = '<tr><td colspan="6" class="text-center py-4 text-gray-400">Chưa có voucher nào.</td></tr>';
+          return;
+        }
+        adminVouchers.forEach(v => {
+          const expiryDate = new Date(v.expiry_date).toLocaleDateString('vi-VN');
+          tbody.innerHTML += `
+            <tr class="text-xs border-b border-gray-100 hover:bg-gray-50/50 transition">
+              <td class="py-3 px-2 font-mono font-bold text-gray-800">${v.code}</td>
+              <td class="py-3 px-2 text-center font-bold text-emerald-600">${v.discount_percent}%</td>
+              <td class="py-3 px-2 text-right font-bold text-gray-700">${v.max_discount ? formatVND(v.max_discount) : 'Không giới hạn'}</td>
+              <td class="py-3 px-2 text-center text-gray-500">${v.usage_limit ? v.usage_limit : 'Vô hạn'}</td>
+              <td class="py-3 px-2 text-center text-gray-500">${expiryDate}</td>
+              <td class="py-3 px-2 text-center">
+                <div class="flex items-center justify-center gap-1.5">
+                  <button onclick="editAdminVoucher('${v.id}')" class="p-1 text-gray-400 hover:text-blue-600 transition" title="Sửa"><i data-lucide="edit-3" class="w-4 h-4"></i></button>
+                  <button onclick="deleteAdminVoucher('${v.id}')" class="p-1 text-gray-400 hover:text-red-500 transition" title="Xóa"><i data-lucide="trash-2" class="w-4 h-4"></i></button>
+                </div>
+              </td>
+            </tr>`;
+        });
+        lucide.createIcons();
+      } catch (err) {
+        tbody.innerHTML = '<tr><td colspan="6" class="text-center py-4 text-rose-500">Lỗi tải danh sách voucher.</td></tr>';
+      }
+    }
+
+    function editAdminVoucher(id) {
+      const v = adminVouchers.find(item => item.id.toString() === id.toString());
+      if (!v) return;
+      document.getElementById('admin-voucher-id').value = v.id;
+      document.getElementById('admin-voucher-code').value = v.code;
+      document.getElementById('admin-voucher-percent').value = v.discount_percent;
+      document.getElementById('admin-voucher-max-discount').value = v.max_discount || '';
+      document.getElementById('admin-voucher-limit').value = v.usage_limit || '';
+      const expiry = v.expiry_date.split(' ')[0];
+      document.getElementById('admin-voucher-expiry').value = expiry;
+      document.getElementById('admin-voucher-form-title').innerText = 'Chỉnh Sửa Voucher';
+      document.getElementById('btn-admin-voucher-submit').innerText = 'Cập nhật Voucher';
+    }
+
+    function resetAdminVoucherForm() {
+      document.getElementById('admin-voucher-id').value = '';
+      document.getElementById('admin-voucher-code').value = '';
+      document.getElementById('admin-voucher-percent').value = '';
+      document.getElementById('admin-voucher-max-discount').value = '';
+      document.getElementById('admin-voucher-limit').value = '';
+      document.getElementById('admin-voucher-expiry').value = '';
+      document.getElementById('admin-voucher-form-title').innerText = 'Thêm Voucher Mới';
+      document.getElementById('btn-admin-voucher-submit').innerText = 'Lưu Voucher';
+    }
+
+    async function handleAdminVoucherSubmit(e) {
+      e.preventDefault();
+      const id = document.getElementById('admin-voucher-id').value;
+      const code = document.getElementById('admin-voucher-code').value.trim();
+      const discount_percent = parseInt(document.getElementById('admin-voucher-percent').value);
+      const maxDiscountVal = document.getElementById('admin-voucher-max-discount').value;
+      const max_discount = maxDiscountVal ? parseInt(maxDiscountVal) : null;
+      const limitVal = document.getElementById('admin-voucher-limit').value;
+      const usage_limit = limitVal ? parseInt(limitVal) : null;
+      const expiry_date = document.getElementById('admin-voucher-expiry').value;
+
+      const bodyData = { code, discount_percent, max_discount, usage_limit, expiry_date };
+      try {
+        let url = '/api/admin/vouchers';
+        let method = 'POST';
+        if (id) {
+          url = '/api/admin/vouchers/' + id;
+          method = 'PUT';
+        }
+        const res = await fetch(url, {
+          method,
+          headers,
+          body: JSON.stringify(bodyData)
+        });
+        const data = await res.json();
+        if (res.ok) {
+          showToast(id ? 'Cập nhật voucher thành công!' : 'Tạo voucher thành công!');
+          resetAdminVoucherForm();
+          await loadAdminVouchers();
+        } else {
+          showToast(data.message || 'Lỗi xử lý voucher', 'info');
+        }
+      } catch (err) {
+        showToast('Lỗi kết nối máy chủ', 'info');
+      }
+    }
+
+    async function deleteAdminVoucher(id) {
+      if (!confirm('Bạn có chắc chắn muốn xóa voucher này?')) return;
+      try {
+        const res = await fetch('/api/admin/vouchers/' + id, {
+          method: 'DELETE',
+          headers
+        });
+        const data = await res.json();
+        if (res.ok) {
+          showToast('Xóa voucher thành công!');
+          await loadAdminVouchers();
+        } else {
+          showToast(data.message || 'Lỗi khi xóa voucher', 'info');
+        }
+      } catch (err) {
+        showToast('Lỗi kết nối máy chủ', 'info');
+      }
+    }
+
+    // --- USERS MANAGEMENT TAB ---
+    let adminUsers = [];
+    async function loadAdminUsers() {
+      const tbody = document.getElementById('admin-users-tbody');
+      tbody.innerHTML = '<tr><td colspan="5" class="text-center py-4 text-gray-400">Đang tải danh sách người dùng...</td></tr>';
+      try {
+        const res = await fetch('/api/admin/users');
+        adminUsers = await res.json();
+        tbody.innerHTML = '';
+        if (adminUsers.length === 0) {
+          tbody.innerHTML = '<tr><td colspan="5" class="text-center py-4 text-gray-400">Chưa có người dùng nào.</td></tr>';
+          return;
+        }
+        adminUsers.forEach(u => {
+          tbody.innerHTML += `
+            <tr class="text-xs border-b border-gray-100 hover:bg-gray-50/50 transition">
+              <td class="py-3 px-2 font-semibold text-gray-800">${u.full_name}</td>
+              <td class="py-3 px-2 text-gray-500">${u.email}</td>
+              <td class="py-3 px-2 text-gray-500">${u.phone || 'Chưa cập nhật'}</td>
+              <td class="py-3 px-2 text-center">
+                <span class="px-2 py-0.5 rounded text-[10px] font-bold ${
+                  u.role === 'Admin' ? 'bg-purple-50 text-purple-600 border border-purple-100' : 'bg-blue-50 text-blue-600 border border-blue-100'
+                }">${u.role}</span>
+              </td>
+              <td class="py-3 px-2 text-center">
+                <div class="flex items-center justify-center gap-1.5">
+                  <button onclick="editAdminUser('${u.id}')" class="p-1 text-gray-400 hover:text-blue-600 transition" title="Sửa"><i data-lucide="edit-3" class="w-4 h-4"></i></button>
+                  <button onclick="deleteAdminUser('${u.id}')" class="p-1 text-gray-400 hover:text-red-500 transition" title="Xóa"><i data-lucide="trash-2" class="w-4 h-4"></i></button>
+                </div>
+              </td>
+            </tr>`;
+        });
+        lucide.createIcons();
+      } catch (err) {
+        tbody.innerHTML = '<tr><td colspan="5" class="text-center py-4 text-rose-500">Lỗi tải danh sách người dùng.</td></tr>';
+      }
+    }
+
+    function editAdminUser(id) {
+      const u = adminUsers.find(item => item.id.toString() === id.toString());
+      if (!u) return;
+      document.getElementById('admin-user-id').value = u.id;
+      document.getElementById('admin-user-name').value = u.full_name;
+      document.getElementById('admin-user-email').value = u.email;
+      document.getElementById('admin-user-phone').value = u.phone || '';
+      document.getElementById('admin-user-role').value = u.role;
+      document.getElementById('admin-user-password').value = '';
+      document.getElementById('admin-user-form-title').innerText = 'Chỉnh Sửa Người Dùng';
+      document.getElementById('btn-admin-user-submit').innerText = 'Cập nhật tài khoản';
+    }
+
+    function resetAdminUserForm() {
+      document.getElementById('admin-user-id').value = '';
+      document.getElementById('admin-user-name').value = '';
+      document.getElementById('admin-user-email').value = '';
+      document.getElementById('admin-user-phone').value = '';
+      document.getElementById('admin-user-role').value = 'Customer';
+      document.getElementById('admin-user-password').value = '';
+      document.getElementById('admin-user-form-title').innerText = 'Cập Nhật Người Dùng';
+      document.getElementById('btn-admin-user-submit').innerText = 'Cập nhật tài khoản';
+    }
+
+    async function handleAdminUserSubmit(e) {
+      e.preventDefault();
+      const id = document.getElementById('admin-user-id').value;
+      if (!id) {
+        showToast('Vui lòng chọn một người dùng từ danh sách để cập nhật vai trò hoặc mật khẩu.', 'info');
+        return;
+      }
+      const full_name = document.getElementById('admin-user-name').value.trim();
+      const email = document.getElementById('admin-user-email').value.trim();
+      const phone = document.getElementById('admin-user-phone').value.trim();
+      const role = document.getElementById('admin-user-role').value;
+      const password = document.getElementById('admin-user-password').value;
+
+      const bodyData = { full_name, email, phone, role };
+      if (password) {
+        bodyData.password = password;
+      }
+
+      try {
+        const res = await fetch('/api/admin/users/' + id, {
+          method: 'PUT',
+          headers,
+          body: JSON.stringify(bodyData)
+        });
+        const data = await res.json();
+        if (res.ok) {
+          showToast('Cập nhật tài khoản thành công!');
+          resetAdminUserForm();
+          await loadAdminUsers();
+        } else {
+          showToast(data.message || 'Lỗi cập nhật người dùng', 'info');
+        }
+      } catch (err) {
+        showToast('Lỗi kết nối máy chủ', 'info');
+      }
+    }
+
+    async function deleteAdminUser(id) {
+      if (!confirm('Bạn có chắc chắn muốn xóa người dùng này?')) return;
+      try {
+        const res = await fetch('/api/admin/users/' + id, {
+          method: 'DELETE',
+          headers
+        });
+        const data = await res.json();
+        if (res.ok) {
+          showToast('Xóa người dùng thành công!');
+          await loadAdminUsers();
+        } else {
+          showToast(data.message || 'Lỗi khi xóa người dùng', 'info');
+        }
+      } catch (err) {
+        showToast('Lỗi kết nối máy chủ', 'info');
+      }
+    }
+
+    // --- REVIEWS MANAGEMENT TAB ---
+    async function loadAdminReviews() {
+      const tbody = document.getElementById('admin-reviews-tbody');
+      const emptyMsg = document.getElementById('admin-reviews-empty');
+      tbody.innerHTML = '<tr><td colspan="6" class="text-center py-4 text-gray-400">Đang tải đánh giá...</td></tr>';
+      emptyMsg.classList.add('hidden');
+      try {
+        const res = await fetch('/api/admin/reviews');
+        const reviews = await res.json();
+        tbody.innerHTML = '';
+        if (reviews.length === 0) {
+          tbody.innerHTML = '';
+          emptyMsg.classList.remove('hidden');
+          return;
+        }
+        reviews.forEach(r => {
+          const prodName = r.product ? r.product.name : 'Sản phẩm đã xóa';
+          const reviewDate = new Date(r.created_at).toLocaleDateString('vi-VN');
+          
+          let starsHtml = '';
+          for (let i = 1; i <= 5; i++) {
+            starsHtml += `<span class="${i <= r.rating ? 'text-amber-400' : 'text-gray-200'}">★</span>`;
+          }
+
+          tbody.innerHTML += `
+            <tr class="text-xs border-b border-gray-100 hover:bg-gray-50/50 transition">
+              <td class="py-3 px-2 font-semibold text-gray-800">${prodName}</td>
+              <td class="py-3 px-2 text-gray-700">${r.user ? r.user.full_name : 'Ẩn danh'}</td>
+              <td class="py-3 px-2 text-center text-sm font-bold text-amber-500">${starsHtml}</td>
+              <td class="py-3 px-2 text-gray-600 max-w-xs truncate" title="${r.comment || ''}">${r.comment || '<span class="italic text-gray-400">Không có bình luận</span>'}</td>
+              <td class="py-3 px-2 text-center text-gray-500">${reviewDate}</td>
+              <td class="py-3 px-2 text-center">
+                <button onclick="deleteAdminReview('${r.id}')" class="p-1 text-gray-400 hover:text-red-500 transition" title="Xóa bình luận"><i data-lucide="trash-2" class="w-4 h-4"></i></button>
+              </td>
+            </tr>`;
+        });
+        lucide.createIcons();
+      } catch (err) {
+        tbody.innerHTML = '<tr><td colspan="6" class="text-center py-4 text-rose-500">Lỗi tải danh sách đánh giá.</td></tr>';
+      }
+    }
+
+    async function deleteAdminReview(id) {
+      if (!confirm('Bạn có chắc chắn muốn xóa đánh giá này?')) return;
+      try {
+        const res = await fetch('/api/admin/reviews/' + id, {
+          method: 'DELETE',
+          headers
+        });
+        const data = await res.json();
+        if (res.ok) {
+          showToast('Xóa đánh giá và cập nhật điểm trung bình thành công!');
+          await loadAdminReviews();
+        } else {
+          showToast(data.message || 'Lỗi khi xóa đánh giá', 'info');
+        }
+      } catch (err) {
+        showToast('Lỗi kết nối máy chủ', 'info');
+      }
+    }
+
+    // --- USER PROFILE PAGE ---
+    function renderProfilePage() {
+      if (!authUser) {
+        showToast('Vui lòng đăng nhập để xem thông tin tài khoản!', 'info');
+        window.location.hash = '#/';
+        return;
+      }
+      document.getElementById('profile-name').value = authUser.full_name || '';
+      document.getElementById('profile-email').value = authUser.email || '';
+      document.getElementById('profile-phone').value = authUser.phone || '';
+      document.getElementById('profile-password').value = '';
+    }
+
+    async function handleProfileUpdate(e) {
+      e.preventDefault();
+      const full_name = document.getElementById('profile-name').value.trim();
+      const phone = document.getElementById('profile-phone').value.trim();
+      const password = document.getElementById('profile-password').value;
+
+      const bodyData = { full_name };
+      if (phone) bodyData.phone = phone;
+      if (password) bodyData.password = password;
+
+      try {
+        const res = await fetch('/api/auth/profile', {
+          method: 'PUT',
+          headers,
+          body: JSON.stringify(bodyData)
+        });
+        const data = await res.json();
+        if (res.ok) {
+          showToast('Cập nhật thông tin thành công!');
+          authUser = data.user;
+          localStorage.setItem('beestyle_user', JSON.stringify(authUser));
+          renderAuthUI();
+          document.getElementById('profile-password').value = '';
+        } else {
+          showToast(data.message || 'Lỗi cập nhật thông tin', 'info');
+        }
+      } catch (err) {
+        showToast('Lỗi kết nối máy chủ', 'info');
+      }
+    }
+
+    // --- CUSTOMER ORDER DETAIL PAGE ---
+    async function renderOrderDetailPage(orderId) {
+      currentOrderDetailId = orderId;
+      
+      const statusBadge = document.getElementById('cust-order-status');
+      const stepperNode = document.getElementById('cust-order-stepper');
+      const actionDiv = document.getElementById('cust-order-action-div');
+      
+      try {
+        const res = await fetch('/api/orders/' + orderId);
+        if (res.status === 404) {
+          showToast('Không tìm thấy đơn hàng!', 'info');
+          window.location.hash = '#/orders';
+          return;
+        }
+        
+        const order = await res.json();
+
+        document.getElementById('cust-order-id').innerText = '#' + order.id;
+        
+        const orderDate = new Date(order.created_at).toLocaleString('vi-VN');
+        document.getElementById('cust-order-date').innerText = 'Đặt ngày: ' + orderDate;
+
+        // Stepper & Status Badge
+        let statusText = 'Chờ xử lý';
+        let statusColorClass = 'bg-yellow-50 text-yellow-600 border border-yellow-200';
+        let stepIndex = 0;
+
+        if (order.status === 'Processing') {
+          statusText = 'Đang xử lý';
+          statusColorClass = 'bg-yellow-100 text-yellow-700 border border-yellow-300';
+          stepIndex = 1;
+        } else if (order.status === 'Shipping') {
+          statusText = 'Đang giao';
+          statusColorClass = 'bg-blue-50 text-blue-600 border border-blue-200';
+          stepIndex = 2;
+        } else if (order.status === 'Completed') {
+          statusText = 'Đã giao hàng';
+          statusColorClass = 'bg-green-50 text-green-600 border border-green-200';
+          stepIndex = 3;
+        } else if (order.status === 'Cancelled') {
+          statusText = 'Đã hủy';
+          statusColorClass = 'bg-red-50 text-red-600 border border-red-200';
+          stepIndex = -1;
+        }
+
+        statusBadge.innerText = statusText;
+        statusBadge.className = `text-xs px-3 py-1 rounded-full font-semibold ${statusColorClass}`;
+
+        // Stepper HTML
+        if (stepIndex === -1) {
+          stepperNode.innerHTML = `
+            <div class="flex items-center justify-center py-4 w-full">
+              <span class="text-red-500 font-bold text-xs bg-red-50 px-4 py-2 border border-red-200 rounded-2xl">ĐƠN HÀNG NÀY ĐÃ BỊ HỦY</span>
+            </div>`;
+        } else {
+          const steps = ['Chờ xử lý', 'Đang xử lý', 'Đang giao', 'Đã giao'];
+          let stepperHtml = '';
+          
+          stepperHtml += `<div class="absolute top-1/2 left-0 right-0 h-1 bg-gray-200 -translate-y-1/2 z-0"></div>`;
+          const pct = stepIndex * 33.33;
+          stepperHtml += `<div class="absolute top-1/2 left-0 h-1 bg-emerald-500 -translate-y-1/2 z-0 transition-all duration-500" style="width: ${pct}%"></div>`;
+
+          steps.forEach((step, idx) => {
+            const isCompleted = idx <= stepIndex;
+            const bgClass = isCompleted ? 'bg-emerald-500 text-white ring-4 ring-emerald-100' : 'bg-gray-200 text-gray-400';
+            stepperHtml += `
+              <div class="flex flex-col items-center gap-1 z-10">
+                <span class="w-6 h-6 rounded-full flex items-center justify-center ${bgClass} transition-colors duration-500 text-[10px]">${idx + 1}</span>
+                <span class="${isCompleted ? 'text-gray-800 font-bold' : 'text-gray-400 font-light'} mt-1 transition-colors duration-500">${step}</span>
+              </div>`;
+          });
+          stepperNode.innerHTML = stepperHtml;
+        }
+
+        document.getElementById('cust-order-name').innerText = order.customer_name;
+        document.getElementById('cust-order-phone').innerText = order.customer_phone;
+        document.getElementById('cust-order-address').innerText = order.customer_address;
+        document.getElementById('cust-order-note').innerText = order.customer_note || 'Không có';
+        
+        document.getElementById('cust-order-payment-method').innerText = order.payment_method === 'cod' ? 'COD (Thanh toán khi nhận hàng)' : 'Chuyển khoản / Trực tuyến';
+        document.getElementById('cust-order-payment-status').innerText = order.payment_status || 'Chưa thanh toán';
+
+        const tbody = document.getElementById('cust-order-items-tbody');
+        tbody.innerHTML = '';
+        let subtotal = 0;
+
+        order.order_items.forEach(item => {
+          const prod = item.product;
+          const name = prod ? prod.name : 'Sản phẩm đã xóa';
+          const img = prod ? prod.thumbnail_url : 'https://images.unsplash.com/photo-1523381210434-271e8be1f52b?w=100';
+          const size = item.size || 'Free';
+          const color = item.color || 'Mặc định';
+          const itemPrice = item.price;
+          const qty = item.quantity;
+          const total = itemPrice * qty;
+          subtotal += total;
+
+          tbody.innerHTML += `
+            <div class="flex items-center justify-between py-4 text-xs">
+              <div class="flex gap-3">
+                <div class="w-10 h-12 bg-gray-50 rounded overflow-hidden shrink-0 border border-gray-100">
+                  <img src="${img}" class="w-full h-full object-cover">
+                </div>
+                <div>
+                  <h5 class="font-bold text-gray-800">${name}</h5>
+                  <p class="text-[10px] text-gray-400 mt-0.5">Phân loại: ${size} · ${color} · Số lượng: ${qty}</p>
+                </div>
+              </div>
+              <span class="font-bold text-gray-800">${formatVND(total)}</span>
+            </div>`;
+        });
+
+        let discount = 0;
+        if (order.voucher) {
+          discount = Math.min(order.voucher.max_discount || subtotal, Math.round(subtotal * order.voucher.discount_percent / 100));
+        }
+
+        document.getElementById('cust-order-subtotal').innerText = formatVND(subtotal);
+        document.getElementById('cust-order-discount').innerText = '-' + formatVND(discount);
+        document.getElementById('cust-order-total').innerText = formatVND(order.total_amount);
+
+        if (order.status === 'Pending') {
+          actionDiv.classList.remove('hidden');
+        } else {
+          actionDiv.classList.add('hidden');
+        }
+
+      } catch (err) {
+        showToast('Lỗi kết nối máy chủ', 'info');
+      }
+    }
+
+    async function cancelClientOrderFromDetails() {
+      if (!currentOrderDetailId) return;
+      if (confirm('Bạn chắc chắn muốn hủy đơn hàng #' + currentOrderDetailId + ' chứ?')) {
+        try {
+          const res = await fetch(`/api/orders/${currentOrderDetailId}/cancel`, {
+            method: 'PUT',
+            headers
+          });
+          const data = await res.json();
+          if (res.ok) {
+            showToast('Hủy đơn hàng thành công!');
+            await renderOrderDetailPage(currentOrderDetailId);
+          } else {
+            showToast(data.message || 'Không thể hủy đơn hàng lúc này', 'info');
+          }
+        } catch (err) {
+          showToast('Lỗi kết nối máy chủ', 'info');
+        }
+      }
+    }
+
+    // --- PRODUCT VARIANTS AND STOCK ---
+    function updateProductDetailsPriceAndImage() {
+      if (!currentProductDetails) return;
+      let basePrice = currentProductDetails.price;
+      let totalPrice = basePrice;
+      let variantImage = currentProductDetails.thumbnail_url;
+
+      let variantData = null;
+      if (currentProductDetails.variant_data) {
+        try {
+          variantData = typeof currentProductDetails.variant_data === 'string' 
+            ? JSON.parse(currentProductDetails.variant_data) 
+            : currentProductDetails.variant_data;
+        } catch (e) {
+          console.error("Failed to parse variant_data:", e);
+        }
+      }
+
+      if (variantData) {
+        if (variantData.colors && variantData.colors[currentSelectedColor]) {
+          const colorVar = variantData.colors[currentSelectedColor];
+          if (colorVar.price_offset) {
+            totalPrice += parseInt(colorVar.price_offset);
+          }
+          if (colorVar.image) {
+            variantImage = colorVar.image;
+          }
+        }
+        if (variantData.sizes && variantData.sizes[currentSelectedSize]) {
+          const sizeVar = variantData.sizes[currentSelectedSize];
+          if (sizeVar.price_offset) {
+            totalPrice += parseInt(sizeVar.price_offset);
+          }
+        }
+      }
+
+      currentSelectedPrice = totalPrice;
+      
+      const priceLabel = document.getElementById('detail-product-price');
+      if (priceLabel) {
+        priceLabel.textContent = formatVND(totalPrice);
+      }
+
+      const mainImg = document.getElementById('detail-main-img');
+      if (mainImg) {
+        mainImg.src = variantImage;
+      }
+    }
+
+    // --- ONLINE PAYMENT SIMULATION ---
+    function closeOnlinePaymentModal() {
+      document.getElementById('online-payment-modal').classList.add('hidden');
+      if (onlinePaymentTimerInterval) {
+        clearInterval(onlinePaymentTimerInterval);
+        onlinePaymentTimerInterval = null;
+      }
+      showToast('Thanh toán giả lập đã bị hủy.', 'info');
+    }
+
+    async function confirmOnlinePayment() {
+      if (!pendingOrderData) return;
+      document.getElementById('online-payment-modal').classList.add('hidden');
+      if (onlinePaymentTimerInterval) {
+        clearInterval(onlinePaymentTimerInterval);
+        onlinePaymentTimerInterval = null;
+      }
+
+      try {
+        const res = await fetch('/api/orders', {
+          method: 'POST',
+          headers,
+          body: JSON.stringify(pendingOrderData)
+        });
+
+        const data = await res.json();
+
+        if (res.ok) {
+          const savedIds = JSON.parse(localStorage.getItem('beestyle_order_ids') || '[]');
+          savedIds.unshift(data.order_id);
+          localStorage.setItem('beestyle_order_ids', JSON.stringify(savedIds));
+
+          cartState = [];
+          localStorage.setItem('beestyle_cart', JSON.stringify(cartState));
+          updateCartBadge();
+          renderCartDrawer();
+          appliedVoucher = null;
+
+          showToast('Đặt hàng và thanh toán trực tuyến thành công!');
+          window.location.hash = '#/orders';
+        } else {
+          showToast(data.message || 'Lỗi đặt hàng, vui lòng thử lại', 'info');
+        }
+      } catch (err) {
+        showToast('Lỗi kết nối máy chủ khi đặt hàng', 'info');
+      } finally {
+        pendingOrderData = null;
+      }
+    }
+
+    document.getElementById('admin-product-form').onsubmit = async (e) => {
+      e.preventDefault();
+      
+      const id = document.getElementById('admin-prod-id').value;
+      const name = document.getElementById('admin-prod-name').value;
+      const price = parseFloat(document.getElementById('admin-prod-price').value);
+      const oldPriceVal = document.getElementById('admin-prod-old-price').value;
+      const old_price = oldPriceVal ? parseFloat(oldPriceVal) : null;
+      const categorySlug = document.getElementById('admin-prod-category').value;
+      const tag = document.getElementById('admin-prod-tag').value;
+      const stock = parseInt(document.getElementById('admin-prod-stock').value) || 0;
+      
+      let thumbnail_url = document.getElementById('admin-prod-image').value.trim();
+      if (thumbnail_url === '') {
+        thumbnail_url = 'https://images.unsplash.com/photo-1523381210434-271e8be1f52b?w=600&auto=format&fit=crop&q=80';
+      }
+
+      const sizes = document.getElementById('admin-prod-sizes').value;
+      const colors = document.getElementById('admin-prod-colors').value;
+      const description = document.getElementById('admin-prod-desc').value;
+
+      const matchedCategory = categoriesState.find(cat => cat.slug === categorySlug);
+      const category_id = matchedCategory ? matchedCategory.id : null;
+
+      const bodyData = {
+        name,
+        price,
+        old_price,
+        category_id,
+        tag,
+        thumbnail_url,
+        sizes,
+        colors,
+        description,
+        stock
+      };
+
+      try {
+        let url = '/api/admin/products';
+        let method = 'POST';
+        if (id) {
+          url = '/api/admin/products/' + id;
+          method = 'PUT';
+        }
+
+        const res = await fetch(url, {
+          method,
+          headers,
+          body: JSON.stringify(bodyData)
+        });
+
+        const data = await res.json();
+
+        if (res.ok) {
+          showToast(id ? 'Cập nhật sản phẩm thành công!' : 'Thêm sản phẩm mới thành công!');
+          resetAdminProductForm();
+          // Clear cached state to force fresh fetch
+          productsState = [];
+          await renderAdminPage();
+        } else {
+          showToast(data.message || 'Lỗi lưu sản phẩm', 'info');
+        }
+      } catch (err) {
+        showToast('Lỗi kết nối máy chủ', 'info');
+      }
+    };
+
+    function editAdminProduct(prodId) {
+      const p = adminProducts.find(x => x.id.toString() === prodId.toString());
+      if (!p) return;
+
+      document.getElementById('admin-prod-form-title').textContent = 'Sửa Sản Phẩm (ID: ' + p.id + ')';
+      document.getElementById('admin-prod-id').value = p.id;
+      document.getElementById('admin-prod-name').value = p.name;
+      document.getElementById('admin-prod-price').value = p.price;
+      document.getElementById('admin-prod-old-price').value = p.old_price || '';
+      
+      const catSlug = p.category ? p.category.slug : 'shirt';
+      document.getElementById('admin-prod-category').value = catSlug;
+      document.getElementById('admin-prod-tag').value = p.tag || '';
+      document.getElementById('admin-prod-image').value = p.thumbnail_url || '';
+      document.getElementById('admin-prod-sizes').value = p.sizes || 'S, M, L, XL';
+      document.getElementById('admin-prod-colors').value = p.colors || 'Trắng, Đen';
+      document.getElementById('admin-prod-desc').value = p.description || '';
+      document.getElementById('admin-prod-stock').value = p.stock !== undefined ? p.stock : 50;
+
+      document.getElementById('btn-admin-prod-submit').textContent = 'Cập nhật sản phẩm';
+      document.getElementById('admin-product-form').scrollIntoView({ behavior: 'smooth' });
+    }
+
+    async function deleteAdminProduct(prodId) {
+      if (confirm('Bạn chắc chắn muốn xóa sản phẩm này khỏi hệ thống?')) {
+        try {
+          const res = await fetch('/api/admin/products/' + prodId, {
+            method: 'DELETE',
+            headers
+          });
+
+          if (res.ok) {
+            productsState = [];
+            await renderAdminPage();
+            showToast('Đã xóa sản phẩm khỏi hệ thống.', 'info');
+          } else {
+            showToast('Không thể xóa sản phẩm lúc này', 'info');
+          }
+        } catch (err) {
+          showToast('Lỗi kết nối máy chủ', 'info');
+        }
+      }
+    }
+
+    function resetAdminProductForm() {
+      document.getElementById('admin-prod-form-title').textContent = 'Thêm Sản Phẩm Mới';
+      document.getElementById('admin-prod-id').value = '';
+      document.getElementById('admin-product-form').reset();
+      document.getElementById('admin-prod-stock').value = 50;
+      document.getElementById('btn-admin-prod-submit').textContent = 'Lưu sản phẩm';
+    }
+
+    async function restoreDefaultProducts() {
+      if (confirm('Bạn có muốn khôi phục danh sách sản phẩm thời trang mặc định ban đầu? (Thao tác này sẽ xóa toàn bộ sản phẩm và đơn hàng hiện tại)')) {
+        try {
+          const res = await fetch('/api/admin/products/restore-defaults', {
+            method: 'POST',
+            headers
+          });
+
+          if (res.ok) {
+            productsState = [];
+            await renderAdminPage();
+            showToast('Đã khôi phục dữ liệu mặc định thành công!', 'success');
+          } else {
+            showToast('Không thể khôi phục dữ liệu mẫu', 'info');
+          }
+        } catch (err) {
+          showToast('Lỗi kết nối máy chủ', 'info');
+        }
+      }
+    }
+
+    async function updateAdminOrderStatus(orderId, newStatus) {
+      try {
+        const res = await fetch(`/api/admin/orders/${orderId}/status`, {
+          method: 'PUT',
+          headers,
+          body: JSON.stringify({ status: newStatus })
+        });
+
+        if (res.ok) {
+          showToast('Cập nhật trạng thái đơn hàng #' + orderId + ' thành công!');
+          await renderAdminPage();
+        } else {
+          showToast('Lỗi cập nhật trạng thái đơn hàng', 'info');
+        }
+      } catch (err) {
+        showToast('Lỗi kết nối máy chủ', 'info');
+      }
+    }
+
+    let currentAdminOrderId = null;
+    async function viewAdminOrderDetails(orderId) {
+      const order = adminOrders.find(o => o.id.toString() === orderId.toString());
+      if (!order) return;
+
+      currentAdminOrderId = orderId;
+
+      document.getElementById('admin-modal-order-id').innerText = '#' + order.id;
+      document.getElementById('admin-modal-cust-name').innerText = order.customer_name;
+      document.getElementById('admin-modal-cust-phone').innerText = order.customer_phone;
+      document.getElementById('admin-modal-cust-address').innerText = order.customer_address;
+      document.getElementById('admin-modal-cust-note').innerText = order.customer_note || 'Không có';
+      
+      const orderDate = new Date(order.created_at).toLocaleString('vi-VN');
+      document.getElementById('admin-modal-order-date').innerText = orderDate;
+      document.getElementById('admin-modal-order-method').innerText = order.payment_method === 'cod' ? 'COD' : 'Chuyển khoản / Trực tuyến';
+      document.getElementById('admin-modal-order-payment-status').innerText = order.payment_status || 'Chưa thanh toán';
+
+      // Status select logic
+      const select = document.getElementById('admin-modal-order-status-select');
+      select.innerHTML = '';
+      
+      const states = [
+        { val: 'Pending', name: 'Chờ xử lý' },
+        { val: 'Processing', name: 'Đang xử lý' },
+        { val: 'Shipping', name: 'Đang giao' },
+        { val: 'Completed', name: 'Đã giao' },
+        { val: 'Cancelled', name: 'Đã hủy' }
+      ];
+
+      if (order.status === 'Completed' || order.status === 'Cancelled') {
+        select.innerHTML = `<option value="${order.status}" selected>${order.status === 'Completed' ? 'Đã giao' : 'Đã hủy'}</option>`;
+        select.disabled = true;
+      } else {
+        select.disabled = false;
+        states.forEach(s => {
+          const selectedAttr = order.status === s.val ? 'selected' : '';
+          select.innerHTML += `<option value="${s.val}" ${selectedAttr}>${s.name}</option>`;
+        });
+      }
+
+      // Items table
+      const tbody = document.getElementById('admin-modal-order-items-tbody');
+      tbody.innerHTML = '';
+      let subtotal = 0;
+
+      order.order_items.forEach(item => {
+        const prod = item.product;
+        const name = prod ? prod.name : 'Sản phẩm đã xóa';
+        const img = prod ? prod.thumbnail_url : 'https://images.unsplash.com/photo-1523381210434-271e8be1f52b?w=100';
+        const size = item.size || 'Free';
+        const color = item.color || 'Mặc định';
+        const itemPrice = item.price;
+        const qty = item.quantity;
+        const total = itemPrice * qty;
+        subtotal += total;
+
+        tbody.innerHTML += `
+          <tr class="border-b border-gray-100 hover:bg-gray-50/50 transition">
+            <td class="py-2.5 px-3">
+              <img src="${img}" class="w-8 h-10 object-cover rounded shadow-sm">
+            </td>
+            <td class="py-2.5 px-3 font-semibold text-gray-800">${name}</td>
+            <td class="py-2.5 px-3 text-gray-500">${size} · ${color}</td>
+            <td class="py-2.5 px-3 text-right font-bold text-gray-700">${formatVND(itemPrice)}</td>
+            <td class="py-2.5 px-3 text-center">${qty}</td>
+            <td class="py-2.5 px-3 text-right font-bold text-gray-700">${formatVND(total)}</td>
+          </tr>`;
+      });
+
+      // Discount & total
+      let discount = 0;
+      if (order.voucher) {
+        discount = Math.min(order.voucher.max_discount || subtotal, Math.round(subtotal * order.voucher.discount_percent / 100));
+      }
+      document.getElementById('admin-modal-order-discount').innerText = '-' + formatVND(discount);
+      document.getElementById('admin-modal-order-total').innerText = formatVND(order.total_amount);
+
+      document.getElementById('admin-order-detail-modal').classList.remove('hidden');
+      lucide.createIcons();
+    }
+
+    function closeAdminOrderDetailModal() {
+      document.getElementById('admin-order-detail-modal').classList.add('hidden');
+    }
+
+    async function updateAdminOrderStatusFromModal(newStatus) {
+      if (!currentAdminOrderId) return;
+      try {
+        const res = await fetch(`/api/admin/orders/${currentAdminOrderId}/status`, {
+          method: 'PUT',
+          headers,
+          body: JSON.stringify({ status: newStatus })
+        });
+        const data = await res.json();
+        if (res.ok) {
+          showToast('Cập nhật trạng thái đơn hàng thành công!');
+          closeAdminOrderDetailModal();
+          await renderAdminPage();
+        } else {
+          showToast(data.message || 'Lỗi cập nhật trạng thái', 'info');
+        }
+      } catch (err) {
+        showToast('Lỗi kết nối máy chủ', 'info');
+      }
+    }
+
+    async function deleteAdminOrderFromModal() {
+      if (!currentAdminOrderId) return;
+      if (!confirm('Bạn có chắc chắn muốn xóa vĩnh viễn đơn hàng này?')) return;
+      try {
+        const res = await fetch(`/api/admin/orders/${currentAdminOrderId}`, {
+          method: 'DELETE',
+          headers
+        });
+        const data = await res.json();
+        if (res.ok) {
+          showToast('Xóa đơn hàng thành công!');
+          closeAdminOrderDetailModal();
+          await renderAdminPage();
+        } else {
+          showToast(data.message || 'Lỗi khi xóa đơn hàng', 'info');
+        }
+      } catch (err) {
+        showToast('Lỗi kết nối máy chủ', 'info');
+      }
+    }
+
+    // -------------------------------------------------------------
+    // Header Navigation Dialogs/Interactions (Search & Cart Drawer)
+    // -------------------------------------------------------------
+    const searchOverlay = document.getElementById('search-overlay');
+    const searchBox = document.getElementById('search-box');
+    const searchInput = document.getElementById('search-input');
+    const searchResultsBox = document.getElementById('search-results-box');
+    const searchResultsList = document.getElementById('search-results-list');
+    
+    document.getElementById('search-btn').onclick = () => {
+      searchOverlay.classList.remove('hidden');
+      setTimeout(() => {
+        searchBox.classList.remove('opacity-0', 'scale-95');
+        searchInput.focus();
+      }, 50);
+    };
+
+    function closeSearchOverlay() {
+      searchBox.classList.add('opacity-0', 'scale-95');
+      setTimeout(() => {
+        searchOverlay.classList.add('hidden');
+        searchInput.value = '';
+        searchResultsBox.classList.add('hidden');
+      }, 200);
+    }
+
+    document.getElementById('close-search').onclick = closeSearchOverlay;
+    searchOverlay.onclick = (e) => {
+      if (e.target === searchOverlay) closeSearchOverlay();
+    };
+
+    searchInput.addEventListener('input', (e) => {
+      const q = e.target.value.toLowerCase().trim();
+      if (q === '') {
+        searchResultsBox.classList.add('hidden');
+        return;
+      }
+
+      const matching = productsState.filter(p => p.name.toLowerCase().includes(q) || p.category_id.toString() === q).slice(0, 5);
+      
+      searchResultsList.innerHTML = '';
+      if (matching.length === 0) {
+        searchResultsList.innerHTML = `<p class="text-xs text-gray-400 italic py-2">Không tìm thấy sản phẩm phù hợp.</p>`;
+      } else {
+        matching.forEach(p => {
+          searchResultsList.innerHTML += `
+            <div onclick="window.location.hash = '#/product/${p.id}'; closeSearchOverlay();" class="flex items-center gap-3 p-2 hover:bg-gray-50 rounded-xl cursor-pointer transition">
+              <div class="w-8 h-10 bg-gray-50 rounded overflow-hidden shrink-0">
+                <img src="${p.thumbnail_url}" class="w-full h-full object-cover">
+              </div>
+              <div class="flex-1 text-xs text-left">
+                <h5 class="font-bold text-gray-800 line-clamp-1">${p.name}</h5>
+                <span class="font-semibold text-[#c45e3a] mt-0.5 block">${formatVND(p.price)}</span>
+              </div>
+            </div>`;
+        });
+      }
+      searchResultsBox.classList.remove('hidden');
+    });
+
+    function quickSearch(val) {
+      closeSearchOverlay();
+      window.location.hash = `#/shop?search=${val}`;
+    }
+
+    const cartDrawer = document.getElementById('cart-drawer');
+    const cartPanel = document.getElementById('cart-panel');
+    const cartBtn = document.getElementById('cart-btn');
+    
+    cartBtn.onclick = () => {
+      renderCartDrawer();
+      cartDrawer.classList.remove('hidden');
+      setTimeout(() => {
+        cartPanel.classList.remove('translate-x-full');
+      }, 50);
+    };
+
+    function closeCart() {
+      cartPanel.classList.add('translate-x-full');
+      setTimeout(() => {
+        cartDrawer.classList.add('hidden');
+      }, 250);
+    }
+
+    document.getElementById('close-cart').onclick = closeCart;
+    document.getElementById('cart-backdrop').onclick = closeCart;
+
+    document.getElementById('menu-btn').onclick = () => {
+      document.getElementById('mobile-menu').classList.toggle('hidden');
+    };
+
+    // -------------------------------------------------------------
+    // Element SDK Fallback Integration
+    // -------------------------------------------------------------
+    const defaultConfig = {
+      brand_name: 'Beestyle',
+      hero_title: 'Nâng tầm\nphong cách\ncủa bạn',
+      hero_subtitle: 'Thời trang cao cấp, tối giản nhưng đậm chất riêng. Hãy khám phá và tự tin tỏa sáng mỗi ngày cùng Beestyle.',
+      background_color: '#faf9f7',
+      text_color: '#1a1a1a',
+      accent_color: '#c45e3a',
+    };
+
+    function applyConfig(config) {
+      const brandNodes = document.querySelectorAll('#brand-name');
+      brandNodes.forEach(node => {
+        node.innerHTML = `<span class="text-3xl">🐝</span>` + (config.brand_name || defaultConfig.brand_name);
+      });
+      
+      const title = config.hero_title || defaultConfig.hero_title;
+      const heroTitleNode = document.getElementById('hero-title');
+      if (heroTitleNode) {
+        heroTitleNode.innerHTML = title.replace(/\n/g, '<br>');
+      }
+      
+      const heroSubNode = document.getElementById('hero-subtitle');
+      if (heroSubNode) {
+        heroSubNode.textContent = config.hero_subtitle || defaultConfig.hero_subtitle;
+      }
+      
+      document.body.style.backgroundColor = config.background_color || defaultConfig.background_color;
+      document.body.style.color = config.text_color || defaultConfig.text_color;
+    }
+
+    if (window.elementSdk && window.elementSdk.init) {
+      window.elementSdk.init({
+        defaultConfig,
+        onConfigChange: async (config) => applyConfig(config),
+        mapToCapabilities: (config) => ({
+          recolorables: [
+            { get: () => config.background_color || defaultConfig.background_color, set: (v) => { config.background_color = v; window.elementSdk.setConfig({ background_color: v }); } },
+            { get: () => config.text_color || defaultConfig.text_color, set: (v) => { config.text_color = v; window.elementSdk.setConfig({ text_color: v }); } },
+            { get: () => config.accent_color || defaultConfig.accent_color, set: (v) => { config.accent_color = v; window.elementSdk.setConfig({ accent_color: v }); } },
+          ],
+          borderables: [],
+          fontEditable: { get: () => 'DM Sans', set: (v) => {} },
+          fontSizeable: { get: () => 16, set: (v) => {} },
+        }),
+        mapToEditPanelValues: (config) => new Map([
+          ['brand_name', config.brand_name || defaultConfig.brand_name],
+          ['hero_title', config.hero_title || defaultConfig.hero_title],
+          ['hero_subtitle', config.hero_subtitle || defaultConfig.hero_subtitle],
+        ])
+      });
+    } else {
+      applyConfig(defaultConfig);
+    }
+  </script>
+ </body>
 </html>

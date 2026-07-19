@@ -13,6 +13,17 @@ return new class extends Migration
     {
         Schema::create('orders', function (Blueprint $table) {
             $table->id();
+            $table->foreignId('user_id')->nullable()->constrained('users')->onDelete('cascade');
+            $table->string('status')->default('Pending'); // Pending, Processing, Shipping, Completed, Cancelled
+            $table->string('customer_name');
+            $table->string('customer_phone');
+            $table->string('customer_address');
+            $table->text('customer_note')->nullable();
+            $table->string('payment_method')->default('cod'); // cod, bank
+            $table->string('payment_status')->default('Unpaid'); // Paid, Unpaid
+            $table->decimal('total_amount', 15, 2);
+            $table->decimal('shipping_fee', 15, 2)->default(0);
+            $table->foreignId('voucher_id')->nullable()->constrained('vouchers')->onDelete('set null');
             $table->timestamps();
         });
     }
