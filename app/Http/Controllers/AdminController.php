@@ -279,26 +279,46 @@ class AdminController extends Controller
     // -------------------------------------------------------------
     public function getVouchers()
     {
-        return response()->json(\App\Models\Voucher::orderBy('created_at', 'desc')->get());
+        $vouchers = \App\Models\Voucher::orderBy('created_at', 'desc')->get()->map(function($voucher) {
+            $voucher->max_discount = $voucher->max_discount_amount;
+            $voucher->expiry_date = $voucher->end_date;
+            return $voucher;
+        });
+        return response()->json($vouchers);
     }
 
     public function createVoucher(Request $request)
     {
-        $data = $request->validate([
+        $request->validate([
             'code' => 'required|string|unique:vouchers,code',
             'discount_percent' => 'required|numeric|min:0|max:100',
-            'max_discount_amount' => 'required|numeric|min:0',
-            'min_order_value' => 'required|numeric|min:0',
-            'start_date' => 'nullable|date',
-            'end_date' => 'nullable|date|after_or_equal:start_date',
+            'max_discount' => 'nullable|numeric|min:0',
+            'expiry_date' => 'required|date',
             'usage_limit' => 'nullable|integer|min:0'
         ]);
 
-        $voucher = \App\Models\Voucher::create($data);
+        $voucher = \App\Models\Voucher::create([
+            'code' => $request->code,
+            'discount_percent' => $request->discount_percent,
+            'max_discount_amount' => $request->max_discount ?: null,
+            'min_order_value' => 0,
+            'start_date' => now(),
+            'end_date' => $request->expiry_date,
+            'usage_limit' => $request->usage_limit ?: null,
+        ]);
 
         return response()->json([
             'message' => 'Tạo voucher thành công!',
-            'voucher' => $voucher
+            'voucher' => [
+                'id' => $voucher->id,
+                'code' => $voucher->code,
+                'discount_percent' => $voucher->discount_percent,
+                'max_discount' => $voucher->max_discount_amount,
+                'usage_limit' => $voucher->usage_limit,
+                'expiry_date' => $voucher->end_date,
+                'created_at' => $voucher->created_at,
+                'updated_at' => $voucher->updated_at
+            ]
         ]);
     }
 
@@ -309,21 +329,34 @@ class AdminController extends Controller
             return response()->json(['message' => 'Voucher không tồn tại'], 404);
         }
 
-        $data = $request->validate([
+        $request->validate([
             'code' => 'required|string|unique:vouchers,code,' . $id,
             'discount_percent' => 'required|numeric|min:0|max:100',
-            'max_discount_amount' => 'required|numeric|min:0',
-            'min_order_value' => 'required|numeric|min:0',
-            'start_date' => 'nullable|date',
-            'end_date' => 'nullable|date|after_or_equal:start_date',
+            'max_discount' => 'nullable|numeric|min:0',
+            'expiry_date' => 'required|date',
             'usage_limit' => 'nullable|integer|min:0'
         ]);
 
-        $voucher->update($data);
+        $voucher->update([
+            'code' => $request->code,
+            'discount_percent' => $request->discount_percent,
+            'max_discount_amount' => $request->max_discount ?: null,
+            'end_date' => $request->expiry_date,
+            'usage_limit' => $request->usage_limit ?: null,
+        ]);
 
         return response()->json([
             'message' => 'Cập nhật voucher thành công!',
-            'voucher' => $voucher
+            'voucher' => [
+                'id' => $voucher->id,
+                'code' => $voucher->code,
+                'discount_percent' => $voucher->discount_percent,
+                'max_discount' => $voucher->max_discount_amount,
+                'usage_limit' => $voucher->usage_limit,
+                'expiry_date' => $voucher->end_date,
+                'created_at' => $voucher->created_at,
+                'updated_at' => $voucher->updated_at
+            ]
         ]);
     }
 
