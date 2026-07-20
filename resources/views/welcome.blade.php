@@ -526,6 +526,17 @@
         <aside class="w-full lg:w-96 shrink-0 bg-white rounded-3xl p-6 border border-[#e8e5e0] shadow-sm space-y-4 h-fit">
           <h3 class="font-semibold text-lg text-gray-800 border-b border-gray-100 pb-2">Đơn hàng của bạn</h3>
           <div id="checkout-items-list" class="divide-y divide-gray-100 max-h-60 overflow-y-auto"></div>
+          
+          <!-- Voucher Section in Checkout -->
+          <div class="border-t border-gray-100 pt-4 space-y-2">
+            <label class="text-xs font-bold text-gray-400 uppercase tracking-wider">Mã giảm giá</label>
+            <div class="flex gap-2">
+              <input type="text" id="checkout-voucher-input" placeholder="Nhập mã code..." class="flex-1 px-4 py-2 text-sm border border-gray-200 rounded-xl outline-none focus:border-[#c45e3a] uppercase font-mono">
+              <button type="button" onclick="applyCheckoutVoucherCode()" class="bg-[#1a1a1a] hover:bg-[#c45e3a] text-white text-xs font-semibold px-4 py-2 rounded-xl transition">Áp dụng</button>
+            </div>
+            <div id="checkout-voucher-status"></div>
+          </div>
+
           <div class="border-t border-gray-200 pt-4 space-y-2 text-sm" id="checkout-summary-calc"></div>
         </aside>
       </div>
@@ -2965,6 +2976,68 @@
           }
         });
       });
+
+      // Update checkout voucher status
+      const voucherInput = document.getElementById('checkout-voucher-input');
+      const voucherStatus = document.getElementById('checkout-voucher-status');
+      if (voucherInput) {
+        voucherInput.value = appliedVoucher ? appliedVoucher.code : '';
+      }
+      if (voucherStatus) {
+        voucherStatus.innerHTML = appliedVoucher ? `
+          <p class="text-xs text-green-600 font-semibold flex items-center gap-1 mt-1">
+            ✓ Đã áp dụng mã giảm giá thành công.
+            <button type="button" onclick="removeCheckoutVoucher()" class="text-red-500 underline ml-2 hover:text-red-700">Hủy</button>
+          </p>
+        ` : `
+          <p class="text-[10px] text-gray-400">Gợi ý: Thử nhập mã <span class="font-bold text-gray-600">BEESTYLE30</span></p>
+        `;
+      }
+    }
+
+    async function applyCheckoutVoucherCode() {
+      const codeInput = document.getElementById('checkout-voucher-input');
+      if (!codeInput) return;
+      const code = codeInput.value.toUpperCase().trim();
+      if (code === '') return;
+
+      let subtotal = 0;
+      cartState.forEach(item => {
+        const prod = productsState.find(p => p.id.toString() === item.productId.toString());
+        if (prod) subtotal += prod.price * item.quantity;
+      });
+
+      try {
+        const res = await fetch('/api/vouchers/apply', {
+          method: 'POST',
+          headers,
+          body: JSON.stringify({ code, order_value: subtotal })
+        });
+
+        const data = await res.json();
+
+        if (res.ok) {
+          appliedVoucher = {
+            id: data.voucher_id,
+            code: data.code,
+            discount_amount: data.discount_amount
+          };
+          showToast('Áp dụng mã giảm giá ' + code + ' thành công!');
+          await renderCheckoutPage();
+        } else {
+          showToast(data.message || 'Mã giảm giá không hợp lệ', 'info');
+          appliedVoucher = null;
+          await renderCheckoutPage();
+        }
+      } catch (err) {
+        showToast('Lỗi áp dụng mã giảm giá', 'info');
+      }
+    }
+
+    function removeCheckoutVoucher() {
+      appliedVoucher = null;
+      showToast('Đã hủy áp dụng mã giảm giá.', 'info');
+      renderCheckoutPage();
     }
 
     document.getElementById('checkout-form').onsubmit = async (e) => {
