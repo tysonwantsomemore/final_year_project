@@ -16,9 +16,9 @@ class AdminController extends Controller
     public function getStats()
     {
         $totalRevenue = Order::where('status', '!=', 'Cancelled')->sum('total_amount');
-        $orderCount = Order::count();
         $productCount = Product::count();
         $reviewCount = Review::count();
+        $orderCount = Order::count();
 
         // Fetch recent activities dynamically (recent orders and recent reviews)
         $recentOrders = Order::orderBy('created_at', 'desc')->take(5)->get()->map(function($order) {
