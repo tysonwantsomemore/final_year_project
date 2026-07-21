@@ -282,12 +282,31 @@ class AdminController extends Controller
     // -------------------------------------------------------------
     // Voucher CRUD
     // -------------------------------------------------------------
+    private function formatVoucher(\App\Models\Voucher $voucher)
+    {
+        return [
+            'id' => $voucher->id,
+            'code' => $voucher->code,
+            'discount_type' => $voucher->discount_amount ? 'amount' : 'percent',
+            'discount_value' => $voucher->discount_amount ? $voucher->discount_amount : $voucher->discount_percent,
+            'discount_percent' => $voucher->discount_percent,
+            'discount_amount' => $voucher->discount_amount,
+            'max_discount' => $voucher->max_discount_amount,
+            'min_order_value' => $voucher->min_order_value,
+            'usage_limit' => $voucher->usage_limit,
+            'usage_limit_per_customer' => $voucher->usage_limit_per_customer,
+            'used_count' => $voucher->used_count,
+            'new_customer_only' => (bool) $voucher->new_customer_only,
+            'expiry_date' => $voucher->end_date,
+            'created_at' => $voucher->created_at,
+            'updated_at' => $voucher->updated_at,
+        ];
+    }
+
     public function getVouchers()
     {
         $vouchers = \App\Models\Voucher::orderBy('created_at', 'desc')->get()->map(function($voucher) {
-            $voucher->max_discount = $voucher->max_discount_amount;
-            $voucher->expiry_date = $voucher->end_date;
-            return $voucher;
+            return $this->formatVoucher($voucher);
         });
         return response()->json($vouchers);
     }
@@ -296,34 +315,37 @@ class AdminController extends Controller
     {
         $request->validate([
             'code' => 'required|string|unique:vouchers,code',
-            'discount_percent' => 'required|numeric|min:0|max:100',
+            'discount_type' => 'required|in:percent,amount',
+            'discount_value' => 'required|numeric|min:0',
             'max_discount' => 'nullable|numeric|min:0',
+            'min_order_value' => 'nullable|numeric|min:0',
             'expiry_date' => 'required|date',
-            'usage_limit' => 'nullable|integer|min:0'
+            'usage_limit' => 'nullable|integer|min:0',
+            'usage_limit_per_customer' => 'nullable|integer|min:0',
+            'new_customer_only' => 'nullable|boolean',
         ]);
+
+        if ($request->discount_type === 'percent' && $request->discount_value > 100) {
+            return response()->json(['message' => 'Phần trăm giảm giá không được vượt quá 100%'], 422);
+        }
 
         $voucher = \App\Models\Voucher::create([
             'code' => $request->code,
-            'discount_percent' => $request->discount_percent,
-            'max_discount_amount' => $request->max_discount ?: null,
-            'min_order_value' => 0,
+            'discount_percent' => $request->discount_type === 'percent' ? $request->discount_value : 0,
+            'discount_amount' => $request->discount_type === 'amount' ? $request->discount_value : null,
+            'max_discount_amount' => $request->discount_type === 'percent' ? ($request->max_discount ?: null) : null,
+            'min_order_value' => $request->min_order_value ?: 0,
             'start_date' => now(),
             'end_date' => $request->expiry_date,
             'usage_limit' => $request->usage_limit ?: null,
+            'usage_limit_per_customer' => $request->usage_limit_per_customer ?: null,
+            'used_count' => 0,
+            'new_customer_only' => $request->boolean('new_customer_only'),
         ]);
 
         return response()->json([
             'message' => 'Tạo voucher thành công!',
-            'voucher' => [
-                'id' => $voucher->id,
-                'code' => $voucher->code,
-                'discount_percent' => $voucher->discount_percent,
-                'max_discount' => $voucher->max_discount_amount,
-                'usage_limit' => $voucher->usage_limit,
-                'expiry_date' => $voucher->end_date,
-                'created_at' => $voucher->created_at,
-                'updated_at' => $voucher->updated_at
-            ]
+            'voucher' => $this->formatVoucher($voucher)
         ]);
     }
 
@@ -336,32 +358,35 @@ class AdminController extends Controller
 
         $request->validate([
             'code' => 'required|string|unique:vouchers,code,' . $id,
-            'discount_percent' => 'required|numeric|min:0|max:100',
+            'discount_type' => 'required|in:percent,amount',
+            'discount_value' => 'required|numeric|min:0',
             'max_discount' => 'nullable|numeric|min:0',
+            'min_order_value' => 'nullable|numeric|min:0',
             'expiry_date' => 'required|date',
-            'usage_limit' => 'nullable|integer|min:0'
+            'usage_limit' => 'nullable|integer|min:0',
+            'usage_limit_per_customer' => 'nullable|integer|min:0',
+            'new_customer_only' => 'nullable|boolean',
         ]);
+
+        if ($request->discount_type === 'percent' && $request->discount_value > 100) {
+            return response()->json(['message' => 'Phần trăm giảm giá không được vượt quá 100%'], 422);
+        }
 
         $voucher->update([
             'code' => $request->code,
-            'discount_percent' => $request->discount_percent,
-            'max_discount_amount' => $request->max_discount ?: null,
+            'discount_percent' => $request->discount_type === 'percent' ? $request->discount_value : 0,
+            'discount_amount' => $request->discount_type === 'amount' ? $request->discount_value : null,
+            'max_discount_amount' => $request->discount_type === 'percent' ? ($request->max_discount ?: null) : null,
+            'min_order_value' => $request->min_order_value ?: 0,
             'end_date' => $request->expiry_date,
             'usage_limit' => $request->usage_limit ?: null,
+            'usage_limit_per_customer' => $request->usage_limit_per_customer ?: null,
+            'new_customer_only' => $request->boolean('new_customer_only'),
         ]);
 
         return response()->json([
             'message' => 'Cập nhật voucher thành công!',
-            'voucher' => [
-                'id' => $voucher->id,
-                'code' => $voucher->code,
-                'discount_percent' => $voucher->discount_percent,
-                'max_discount' => $voucher->max_discount_amount,
-                'usage_limit' => $voucher->usage_limit,
-                'expiry_date' => $voucher->end_date,
-                'created_at' => $voucher->created_at,
-                'updated_at' => $voucher->updated_at
-            ]
+            'voucher' => $this->formatVoucher($voucher)
         ]);
     }
 

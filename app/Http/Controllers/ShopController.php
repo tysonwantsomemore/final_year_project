@@ -10,6 +10,7 @@ use App\Models\OrderItem;
 use App\Models\Review;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\DB;
+use Illuminate\Support\Facades\Auth;
 
 class ShopController extends Controller
 {
@@ -146,10 +147,37 @@ class ShopController extends Controller
             return response()->json(['message' => 'Mã giảm giá đã hết lượt sử dụng'], 400);
         }
 
+        if ($voucher->new_customer_only || $voucher->usage_limit_per_customer !== null) {
+            if (!Auth::check()) {
+                return response()->json(['message' => 'Vui lòng đăng nhập để sử dụng mã giảm giá này'], 400);
+            }
+
+            if ($voucher->new_customer_only) {
+                $hasAnyOrder = Order::where('user_id', Auth::id())->where('status', '!=', 'Cancelled')->exists();
+                if ($hasAnyOrder) {
+                    return response()->json(['message' => 'Mã giảm giá chỉ áp dụng cho khách hàng mới'], 400);
+                }
+            }
+
+            if ($voucher->usage_limit_per_customer !== null) {
+                $customerUsedCount = Order::where('user_id', Auth::id())
+                    ->where('voucher_id', $voucher->id)
+                    ->where('status', '!=', 'Cancelled')
+                    ->count();
+                if ($customerUsedCount >= $voucher->usage_limit_per_customer) {
+                    return response()->json(['message' => 'Bạn đã sử dụng hết số lượt cho phép của mã này'], 400);
+                }
+            }
+        }
+
         // Calculate discount
-        $discountAmount = ($request->order_value * $voucher->discount_percent) / 100;
-        if ($voucher->max_discount_amount && $discountAmount > $voucher->max_discount_amount) {
-            $discountAmount = $voucher->max_discount_amount;
+        if ($voucher->discount_amount) {
+            $discountAmount = min($voucher->discount_amount, $request->order_value);
+        } else {
+            $discountAmount = ($request->order_value * $voucher->discount_percent) / 100;
+            if ($voucher->max_discount_amount && $discountAmount > $voucher->max_discount_amount) {
+                $discountAmount = $voucher->max_discount_amount;
+            }
         }
 
         return response()->json([
@@ -185,8 +213,42 @@ class ShopController extends Controller
                     $paymentStatus = 'Paid';
                 }
 
+                $voucher = null;
+                if ($request->voucher_id) {
+                    $voucher = Voucher::lockForUpdate()->find($request->voucher_id);
+                    if ($voucher) {
+                        if ($voucher->usage_limit !== null && $voucher->usage_limit <= 0) {
+                            throw new \Exception('Mã giảm giá đã hết lượt sử dụng.');
+                        }
+
+                        if ($voucher->new_customer_only || $voucher->usage_limit_per_customer !== null) {
+                            if (!Auth::check()) {
+                                throw new \Exception('Vui lòng đăng nhập để sử dụng mã giảm giá này.');
+                            }
+
+                            if ($voucher->new_customer_only) {
+                                $hasAnyOrder = Order::where('user_id', Auth::id())->where('status', '!=', 'Cancelled')->exists();
+                                if ($hasAnyOrder) {
+                                    throw new \Exception('Mã giảm giá chỉ áp dụng cho khách hàng mới.');
+                                }
+                            }
+
+                            if ($voucher->usage_limit_per_customer !== null) {
+                                $customerUsedCount = Order::where('user_id', Auth::id())
+                                    ->where('voucher_id', $voucher->id)
+                                    ->where('status', '!=', 'Cancelled')
+                                    ->count();
+                                if ($customerUsedCount >= $voucher->usage_limit_per_customer) {
+                                    throw new \Exception('Bạn đã sử dụng hết số lượt cho phép của mã này.');
+                                }
+                            }
+                        }
+                    }
+                }
+
                 // Create Order
                 $order = Order::create([
+                    'user_id' => Auth::id(),
                     'status' => 'Pending',
                     'customer_name' => $request->customer_name,
                     'customer_phone' => $request->customer_phone,
@@ -220,13 +282,13 @@ class ShopController extends Controller
                     ]);
                 }
 
-                // Decrement voucher limit if applicable
-                if ($request->voucher_id) {
-                    $voucher = Voucher::find($request->voucher_id);
-                    if ($voucher && $voucher->usage_limit !== null) {
+                // Decrement voucher limit and track usage if applicable
+                if ($voucher) {
+                    if ($voucher->usage_limit !== null) {
                         $voucher->usage_limit = max(0, $voucher->usage_limit - 1);
-                        $voucher->save();
                     }
+                    $voucher->used_count = ($voucher->used_count ?? 0) + 1;
+                    $voucher->save();
                 }
 
                 return response()->json([

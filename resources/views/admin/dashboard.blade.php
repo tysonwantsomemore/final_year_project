@@ -55,11 +55,6 @@
           <span class="sidebar-text">Đơn hàng</span>
         </button>
 
-        <button onclick="switchAdminTab('voucher')" id="btn-admin-sidebar-voucher" class="w-full flex items-center gap-3 px-6 py-3 text-sm font-semibold transition text-white/60 hover:text-white hover:bg-white/5 border-l-4 border-transparent text-left outline-none">
-          <i data-lucide="ticket" class="w-5 h-5 shrink-0"></i>
-          <span class="sidebar-text">Vouchers</span>
-        </button>
-
         <button onclick="switchAdminTab('user')" id="btn-admin-sidebar-user" class="w-full flex items-center gap-3 px-6 py-3 text-sm font-semibold transition text-white/60 hover:text-white hover:bg-white/5 border-l-4 border-transparent text-left outline-none">
           <i data-lucide="users" class="w-5 h-5 shrink-0"></i>
           <span class="sidebar-text">Người dùng</span>
@@ -68,6 +63,44 @@
         <button onclick="switchAdminTab('review')" id="btn-admin-sidebar-review" class="w-full flex items-center gap-3 px-6 py-3 text-sm font-semibold transition text-white/60 hover:text-white hover:bg-white/5 border-l-4 border-transparent text-left outline-none">
           <i data-lucide="message-square" class="w-5 h-5 shrink-0"></i>
           <span class="sidebar-text">Đánh giá</span>
+        </button>
+
+        <div class="h-px bg-white/10 my-2"></div>
+
+        <div class="px-6 text-[10px] uppercase font-bold text-white/40 tracking-wider sidebar-text mb-2">Marketing</div>
+
+        <button onclick="switchAdminTab('banner')" id="btn-admin-sidebar-banner" class="w-full flex items-center gap-3 px-6 py-3 text-sm font-semibold transition text-white/60 hover:text-white hover:bg-white/5 border-l-4 border-transparent text-left outline-none">
+          <i data-lucide="image" class="w-5 h-5 shrink-0"></i>
+          <span class="sidebar-text">Banner</span>
+        </button>
+
+        <button onclick="switchAdminTab('promotion')" id="btn-admin-sidebar-promotion" class="w-full flex items-center gap-3 px-6 py-3 text-sm font-semibold transition text-white/60 hover:text-white hover:bg-white/5 border-l-4 border-transparent text-left outline-none">
+          <i data-lucide="percent" class="w-5 h-5 shrink-0"></i>
+          <span class="sidebar-text">Khuyến mãi</span>
+        </button>
+
+        <button onclick="switchAdminTab('voucher')" id="btn-admin-sidebar-voucher" class="w-full flex items-center gap-3 px-6 py-3 text-sm font-semibold transition text-white/60 hover:text-white hover:bg-white/5 border-l-4 border-transparent text-left outline-none">
+          <i data-lucide="ticket" class="w-5 h-5 shrink-0"></i>
+          <span class="sidebar-text">Voucher</span>
+        </button>
+
+        <button onclick="switchAdminTab('collection')" id="btn-admin-sidebar-collection" class="w-full flex items-center gap-3 px-6 py-3 text-sm font-semibold transition text-white/60 hover:text-white hover:bg-white/5 border-l-4 border-transparent text-left outline-none">
+          <i data-lucide="layers" class="w-5 h-5 shrink-0"></i>
+          <span class="sidebar-text">Bộ sưu tập</span>
+        </button>
+
+        <button onclick="switchAdminTab('post')" id="btn-admin-sidebar-post" class="w-full flex items-center gap-3 px-6 py-3 text-sm font-semibold transition text-white/60 hover:text-white hover:bg-white/5 border-l-4 border-transparent text-left outline-none">
+          <i data-lucide="file-text" class="w-5 h-5 shrink-0"></i>
+          <span class="sidebar-text">Bài viết</span>
+        </button>
+
+        <div class="h-px bg-white/10 my-2"></div>
+
+        <div class="px-6 text-[10px] uppercase font-bold text-white/40 tracking-wider sidebar-text mb-2">Phân tích</div>
+
+        <button onclick="switchAdminTab('report')" id="btn-admin-sidebar-report" class="w-full flex items-center gap-3 px-6 py-3 text-sm font-semibold transition text-white/60 hover:text-white hover:bg-white/5 border-l-4 border-transparent text-left outline-none">
+          <i data-lucide="bar-chart-3" class="w-5 h-5 shrink-0"></i>
+          <span class="sidebar-text">Báo cáo & Thống kê</span>
         </button>
 
         <div class="h-px bg-white/10 my-2"></div>
@@ -371,25 +404,49 @@
 
               <div class="grid grid-cols-2 gap-3">
                 <div class="space-y-1">
-                  <label class="text-[10px] text-gray-500 font-semibold uppercase">Phần trăm giảm (%) *</label>
-                  <input type="number" id="admin-voucher-percent" placeholder="10" min="1" max="100" required class="w-full px-3 py-2 border border-gray-200 rounded-xl outline-none focus:border-[#4e73df] transition text-xs">
+                  <label class="text-[10px] text-gray-500 font-semibold uppercase">Loại giảm *</label>
+                  <select id="admin-voucher-type" onchange="toggleVoucherDiscountFields()" class="w-full px-3 py-2 border border-gray-200 rounded-xl outline-none focus:border-[#4e73df] transition text-xs bg-white cursor-pointer">
+                    <option value="percent">Giảm theo %</option>
+                    <option value="amount">Giảm theo số tiền</option>
+                  </select>
                 </div>
                 <div class="space-y-1">
+                  <label class="text-[10px] text-gray-500 font-semibold uppercase" id="admin-voucher-value-label">Giá trị giảm (%) *</label>
+                  <input type="number" id="admin-voucher-value" placeholder="10" min="0" required class="w-full px-3 py-2 border border-gray-200 rounded-xl outline-none focus:border-[#4e73df] transition text-xs">
+                </div>
+              </div>
+
+              <div class="grid grid-cols-2 gap-3">
+                <div class="space-y-1" id="admin-voucher-max-discount-wrap">
                   <label class="text-[10px] text-gray-500 font-semibold uppercase">Giảm tối đa (₫)</label>
                   <input type="number" id="admin-voucher-max-discount" placeholder="50000" class="w-full px-3 py-2 border border-gray-200 rounded-xl outline-none focus:border-[#4e73df] transition text-xs">
+                </div>
+                <div class="space-y-1">
+                  <label class="text-[10px] text-gray-500 font-semibold uppercase">Đơn tối thiểu (₫)</label>
+                  <input type="number" id="admin-voucher-min-order" placeholder="0" class="w-full px-3 py-2 border border-gray-200 rounded-xl outline-none focus:border-[#4e73df] transition text-xs">
                 </div>
               </div>
 
               <div class="grid grid-cols-2 gap-3">
                 <div class="space-y-1">
-                  <label class="text-[10px] text-gray-500 font-semibold uppercase">Giới hạn sử dụng</label>
+                  <label class="text-[10px] text-gray-500 font-semibold uppercase">Tổng lượt dùng</label>
                   <input type="number" id="admin-voucher-limit" placeholder="100" class="w-full px-3 py-2 border border-gray-200 rounded-xl outline-none focus:border-[#4e73df] transition text-xs">
                 </div>
                 <div class="space-y-1">
-                  <label class="text-[10px] text-gray-500 font-semibold uppercase">Ngày hết hạn *</label>
-                  <input type="date" id="admin-voucher-expiry" required class="w-full px-3 py-2 border border-gray-200 rounded-xl outline-none focus:border-[#4e73df] transition text-xs bg-white">
+                  <label class="text-[10px] text-gray-500 font-semibold uppercase">Giới hạn / khách</label>
+                  <input type="number" id="admin-voucher-limit-per-customer" placeholder="1" class="w-full px-3 py-2 border border-gray-200 rounded-xl outline-none focus:border-[#4e73df] transition text-xs">
                 </div>
               </div>
+
+              <div class="space-y-1">
+                <label class="text-[10px] text-gray-500 font-semibold uppercase">Ngày hết hạn *</label>
+                <input type="date" id="admin-voucher-expiry" required class="w-full px-3 py-2 border border-gray-200 rounded-xl outline-none focus:border-[#4e73df] transition text-xs bg-white">
+              </div>
+
+              <label class="flex items-center gap-2 text-[11px] text-gray-600 font-semibold pt-1">
+                <input type="checkbox" id="admin-voucher-new-customer-only" class="w-3.5 h-3.5">
+                Chỉ áp dụng cho khách hàng mới
+              </label>
 
               <div class="flex gap-2 pt-2">
                 <button type="submit" class="flex-1 bg-[#4e73df] hover:bg-[#2e59d9] text-white py-2 rounded-xl font-semibold transition text-xs" id="btn-admin-voucher-submit">Lưu Voucher</button>
@@ -406,9 +463,11 @@
                 <thead>
                   <tr class="text-[10px] text-gray-400 uppercase border-b border-gray-100">
                     <th class="py-3 px-2">Mã code</th>
-                    <th class="py-3 px-2 text-center">Giảm %</th>
-                    <th class="py-3 px-2 text-right">Giảm tối đa</th>
+                    <th class="py-3 px-2 text-center">Giá trị giảm</th>
+                    <th class="py-3 px-2 text-right">Đơn tối thiểu</th>
                     <th class="py-3 px-2 text-center">Lượt dùng</th>
+                    <th class="py-3 px-2 text-center">Giới hạn/khách</th>
+                    <th class="py-3 px-2 text-center">Khách mới</th>
                     <th class="py-3 px-2 text-center">Hết hạn</th>
                     <th class="py-3 px-2 text-center">Hành động</th>
                   </tr>
@@ -503,6 +562,395 @@
           </div>
           <div id="admin-reviews-empty" class="hidden text-center py-12 text-gray-400">
             Chưa có đánh giá nào trên hệ thống.
+          </div>
+        </div>
+
+        <!-- Banner Management Tab -->
+        <div id="admin-tab-banner" class="admin-tab hidden grid grid-cols-1 lg:grid-cols-3 gap-6">
+          <div class="bg-white p-5 rounded-xl border border-gray-200 shadow-sm h-fit text-xs">
+            <h3 class="font-bold text-gray-800 text-sm mb-4" id="admin-banner-form-title">Thêm Banner Mới</h3>
+            <form id="admin-banner-form" class="space-y-3" onsubmit="handleBannerSubmit(event)">
+              <input type="hidden" id="admin-banner-id">
+              <div class="space-y-1">
+                <label class="text-[10px] text-gray-500 font-semibold uppercase">Tiêu đề *</label>
+                <input type="text" id="admin-banner-title" placeholder="Summer Sale" required class="w-full px-3 py-2 border border-gray-200 rounded-xl outline-none focus:border-[#4e73df] transition text-xs">
+              </div>
+              <div class="space-y-1">
+                <label class="text-[10px] text-gray-500 font-semibold uppercase">Hình ảnh (URL) *</label>
+                <input type="url" id="admin-banner-image" placeholder="https://images.unsplash.com/..." required class="w-full px-3 py-2 border border-gray-200 rounded-xl outline-none focus:border-[#4e73df] transition text-xs">
+              </div>
+              <div class="space-y-1">
+                <label class="text-[10px] text-gray-500 font-semibold uppercase">Link chuyển hướng</label>
+                <input type="text" id="admin-banner-link" placeholder="#/shop?tag=Sale" class="w-full px-3 py-2 border border-gray-200 rounded-xl outline-none focus:border-[#4e73df] transition text-xs">
+              </div>
+              <div class="grid grid-cols-2 gap-3">
+                <div class="space-y-1">
+                  <label class="text-[10px] text-gray-500 font-semibold uppercase">Chương trình</label>
+                  <input type="text" id="admin-banner-season" placeholder="Black Friday" class="w-full px-3 py-2 border border-gray-200 rounded-xl outline-none focus:border-[#4e73df] transition text-xs">
+                </div>
+                <div class="space-y-1">
+                  <label class="text-[10px] text-gray-500 font-semibold uppercase">Thứ tự hiển thị</label>
+                  <input type="number" id="admin-banner-sort" placeholder="0" value="0" class="w-full px-3 py-2 border border-gray-200 rounded-xl outline-none focus:border-[#4e73df] transition text-xs">
+                </div>
+              </div>
+              <div class="grid grid-cols-2 gap-3">
+                <div class="space-y-1">
+                  <label class="text-[10px] text-gray-500 font-semibold uppercase">Ngày bắt đầu *</label>
+                  <input type="date" id="admin-banner-start" required class="w-full px-3 py-2 border border-gray-200 rounded-xl outline-none focus:border-[#4e73df] transition text-xs bg-white">
+                </div>
+                <div class="space-y-1">
+                  <label class="text-[10px] text-gray-500 font-semibold uppercase">Ngày kết thúc *</label>
+                  <input type="date" id="admin-banner-end" required class="w-full px-3 py-2 border border-gray-200 rounded-xl outline-none focus:border-[#4e73df] transition text-xs bg-white">
+                </div>
+              </div>
+              <label class="flex items-center gap-2 text-[11px] text-gray-600 font-semibold pt-1">
+                <input type="checkbox" id="admin-banner-active" checked class="w-3.5 h-3.5">
+                Hiển thị banner này
+              </label>
+              <div class="flex gap-2 pt-2">
+                <button type="submit" class="flex-1 bg-[#4e73df] hover:bg-[#2e59d9] text-white py-2 rounded-xl font-semibold transition text-xs" id="btn-admin-banner-submit">Lưu Banner</button>
+                <button type="button" onclick="resetBannerForm()" class="px-4 py-2 border border-gray-200 hover:bg-gray-50 rounded-xl transition text-xs text-gray-500">Hủy</button>
+              </div>
+            </form>
+          </div>
+          <div class="lg:col-span-2 bg-white p-5 rounded-xl border border-gray-200 shadow-sm space-y-4">
+            <h3 class="font-bold text-gray-800 text-sm">Danh Sách Banner</h3>
+            <div class="overflow-x-auto">
+              <table class="w-full text-xs text-left border-collapse">
+                <thead>
+                  <tr class="text-[10px] text-gray-400 uppercase border-b border-gray-100">
+                    <th class="py-3 px-2">Ảnh</th>
+                    <th class="py-3 px-2">Tiêu đề</th>
+                    <th class="py-3 px-2 text-center">Thời gian</th>
+                    <th class="py-3 px-2 text-center">Trạng thái</th>
+                    <th class="py-3 px-2 text-center">Hành động</th>
+                  </tr>
+                </thead>
+                <tbody id="admin-banners-tbody" class="divide-y divide-gray-100"></tbody>
+              </table>
+            </div>
+            <div id="admin-banners-empty" class="hidden text-center py-12 text-gray-400">Chưa có banner nào.</div>
+          </div>
+        </div>
+
+        <!-- Promotion Management Tab -->
+        <div id="admin-tab-promotion" class="admin-tab hidden grid grid-cols-1 lg:grid-cols-3 gap-6">
+          <div class="bg-white p-5 rounded-xl border border-gray-200 shadow-sm h-fit text-xs">
+            <h3 class="font-bold text-gray-800 text-sm mb-4" id="admin-promotion-form-title">Thêm Chương Trình Khuyến Mãi</h3>
+            <form id="admin-promotion-form" class="space-y-3" onsubmit="handlePromotionSubmit(event)">
+              <input type="hidden" id="admin-promotion-id">
+              <div class="space-y-1">
+                <label class="text-[10px] text-gray-500 font-semibold uppercase">Tên chương trình *</label>
+                <input type="text" id="admin-promotion-name" placeholder="Flash Sale" required class="w-full px-3 py-2 border border-gray-200 rounded-xl outline-none focus:border-[#4e73df] transition text-xs">
+              </div>
+              <div class="grid grid-cols-2 gap-3">
+                <div class="space-y-1">
+                  <label class="text-[10px] text-gray-500 font-semibold uppercase">Loại giảm *</label>
+                  <select id="admin-promotion-type" class="w-full px-3 py-2 border border-gray-200 rounded-xl outline-none focus:border-[#4e73df] transition text-xs bg-white cursor-pointer">
+                    <option value="percent">Giảm theo %</option>
+                    <option value="amount">Giảm theo số tiền</option>
+                  </select>
+                </div>
+                <div class="space-y-1">
+                  <label class="text-[10px] text-gray-500 font-semibold uppercase">Giá trị giảm *</label>
+                  <input type="number" id="admin-promotion-value" placeholder="20" required class="w-full px-3 py-2 border border-gray-200 rounded-xl outline-none focus:border-[#4e73df] transition text-xs">
+                </div>
+              </div>
+              <div class="space-y-1">
+                <label class="text-[10px] text-gray-500 font-semibold uppercase">Áp dụng cho *</label>
+                <select id="admin-promotion-scope" onchange="togglePromotionScopeFields()" class="w-full px-3 py-2 border border-gray-200 rounded-xl outline-none focus:border-[#4e73df] transition text-xs bg-white cursor-pointer">
+                  <option value="all">Toàn bộ cửa hàng</option>
+                  <option value="category">Danh mục sản phẩm</option>
+                  <option value="product">Một sản phẩm</option>
+                </select>
+              </div>
+              <div class="space-y-1 hidden" id="admin-promotion-category-wrap">
+                <label class="text-[10px] text-gray-500 font-semibold uppercase">Danh mục *</label>
+                <select id="admin-promotion-category" class="w-full px-3 py-2 border border-gray-200 rounded-xl outline-none focus:border-[#4e73df] transition text-xs bg-white cursor-pointer"></select>
+              </div>
+              <div class="space-y-1 hidden" id="admin-promotion-product-wrap">
+                <label class="text-[10px] text-gray-500 font-semibold uppercase">Sản phẩm *</label>
+                <select id="admin-promotion-product" class="w-full px-3 py-2 border border-gray-200 rounded-xl outline-none focus:border-[#4e73df] transition text-xs bg-white cursor-pointer"></select>
+              </div>
+              <div class="grid grid-cols-2 gap-3">
+                <div class="space-y-1">
+                  <label class="text-[10px] text-gray-500 font-semibold uppercase">Ngày bắt đầu *</label>
+                  <input type="date" id="admin-promotion-start" required class="w-full px-3 py-2 border border-gray-200 rounded-xl outline-none focus:border-[#4e73df] transition text-xs bg-white">
+                </div>
+                <div class="space-y-1">
+                  <label class="text-[10px] text-gray-500 font-semibold uppercase">Ngày kết thúc *</label>
+                  <input type="date" id="admin-promotion-end" required class="w-full px-3 py-2 border border-gray-200 rounded-xl outline-none focus:border-[#4e73df] transition text-xs bg-white">
+                </div>
+              </div>
+              <label class="flex items-center gap-2 text-[11px] text-gray-600 font-semibold pt-1">
+                <input type="checkbox" id="admin-promotion-active" checked class="w-3.5 h-3.5">
+                Đang áp dụng
+              </label>
+              <div class="flex gap-2 pt-2">
+                <button type="submit" class="flex-1 bg-[#4e73df] hover:bg-[#2e59d9] text-white py-2 rounded-xl font-semibold transition text-xs" id="btn-admin-promotion-submit">Lưu Khuyến Mãi</button>
+                <button type="button" onclick="resetPromotionForm()" class="px-4 py-2 border border-gray-200 hover:bg-gray-50 rounded-xl transition text-xs text-gray-500">Hủy</button>
+              </div>
+            </form>
+          </div>
+          <div class="lg:col-span-2 bg-white p-5 rounded-xl border border-gray-200 shadow-sm space-y-4">
+            <h3 class="font-bold text-gray-800 text-sm">Danh Sách Chương Trình Khuyến Mãi</h3>
+            <div class="overflow-x-auto">
+              <table class="w-full text-xs text-left border-collapse">
+                <thead>
+                  <tr class="text-[10px] text-gray-400 uppercase border-b border-gray-100">
+                    <th class="py-3 px-2">Chương trình</th>
+                    <th class="py-3 px-2 text-center">Giảm</th>
+                    <th class="py-3 px-2">Áp dụng</th>
+                    <th class="py-3 px-2 text-center">Thời gian</th>
+                    <th class="py-3 px-2 text-center">Trạng thái</th>
+                    <th class="py-3 px-2 text-center">Hành động</th>
+                  </tr>
+                </thead>
+                <tbody id="admin-promotions-tbody" class="divide-y divide-gray-100"></tbody>
+              </table>
+            </div>
+            <div id="admin-promotions-empty" class="hidden text-center py-12 text-gray-400">Chưa có chương trình khuyến mãi nào.</div>
+          </div>
+        </div>
+
+        <!-- Collection Management Tab -->
+        <div id="admin-tab-collection" class="admin-tab hidden grid grid-cols-1 lg:grid-cols-3 gap-6">
+          <div class="bg-white p-5 rounded-xl border border-gray-200 shadow-sm h-fit text-xs">
+            <h3 class="font-bold text-gray-800 text-sm mb-4" id="admin-collection-form-title">Thêm Bộ Sưu Tập Mới</h3>
+            <form id="admin-collection-form" class="space-y-3" onsubmit="handleCollectionSubmit(event)">
+              <input type="hidden" id="admin-collection-id">
+              <div class="space-y-1">
+                <label class="text-[10px] text-gray-500 font-semibold uppercase">Tên bộ sưu tập *</label>
+                <input type="text" id="admin-collection-name" placeholder="Thu Đông 2026" required class="w-full px-3 py-2 border border-gray-200 rounded-xl outline-none focus:border-[#4e73df] transition text-xs">
+              </div>
+              <div class="space-y-1">
+                <label class="text-[10px] text-gray-500 font-semibold uppercase">Ảnh đại diện (URL)</label>
+                <input type="url" id="admin-collection-image" placeholder="https://images.unsplash.com/..." class="w-full px-3 py-2 border border-gray-200 rounded-xl outline-none focus:border-[#4e73df] transition text-xs">
+              </div>
+              <div class="space-y-1">
+                <label class="text-[10px] text-gray-500 font-semibold uppercase">Mô tả</label>
+                <textarea id="admin-collection-desc" rows="2" class="w-full px-3 py-2 border border-gray-200 rounded-xl outline-none focus:border-[#4e73df] transition text-xs"></textarea>
+              </div>
+              <div class="space-y-1">
+                <label class="text-[10px] text-gray-500 font-semibold uppercase">Sản phẩm trong bộ sưu tập</label>
+                <div id="admin-collection-products-list" class="max-h-48 overflow-y-auto border border-gray-200 rounded-xl p-2 space-y-1"></div>
+              </div>
+              <div class="flex gap-2 pt-2">
+                <button type="submit" class="flex-1 bg-[#4e73df] hover:bg-[#2e59d9] text-white py-2 rounded-xl font-semibold transition text-xs" id="btn-admin-collection-submit">Lưu Bộ Sưu Tập</button>
+                <button type="button" onclick="resetCollectionForm()" class="px-4 py-2 border border-gray-200 hover:bg-gray-50 rounded-xl transition text-xs text-gray-500">Hủy</button>
+              </div>
+            </form>
+          </div>
+          <div class="lg:col-span-2 bg-white p-5 rounded-xl border border-gray-200 shadow-sm space-y-4">
+            <h3 class="font-bold text-gray-800 text-sm">Danh Sách Bộ Sưu Tập</h3>
+            <div class="overflow-x-auto">
+              <table class="w-full text-xs text-left border-collapse">
+                <thead>
+                  <tr class="text-[10px] text-gray-400 uppercase border-b border-gray-100">
+                    <th class="py-3 px-2">Ảnh</th>
+                    <th class="py-3 px-2">Tên bộ sưu tập</th>
+                    <th class="py-3 px-2 text-center">Số sản phẩm</th>
+                    <th class="py-3 px-2 text-center">Hành động</th>
+                  </tr>
+                </thead>
+                <tbody id="admin-collections-tbody" class="divide-y divide-gray-100"></tbody>
+              </table>
+            </div>
+            <div id="admin-collections-empty" class="hidden text-center py-12 text-gray-400">Chưa có bộ sưu tập nào.</div>
+          </div>
+        </div>
+
+        <!-- Post Management Tab -->
+        <div id="admin-tab-post" class="admin-tab hidden grid grid-cols-1 lg:grid-cols-3 gap-6">
+          <div class="bg-white p-5 rounded-xl border border-gray-200 shadow-sm h-fit text-xs">
+            <h3 class="font-bold text-gray-800 text-sm mb-4" id="admin-post-form-title">Thêm Bài Viết Mới</h3>
+            <form id="admin-post-form" class="space-y-3" onsubmit="handlePostSubmit(event)">
+              <input type="hidden" id="admin-post-id">
+              <div class="space-y-1">
+                <label class="text-[10px] text-gray-500 font-semibold uppercase">Tiêu đề *</label>
+                <input type="text" id="admin-post-title" placeholder="Xu hướng thời trang Thu 2026" required class="w-full px-3 py-2 border border-gray-200 rounded-xl outline-none focus:border-[#4e73df] transition text-xs">
+              </div>
+              <div class="space-y-1">
+                <label class="text-[10px] text-gray-500 font-semibold uppercase">Danh mục *</label>
+                <select id="admin-post-category" required class="w-full px-3 py-2 border border-gray-200 rounded-xl outline-none focus:border-[#4e73df] transition text-xs bg-white cursor-pointer">
+                  <option value="tin_thoi_trang">Tin thời trang</option>
+                  <option value="huong_dan_phoi_do">Hướng dẫn phối đồ</option>
+                  <option value="xu_huong_moi">Xu hướng mới</option>
+                  <option value="chinh_sach_doi_tra">Chính sách đổi trả</option>
+                </select>
+              </div>
+              <div class="space-y-1">
+                <label class="text-[10px] text-gray-500 font-semibold uppercase">Ảnh đại diện (URL)</label>
+                <input type="url" id="admin-post-image" placeholder="https://images.unsplash.com/..." class="w-full px-3 py-2 border border-gray-200 rounded-xl outline-none focus:border-[#4e73df] transition text-xs">
+              </div>
+              <div class="space-y-1">
+                <label class="text-[10px] text-gray-500 font-semibold uppercase">Nội dung *</label>
+                <textarea id="admin-post-content" rows="5" required class="w-full px-3 py-2 border border-gray-200 rounded-xl outline-none focus:border-[#4e73df] transition text-xs"></textarea>
+              </div>
+              <label class="flex items-center gap-2 text-[11px] text-gray-600 font-semibold pt-1">
+                <input type="checkbox" id="admin-post-published" checked class="w-3.5 h-3.5">
+                Đăng bài viết này
+              </label>
+              <div class="flex gap-2 pt-2">
+                <button type="submit" class="flex-1 bg-[#4e73df] hover:bg-[#2e59d9] text-white py-2 rounded-xl font-semibold transition text-xs" id="btn-admin-post-submit">Lưu Bài Viết</button>
+                <button type="button" onclick="resetPostForm()" class="px-4 py-2 border border-gray-200 hover:bg-gray-50 rounded-xl transition text-xs text-gray-500">Hủy</button>
+              </div>
+            </form>
+          </div>
+          <div class="lg:col-span-2 bg-white p-5 rounded-xl border border-gray-200 shadow-sm space-y-4">
+            <h3 class="font-bold text-gray-800 text-sm">Danh Sách Bài Viết</h3>
+            <div class="overflow-x-auto">
+              <table class="w-full text-xs text-left border-collapse">
+                <thead>
+                  <tr class="text-[10px] text-gray-400 uppercase border-b border-gray-100">
+                    <th class="py-3 px-2">Ảnh</th>
+                    <th class="py-3 px-2">Tiêu đề</th>
+                    <th class="py-3 px-2">Danh mục</th>
+                    <th class="py-3 px-2 text-center">Trạng thái</th>
+                    <th class="py-3 px-2 text-center">Hành động</th>
+                  </tr>
+                </thead>
+                <tbody id="admin-posts-tbody" class="divide-y divide-gray-100"></tbody>
+              </table>
+            </div>
+            <div id="admin-posts-empty" class="hidden text-center py-12 text-gray-400">Chưa có bài viết nào.</div>
+          </div>
+        </div>
+
+        <!-- Reports & Analytics Tab -->
+        <div id="admin-tab-report" class="admin-tab hidden space-y-6">
+          <!-- Revenue -->
+          <div class="bg-white rounded-xl border border-gray-200 shadow-sm overflow-hidden">
+            <div class="bg-gray-50 px-5 py-4 border-b border-gray-200 flex flex-wrap items-center justify-between gap-3">
+              <h3 class="font-bold text-sm text-[#4e73df]">Báo Cáo Doanh Thu</h3>
+              <div class="flex gap-1.5" id="report-revenue-period-buttons">
+                <button onclick="changeReportPeriod('today')" data-period="today" class="report-period-btn px-3 py-1.5 text-xs font-bold rounded-lg text-gray-500 hover:text-black transition">Hôm nay</button>
+                <button onclick="changeReportPeriod('week')" data-period="week" class="report-period-btn px-3 py-1.5 text-xs font-bold rounded-lg bg-white shadow-sm text-black transition">Tuần</button>
+                <button onclick="changeReportPeriod('month')" data-period="month" class="report-period-btn px-3 py-1.5 text-xs font-bold rounded-lg text-gray-500 hover:text-black transition">Tháng</button>
+                <button onclick="changeReportPeriod('year')" data-period="year" class="report-period-btn px-3 py-1.5 text-xs font-bold rounded-lg text-gray-500 hover:text-black transition">Năm</button>
+              </div>
+            </div>
+            <div class="p-5" style="position: relative; height: 300px;">
+              <canvas id="reportRevenueChart"></canvas>
+            </div>
+          </div>
+
+          <!-- Order Stats -->
+          <div class="grid grid-cols-2 sm:grid-cols-3 lg:grid-cols-6 gap-4">
+            <div class="bg-white p-4 rounded-xl border-l-4 border-gray-400 shadow-sm">
+              <p class="text-[10px] text-gray-500 uppercase font-bold tracking-wider">Tổng đơn</p>
+              <h3 class="text-lg font-bold text-gray-800 mt-1" id="report-orders-total">0</h3>
+            </div>
+            <div class="bg-white p-4 rounded-xl border-l-4 border-yellow-400 shadow-sm">
+              <p class="text-[10px] text-yellow-600 uppercase font-bold tracking-wider">Chờ xác nhận</p>
+              <h3 class="text-lg font-bold text-gray-800 mt-1" id="report-orders-pending">0</h3>
+            </div>
+            <div class="bg-white p-4 rounded-xl border-l-4 border-amber-500 shadow-sm">
+              <p class="text-[10px] text-amber-600 uppercase font-bold tracking-wider">Đang xử lý</p>
+              <h3 class="text-lg font-bold text-gray-800 mt-1" id="report-orders-processing">0</h3>
+            </div>
+            <div class="bg-white p-4 rounded-xl border-l-4 border-blue-400 shadow-sm">
+              <p class="text-[10px] text-blue-600 uppercase font-bold tracking-wider">Đang giao</p>
+              <h3 class="text-lg font-bold text-gray-800 mt-1" id="report-orders-shipping">0</h3>
+            </div>
+            <div class="bg-white p-4 rounded-xl border-l-4 border-emerald-500 shadow-sm">
+              <p class="text-[10px] text-emerald-600 uppercase font-bold tracking-wider">Hoàn thành</p>
+              <h3 class="text-lg font-bold text-gray-800 mt-1" id="report-orders-completed">0</h3>
+            </div>
+            <div class="bg-white p-4 rounded-xl border-l-4 border-red-400 shadow-sm">
+              <p class="text-[10px] text-red-500 uppercase font-bold tracking-wider">Đã hủy</p>
+              <h3 class="text-lg font-bold text-gray-800 mt-1" id="report-orders-cancelled">0</h3>
+            </div>
+          </div>
+
+          <!-- Top products + Category -->
+          <div class="grid grid-cols-1 lg:grid-cols-2 gap-6">
+            <div class="bg-white rounded-xl border border-gray-200 shadow-sm overflow-hidden flex flex-col">
+              <div class="bg-gray-50 px-5 py-4 border-b border-gray-200">
+                <h3 class="font-bold text-sm text-gray-800">Top 10 Sản Phẩm Bán Chạy</h3>
+              </div>
+              <div class="p-5 flex-grow" style="position: relative; height: 320px;">
+                <canvas id="reportTopProductsChart"></canvas>
+              </div>
+            </div>
+            <div class="bg-white rounded-xl border border-gray-200 shadow-sm overflow-hidden flex flex-col">
+              <div class="bg-gray-50 px-5 py-4 border-b border-gray-200">
+                <h3 class="font-bold text-sm text-gray-800">Doanh Thu Theo Danh Mục</h3>
+              </div>
+              <div class="p-5 flex-grow flex flex-col justify-center items-center" style="position: relative; height: 320px;">
+                <div class="w-full flex-grow max-h-[220px]">
+                  <canvas id="reportCategoryChart"></canvas>
+                </div>
+                <div class="flex flex-wrap justify-center gap-3 text-xs mt-4" id="report-category-legend"></div>
+              </div>
+            </div>
+          </div>
+
+          <!-- Size + Color -->
+          <div class="grid grid-cols-1 lg:grid-cols-2 gap-6">
+            <div class="bg-white rounded-xl border border-gray-200 shadow-sm overflow-hidden flex flex-col">
+              <div class="bg-gray-50 px-5 py-4 border-b border-gray-200">
+                <h3 class="font-bold text-sm text-gray-800">Thống Kê Theo Size</h3>
+              </div>
+              <div class="p-5 flex-grow" style="position: relative; height: 280px;">
+                <canvas id="reportSizeChart"></canvas>
+              </div>
+            </div>
+            <div class="bg-white rounded-xl border border-gray-200 shadow-sm overflow-hidden flex flex-col">
+              <div class="bg-gray-50 px-5 py-4 border-b border-gray-200">
+                <h3 class="font-bold text-sm text-gray-800">Thống Kê Theo Màu Sắc</h3>
+              </div>
+              <div class="p-5 flex-grow" style="position: relative; height: 280px;">
+                <canvas id="reportColorChart"></canvas>
+              </div>
+            </div>
+          </div>
+
+          <!-- Inventory -->
+          <div class="bg-white rounded-xl border border-gray-200 shadow-sm p-5 space-y-4">
+            <div class="flex items-center justify-between">
+              <h3 class="font-bold text-gray-800 text-sm">Thống Kê Tồn Kho</h3>
+              <span class="text-[10px] text-gray-400">Cảnh báo khi tồn kho dưới 5 sản phẩm</span>
+            </div>
+            <div class="overflow-x-auto">
+              <table class="w-full text-xs text-left border-collapse">
+                <thead>
+                  <tr class="text-[10px] text-gray-400 uppercase border-b border-gray-100">
+                    <th class="py-3 px-2">Sản phẩm</th>
+                    <th class="py-3 px-2 text-center">Tồn kho</th>
+                    <th class="py-3 px-2 text-center">Trạng thái</th>
+                  </tr>
+                </thead>
+                <tbody id="report-inventory-tbody" class="divide-y divide-gray-100"></tbody>
+              </table>
+            </div>
+          </div>
+
+          <!-- Customers -->
+          <div class="bg-white rounded-xl border border-gray-200 shadow-sm p-5 space-y-4">
+            <h3 class="font-bold text-gray-800 text-sm">Thống Kê Khách Hàng</h3>
+            <div class="grid grid-cols-2 gap-4">
+              <div class="bg-gray-50 p-4 rounded-xl border border-gray-100">
+                <p class="text-[10px] text-gray-500 uppercase font-bold tracking-wider">Tổng khách hàng</p>
+                <h3 class="text-lg font-bold text-gray-800 mt-1" id="report-customers-total">0</h3>
+              </div>
+              <div class="bg-gray-50 p-4 rounded-xl border border-gray-100">
+                <p class="text-[10px] text-gray-500 uppercase font-bold tracking-wider">Khách hàng mới (tháng này)</p>
+                <h3 class="text-lg font-bold text-gray-800 mt-1" id="report-customers-new">0</h3>
+              </div>
+            </div>
+            <div class="overflow-x-auto">
+              <table class="w-full text-xs text-left border-collapse">
+                <thead>
+                  <tr class="text-[10px] text-gray-400 uppercase border-b border-gray-100">
+                    <th class="py-3 px-2">Khách hàng</th>
+                    <th class="py-3 px-2 text-center">Số đơn</th>
+                    <th class="py-3 px-2 text-right">Tổng chi tiêu</th>
+                  </tr>
+                </thead>
+                <tbody id="report-customers-tbody" class="divide-y divide-gray-100"></tbody>
+              </table>
+            </div>
           </div>
         </div>
       </div>
@@ -971,7 +1419,7 @@
       document.getElementById('admin-tab-' + tabName).classList.remove('hidden');
 
       // Update sidebar buttons styling
-      const adminTabs = ['stat', 'prod', 'ord', 'voucher', 'user', 'review'];
+      const adminTabs = ['stat', 'prod', 'ord', 'user', 'review', 'banner', 'promotion', 'voucher', 'collection', 'post', 'report'];
       adminTabs.forEach(tab => {
         const btn = document.getElementById('btn-admin-sidebar-' + tab);
         if (btn) {
@@ -990,6 +1438,16 @@
         loadAdminUsers();
       } else if (tabName === 'review') {
         loadAdminReviews();
+      } else if (tabName === 'banner') {
+        loadBanners();
+      } else if (tabName === 'promotion') {
+        loadPromotions();
+      } else if (tabName === 'collection') {
+        loadCollections();
+      } else if (tabName === 'post') {
+        loadPosts();
+      } else if (tabName === 'report') {
+        loadReports();
       }
       lucide.createIcons();
     }
@@ -998,23 +1456,26 @@
     let adminVouchers = [];
     async function loadAdminVouchers() {
       const tbody = document.getElementById('admin-vouchers-tbody');
-      tbody.innerHTML = '<tr><td colspan="6" class="text-center py-4 text-gray-400">Đang tải voucher...</td></tr>';
+      tbody.innerHTML = '<tr><td colspan="8" class="text-center py-4 text-gray-400">Đang tải voucher...</td></tr>';
       try {
         const res = await fetch('/api/admin/vouchers');
         adminVouchers = await res.json();
         tbody.innerHTML = '';
         if (adminVouchers.length === 0) {
-          tbody.innerHTML = '<tr><td colspan="6" class="text-center py-4 text-gray-400">Chưa có voucher nào.</td></tr>';
+          tbody.innerHTML = '<tr><td colspan="8" class="text-center py-4 text-gray-400">Chưa có voucher nào.</td></tr>';
           return;
         }
         adminVouchers.forEach(v => {
           const expiryDate = new Date(v.expiry_date).toLocaleDateString('vi-VN');
+          const valueText = v.discount_type === 'amount' ? formatVND(v.discount_value) : v.discount_value + '%';
           tbody.innerHTML += `
             <tr class="text-xs border-b border-gray-100 hover:bg-gray-50/50 transition">
               <td class="py-3 px-2 font-mono font-bold text-gray-800">${v.code}</td>
-              <td class="py-3 px-2 text-center font-bold text-emerald-600">${v.discount_percent}%</td>
-              <td class="py-3 px-2 text-right font-bold text-gray-700">${v.max_discount ? formatVND(v.max_discount) : 'Không giới hạn'}</td>
-              <td class="py-3 px-2 text-center text-gray-500">${v.usage_limit ? v.usage_limit : 'Vô hạn'}</td>
+              <td class="py-3 px-2 text-center font-bold text-emerald-600">${valueText}</td>
+              <td class="py-3 px-2 text-right font-bold text-gray-700">${v.min_order_value ? formatVND(v.min_order_value) : 'Không yêu cầu'}</td>
+              <td class="py-3 px-2 text-center text-gray-500">${v.usage_limit !== null ? v.usage_limit : 'Vô hạn'} <span class="text-gray-300">(đã dùng ${v.used_count || 0})</span></td>
+              <td class="py-3 px-2 text-center text-gray-500">${v.usage_limit_per_customer !== null ? v.usage_limit_per_customer : 'Không giới hạn'}</td>
+              <td class="py-3 px-2 text-center">${v.new_customer_only ? '<span class="px-2 py-0.5 rounded text-[10px] font-bold bg-purple-50 text-purple-600 border border-purple-100">Có</span>' : '<span class="text-gray-400">-</span>'}</td>
               <td class="py-3 px-2 text-center text-gray-500">${expiryDate}</td>
               <td class="py-3 px-2 text-center">
                 <div class="flex items-center justify-center gap-1.5">
@@ -1026,7 +1487,20 @@
         });
         lucide.createIcons();
       } catch (err) {
-        tbody.innerHTML = '<tr><td colspan="6" class="text-center py-4 text-rose-500">Lỗi tải danh sách voucher.</td></tr>';
+        tbody.innerHTML = '<tr><td colspan="8" class="text-center py-4 text-rose-500">Lỗi tải danh sách voucher.</td></tr>';
+      }
+    }
+
+    function toggleVoucherDiscountFields() {
+      const type = document.getElementById('admin-voucher-type').value;
+      const label = document.getElementById('admin-voucher-value-label');
+      const maxDiscountWrap = document.getElementById('admin-voucher-max-discount-wrap');
+      if (type === 'amount') {
+        label.textContent = 'Giá trị giảm (₫) *';
+        maxDiscountWrap.classList.add('hidden');
+      } else {
+        label.textContent = 'Giá trị giảm (%) *';
+        maxDiscountWrap.classList.remove('hidden');
       }
     }
 
@@ -1035,9 +1509,14 @@
       if (!v) return;
       document.getElementById('admin-voucher-id').value = v.id;
       document.getElementById('admin-voucher-code').value = v.code;
-      document.getElementById('admin-voucher-percent').value = v.discount_percent;
+      document.getElementById('admin-voucher-type').value = v.discount_type;
+      document.getElementById('admin-voucher-value').value = v.discount_value;
       document.getElementById('admin-voucher-max-discount').value = v.max_discount || '';
-      document.getElementById('admin-voucher-limit').value = v.usage_limit || '';
+      document.getElementById('admin-voucher-min-order').value = v.min_order_value || '';
+      document.getElementById('admin-voucher-limit').value = v.usage_limit !== null ? v.usage_limit : '';
+      document.getElementById('admin-voucher-limit-per-customer').value = v.usage_limit_per_customer !== null ? v.usage_limit_per_customer : '';
+      document.getElementById('admin-voucher-new-customer-only').checked = !!v.new_customer_only;
+      toggleVoucherDiscountFields();
       const expiry = v.expiry_date.split(' ')[0];
       document.getElementById('admin-voucher-expiry').value = expiry;
       document.getElementById('admin-voucher-form-title').innerText = 'Chỉnh Sửa Voucher';
@@ -1047,10 +1526,15 @@
     function resetAdminVoucherForm() {
       document.getElementById('admin-voucher-id').value = '';
       document.getElementById('admin-voucher-code').value = '';
-      document.getElementById('admin-voucher-percent').value = '';
+      document.getElementById('admin-voucher-type').value = 'percent';
+      document.getElementById('admin-voucher-value').value = '';
       document.getElementById('admin-voucher-max-discount').value = '';
+      document.getElementById('admin-voucher-min-order').value = '';
       document.getElementById('admin-voucher-limit').value = '';
+      document.getElementById('admin-voucher-limit-per-customer').value = '';
+      document.getElementById('admin-voucher-new-customer-only').checked = false;
       document.getElementById('admin-voucher-expiry').value = '';
+      toggleVoucherDiscountFields();
       document.getElementById('admin-voucher-form-title').innerText = 'Thêm Voucher Mới';
       document.getElementById('btn-admin-voucher-submit').innerText = 'Lưu Voucher';
     }
@@ -1059,14 +1543,20 @@
       e.preventDefault();
       const id = document.getElementById('admin-voucher-id').value;
       const code = document.getElementById('admin-voucher-code').value.trim();
-      const discount_percent = parseInt(document.getElementById('admin-voucher-percent').value);
+      const discount_type = document.getElementById('admin-voucher-type').value;
+      const discount_value = parseFloat(document.getElementById('admin-voucher-value').value);
       const maxDiscountVal = document.getElementById('admin-voucher-max-discount').value;
-      const max_discount = maxDiscountVal ? parseInt(maxDiscountVal) : null;
+      const max_discount = maxDiscountVal ? parseFloat(maxDiscountVal) : null;
+      const minOrderVal = document.getElementById('admin-voucher-min-order').value;
+      const min_order_value = minOrderVal ? parseFloat(minOrderVal) : null;
       const limitVal = document.getElementById('admin-voucher-limit').value;
       const usage_limit = limitVal ? parseInt(limitVal) : null;
+      const limitPerCustomerVal = document.getElementById('admin-voucher-limit-per-customer').value;
+      const usage_limit_per_customer = limitPerCustomerVal ? parseInt(limitPerCustomerVal) : null;
+      const new_customer_only = document.getElementById('admin-voucher-new-customer-only').checked;
       const expiry_date = document.getElementById('admin-voucher-expiry').value;
 
-      const bodyData = { code, discount_percent, max_discount, usage_limit, expiry_date };
+      const bodyData = { code, discount_type, discount_value, max_discount, min_order_value, usage_limit, usage_limit_per_customer, new_customer_only, expiry_date };
       try {
         let url = '/api/admin/vouchers';
         let method = 'POST';
@@ -1287,6 +1777,760 @@
         }
       } catch (err) {
         showToast('Lỗi kết nối máy chủ', 'info');
+      }
+    }
+
+    // --- BANNER MANAGEMENT TAB ---
+    let adminBanners = [];
+    async function loadBanners() {
+      const tbody = document.getElementById('admin-banners-tbody');
+      const emptyMsg = document.getElementById('admin-banners-empty');
+      tbody.innerHTML = '<tr><td colspan="5" class="text-center py-4 text-gray-400">Đang tải banner...</td></tr>';
+      emptyMsg.classList.add('hidden');
+      try {
+        const res = await fetch('/api/admin/banners');
+        adminBanners = await res.json();
+        tbody.innerHTML = '';
+        if (adminBanners.length === 0) {
+          emptyMsg.classList.remove('hidden');
+          return;
+        }
+        adminBanners.forEach(b => {
+          const start = new Date(b.start_date).toLocaleDateString('vi-VN');
+          const end = new Date(b.end_date).toLocaleDateString('vi-VN');
+          tbody.innerHTML += `
+            <tr class="text-xs border-b border-gray-100 hover:bg-gray-50/50 transition">
+              <td class="py-3 px-2"><div class="w-14 h-9 rounded overflow-hidden bg-gray-100"><img src="${b.image_url}" class="w-full h-full object-cover"></div></td>
+              <td class="py-3 px-2 font-semibold text-gray-800">${b.title}${b.season ? `<p class="text-[10px] text-gray-400">${b.season}</p>` : ''}</td>
+              <td class="py-3 px-2 text-center text-gray-500">${start} - ${end}</td>
+              <td class="py-3 px-2 text-center">
+                <button onclick="toggleBannerActive('${b.id}')" class="px-2 py-0.5 rounded text-[10px] font-bold transition ${b.is_active ? 'bg-emerald-50 text-emerald-600 border border-emerald-100' : 'bg-gray-100 text-gray-500 border border-gray-200'}">${b.is_active ? 'Đang hiển thị' : 'Đã ẩn'}</button>
+              </td>
+              <td class="py-3 px-2 text-center">
+                <div class="flex items-center justify-center gap-1.5">
+                  <button onclick="editBanner('${b.id}')" class="p-1 text-gray-400 hover:text-blue-600 transition" title="Sửa"><i data-lucide="edit-3" class="w-4 h-4"></i></button>
+                  <button onclick="deleteBanner('${b.id}')" class="p-1 text-gray-400 hover:text-red-500 transition" title="Xóa"><i data-lucide="trash-2" class="w-4 h-4"></i></button>
+                </div>
+              </td>
+            </tr>`;
+        });
+        lucide.createIcons();
+      } catch (err) {
+        tbody.innerHTML = '<tr><td colspan="5" class="text-center py-4 text-rose-500">Lỗi tải danh sách banner.</td></tr>';
+      }
+    }
+
+    function editBanner(id) {
+      const b = adminBanners.find(item => item.id.toString() === id.toString());
+      if (!b) return;
+      document.getElementById('admin-banner-id').value = b.id;
+      document.getElementById('admin-banner-title').value = b.title;
+      document.getElementById('admin-banner-image').value = b.image_url;
+      document.getElementById('admin-banner-link').value = b.link_url || '';
+      document.getElementById('admin-banner-season').value = b.season || '';
+      document.getElementById('admin-banner-sort').value = b.sort_order || 0;
+      document.getElementById('admin-banner-start').value = b.start_date.split(' ')[0].split('T')[0];
+      document.getElementById('admin-banner-end').value = b.end_date.split(' ')[0].split('T')[0];
+      document.getElementById('admin-banner-active').checked = !!b.is_active;
+      document.getElementById('admin-banner-form-title').innerText = 'Chỉnh Sửa Banner';
+      document.getElementById('btn-admin-banner-submit').innerText = 'Cập nhật Banner';
+    }
+
+    function resetBannerForm() {
+      document.getElementById('admin-banner-id').value = '';
+      document.getElementById('admin-banner-title').value = '';
+      document.getElementById('admin-banner-image').value = '';
+      document.getElementById('admin-banner-link').value = '';
+      document.getElementById('admin-banner-season').value = '';
+      document.getElementById('admin-banner-sort').value = 0;
+      document.getElementById('admin-banner-start').value = '';
+      document.getElementById('admin-banner-end').value = '';
+      document.getElementById('admin-banner-active').checked = true;
+      document.getElementById('admin-banner-form-title').innerText = 'Thêm Banner Mới';
+      document.getElementById('btn-admin-banner-submit').innerText = 'Lưu Banner';
+    }
+
+    async function handleBannerSubmit(e) {
+      e.preventDefault();
+      const id = document.getElementById('admin-banner-id').value;
+      const bodyData = {
+        title: document.getElementById('admin-banner-title').value.trim(),
+        image_url: document.getElementById('admin-banner-image').value.trim(),
+        link_url: document.getElementById('admin-banner-link').value.trim() || null,
+        season: document.getElementById('admin-banner-season').value.trim() || null,
+        sort_order: parseInt(document.getElementById('admin-banner-sort').value) || 0,
+        start_date: document.getElementById('admin-banner-start').value,
+        end_date: document.getElementById('admin-banner-end').value,
+        is_active: document.getElementById('admin-banner-active').checked,
+      };
+      try {
+        let url = '/api/admin/banners';
+        let method = 'POST';
+        if (id) { url = '/api/admin/banners/' + id; method = 'PUT'; }
+        const res = await fetch(url, { method, headers, body: JSON.stringify(bodyData) });
+        const data = await res.json();
+        if (res.ok) {
+          showToast(id ? 'Cập nhật banner thành công!' : 'Tạo banner thành công!');
+          resetBannerForm();
+          await loadBanners();
+        } else {
+          showToast(data.message || 'Lỗi xử lý banner', 'info');
+        }
+      } catch (err) {
+        showToast('Lỗi kết nối máy chủ', 'info');
+      }
+    }
+
+    async function deleteBanner(id) {
+      if (!confirm('Bạn có chắc chắn muốn xóa banner này?')) return;
+      try {
+        const res = await fetch('/api/admin/banners/' + id, { method: 'DELETE', headers });
+        const data = await res.json();
+        if (res.ok) {
+          showToast('Xóa banner thành công!');
+          await loadBanners();
+        } else {
+          showToast(data.message || 'Lỗi khi xóa banner', 'info');
+        }
+      } catch (err) {
+        showToast('Lỗi kết nối máy chủ', 'info');
+      }
+    }
+
+    async function toggleBannerActive(id) {
+      const b = adminBanners.find(item => item.id.toString() === id.toString());
+      if (!b) return;
+      try {
+        const res = await fetch('/api/admin/banners/' + id, {
+          method: 'PUT',
+          headers,
+          body: JSON.stringify({
+            title: b.title, image_url: b.image_url, link_url: b.link_url, season: b.season,
+            sort_order: b.sort_order, start_date: b.start_date.split(' ')[0].split('T')[0], end_date: b.end_date.split(' ')[0].split('T')[0],
+            is_active: !b.is_active
+          })
+        });
+        const data = await res.json();
+        if (res.ok) {
+          await loadBanners();
+        } else {
+          showToast(data.message || 'Lỗi cập nhật trạng thái banner', 'info');
+        }
+      } catch (err) {
+        showToast('Lỗi kết nối máy chủ', 'info');
+      }
+    }
+
+    // --- PROMOTION MANAGEMENT TAB ---
+    let adminPromotions = [];
+    function populatePromotionSelects() {
+      const catSelect = document.getElementById('admin-promotion-category');
+      catSelect.innerHTML = categoriesState.map(c => `<option value="${c.id}">${c.name}</option>`).join('');
+      const prodSelect = document.getElementById('admin-promotion-product');
+      prodSelect.innerHTML = adminProducts.map(p => `<option value="${p.id}">${p.name}</option>`).join('');
+    }
+
+    function togglePromotionScopeFields() {
+      const scope = document.getElementById('admin-promotion-scope').value;
+      document.getElementById('admin-promotion-category-wrap').classList.toggle('hidden', scope !== 'category');
+      document.getElementById('admin-promotion-product-wrap').classList.toggle('hidden', scope !== 'product');
+    }
+
+    async function loadPromotions() {
+      populatePromotionSelects();
+      const tbody = document.getElementById('admin-promotions-tbody');
+      const emptyMsg = document.getElementById('admin-promotions-empty');
+      tbody.innerHTML = '<tr><td colspan="6" class="text-center py-4 text-gray-400">Đang tải khuyến mãi...</td></tr>';
+      emptyMsg.classList.add('hidden');
+      try {
+        const res = await fetch('/api/admin/promotions');
+        adminPromotions = await res.json();
+        tbody.innerHTML = '';
+        if (adminPromotions.length === 0) {
+          emptyMsg.classList.remove('hidden');
+          return;
+        }
+        adminPromotions.forEach(p => {
+          const valueText = p.discount_type === 'amount' ? formatVND(p.discount_value) : p.discount_value + '%';
+          const scopeText = p.apply_scope === 'all' ? 'Toàn bộ cửa hàng' : p.apply_scope === 'category' ? ('Danh mục: ' + (p.category ? p.category.name : '—')) : ('Sản phẩm: ' + (p.product ? p.product.name : '—'));
+          const start = new Date(p.start_date).toLocaleDateString('vi-VN');
+          const end = new Date(p.end_date).toLocaleDateString('vi-VN');
+          tbody.innerHTML += `
+            <tr class="text-xs border-b border-gray-100 hover:bg-gray-50/50 transition">
+              <td class="py-3 px-2 font-semibold text-gray-800">${p.name}</td>
+              <td class="py-3 px-2 text-center font-bold text-emerald-600">${valueText}</td>
+              <td class="py-3 px-2 text-gray-500">${scopeText}</td>
+              <td class="py-3 px-2 text-center text-gray-500">${start} - ${end}</td>
+              <td class="py-3 px-2 text-center">${p.is_active ? '<span class="px-2 py-0.5 rounded text-[10px] font-bold bg-emerald-50 text-emerald-600 border border-emerald-100">Đang chạy</span>' : '<span class="px-2 py-0.5 rounded text-[10px] font-bold bg-gray-100 text-gray-500 border border-gray-200">Tạm ẩn</span>'}</td>
+              <td class="py-3 px-2 text-center">
+                <div class="flex items-center justify-center gap-1.5">
+                  <button onclick="editPromotion('${p.id}')" class="p-1 text-gray-400 hover:text-blue-600 transition" title="Sửa"><i data-lucide="edit-3" class="w-4 h-4"></i></button>
+                  <button onclick="deletePromotion('${p.id}')" class="p-1 text-gray-400 hover:text-red-500 transition" title="Xóa"><i data-lucide="trash-2" class="w-4 h-4"></i></button>
+                </div>
+              </td>
+            </tr>`;
+        });
+        lucide.createIcons();
+      } catch (err) {
+        tbody.innerHTML = '<tr><td colspan="6" class="text-center py-4 text-rose-500">Lỗi tải danh sách khuyến mãi.</td></tr>';
+      }
+    }
+
+    function editPromotion(id) {
+      const p = adminPromotions.find(item => item.id.toString() === id.toString());
+      if (!p) return;
+      document.getElementById('admin-promotion-id').value = p.id;
+      document.getElementById('admin-promotion-name').value = p.name;
+      document.getElementById('admin-promotion-type').value = p.discount_type;
+      document.getElementById('admin-promotion-value').value = p.discount_value;
+      document.getElementById('admin-promotion-scope').value = p.apply_scope;
+      togglePromotionScopeFields();
+      if (p.category_id) document.getElementById('admin-promotion-category').value = p.category_id;
+      if (p.product_id) document.getElementById('admin-promotion-product').value = p.product_id;
+      document.getElementById('admin-promotion-start').value = p.start_date.split(' ')[0].split('T')[0];
+      document.getElementById('admin-promotion-end').value = p.end_date.split(' ')[0].split('T')[0];
+      document.getElementById('admin-promotion-active').checked = !!p.is_active;
+      document.getElementById('admin-promotion-form-title').innerText = 'Chỉnh Sửa Khuyến Mãi';
+      document.getElementById('btn-admin-promotion-submit').innerText = 'Cập nhật Khuyến Mãi';
+    }
+
+    function resetPromotionForm() {
+      document.getElementById('admin-promotion-id').value = '';
+      document.getElementById('admin-promotion-name').value = '';
+      document.getElementById('admin-promotion-type').value = 'percent';
+      document.getElementById('admin-promotion-value').value = '';
+      document.getElementById('admin-promotion-scope').value = 'all';
+      togglePromotionScopeFields();
+      document.getElementById('admin-promotion-start').value = '';
+      document.getElementById('admin-promotion-end').value = '';
+      document.getElementById('admin-promotion-active').checked = true;
+      document.getElementById('admin-promotion-form-title').innerText = 'Thêm Chương Trình Khuyến Mãi';
+      document.getElementById('btn-admin-promotion-submit').innerText = 'Lưu Khuyến Mãi';
+    }
+
+    async function handlePromotionSubmit(e) {
+      e.preventDefault();
+      const id = document.getElementById('admin-promotion-id').value;
+      const apply_scope = document.getElementById('admin-promotion-scope').value;
+      const bodyData = {
+        name: document.getElementById('admin-promotion-name').value.trim(),
+        discount_type: document.getElementById('admin-promotion-type').value,
+        discount_value: parseFloat(document.getElementById('admin-promotion-value').value),
+        apply_scope,
+        category_id: apply_scope === 'category' ? document.getElementById('admin-promotion-category').value : null,
+        product_id: apply_scope === 'product' ? document.getElementById('admin-promotion-product').value : null,
+        start_date: document.getElementById('admin-promotion-start').value,
+        end_date: document.getElementById('admin-promotion-end').value,
+        is_active: document.getElementById('admin-promotion-active').checked,
+      };
+      try {
+        let url = '/api/admin/promotions';
+        let method = 'POST';
+        if (id) { url = '/api/admin/promotions/' + id; method = 'PUT'; }
+        const res = await fetch(url, { method, headers, body: JSON.stringify(bodyData) });
+        const data = await res.json();
+        if (res.ok) {
+          showToast(id ? 'Cập nhật khuyến mãi thành công!' : 'Tạo khuyến mãi thành công!');
+          resetPromotionForm();
+          await loadPromotions();
+        } else {
+          showToast(data.message || 'Lỗi xử lý khuyến mãi', 'info');
+        }
+      } catch (err) {
+        showToast('Lỗi kết nối máy chủ', 'info');
+      }
+    }
+
+    async function deletePromotion(id) {
+      if (!confirm('Bạn có chắc chắn muốn xóa chương trình khuyến mãi này?')) return;
+      try {
+        const res = await fetch('/api/admin/promotions/' + id, { method: 'DELETE', headers });
+        const data = await res.json();
+        if (res.ok) {
+          showToast('Xóa khuyến mãi thành công!');
+          await loadPromotions();
+        } else {
+          showToast(data.message || 'Lỗi khi xóa khuyến mãi', 'info');
+        }
+      } catch (err) {
+        showToast('Lỗi kết nối máy chủ', 'info');
+      }
+    }
+
+    // --- COLLECTION MANAGEMENT TAB ---
+    let adminCollections = [];
+    function renderCollectionProductCheckboxes(selectedIds = []) {
+      const box = document.getElementById('admin-collection-products-list');
+      if (!adminProducts.length) {
+        box.innerHTML = '<p class="text-gray-400 italic">Không có sản phẩm.</p>';
+        return;
+      }
+      const selectedIdsStr = selectedIds.map(x => x.toString());
+      box.innerHTML = adminProducts.map(p => `
+        <label class="flex items-center gap-2 text-[11px] text-gray-600 py-0.5">
+          <input type="checkbox" value="${p.id}" class="admin-collection-product-checkbox w-3.5 h-3.5" ${selectedIdsStr.includes(p.id.toString()) ? 'checked' : ''}>
+          ${p.name}
+        </label>`).join('');
+    }
+
+    async function loadCollections() {
+      renderCollectionProductCheckboxes();
+      const tbody = document.getElementById('admin-collections-tbody');
+      const emptyMsg = document.getElementById('admin-collections-empty');
+      tbody.innerHTML = '<tr><td colspan="4" class="text-center py-4 text-gray-400">Đang tải bộ sưu tập...</td></tr>';
+      emptyMsg.classList.add('hidden');
+      try {
+        const res = await fetch('/api/admin/collections');
+        adminCollections = await res.json();
+        tbody.innerHTML = '';
+        if (adminCollections.length === 0) {
+          emptyMsg.classList.remove('hidden');
+          return;
+        }
+        adminCollections.forEach(c => {
+          tbody.innerHTML += `
+            <tr class="text-xs border-b border-gray-100 hover:bg-gray-50/50 transition">
+              <td class="py-3 px-2"><div class="w-10 h-10 rounded overflow-hidden bg-gray-100">${c.thumbnail_url ? `<img src="${c.thumbnail_url}" class="w-full h-full object-cover">` : ''}</div></td>
+              <td class="py-3 px-2 font-semibold text-gray-800">${c.name}</td>
+              <td class="py-3 px-2 text-center text-gray-500">${c.products ? c.products.length : 0}</td>
+              <td class="py-3 px-2 text-center">
+                <div class="flex items-center justify-center gap-1.5">
+                  <button onclick="editCollection('${c.id}')" class="p-1 text-gray-400 hover:text-blue-600 transition" title="Sửa"><i data-lucide="edit-3" class="w-4 h-4"></i></button>
+                  <button onclick="deleteCollection('${c.id}')" class="p-1 text-gray-400 hover:text-red-500 transition" title="Xóa"><i data-lucide="trash-2" class="w-4 h-4"></i></button>
+                </div>
+              </td>
+            </tr>`;
+        });
+        lucide.createIcons();
+      } catch (err) {
+        tbody.innerHTML = '<tr><td colspan="4" class="text-center py-4 text-rose-500">Lỗi tải danh sách bộ sưu tập.</td></tr>';
+      }
+    }
+
+    function editCollection(id) {
+      const c = adminCollections.find(item => item.id.toString() === id.toString());
+      if (!c) return;
+      document.getElementById('admin-collection-id').value = c.id;
+      document.getElementById('admin-collection-name').value = c.name;
+      document.getElementById('admin-collection-image').value = c.thumbnail_url || '';
+      document.getElementById('admin-collection-desc').value = c.description || '';
+      renderCollectionProductCheckboxes((c.products || []).map(p => p.id));
+      document.getElementById('admin-collection-form-title').innerText = 'Chỉnh Sửa Bộ Sưu Tập';
+      document.getElementById('btn-admin-collection-submit').innerText = 'Cập nhật Bộ Sưu Tập';
+    }
+
+    function resetCollectionForm() {
+      document.getElementById('admin-collection-id').value = '';
+      document.getElementById('admin-collection-name').value = '';
+      document.getElementById('admin-collection-image').value = '';
+      document.getElementById('admin-collection-desc').value = '';
+      renderCollectionProductCheckboxes();
+      document.getElementById('admin-collection-form-title').innerText = 'Thêm Bộ Sưu Tập Mới';
+      document.getElementById('btn-admin-collection-submit').innerText = 'Lưu Bộ Sưu Tập';
+    }
+
+    async function handleCollectionSubmit(e) {
+      e.preventDefault();
+      const id = document.getElementById('admin-collection-id').value;
+      const product_ids = Array.from(document.querySelectorAll('.admin-collection-product-checkbox:checked')).map(cb => cb.value);
+      const bodyData = {
+        name: document.getElementById('admin-collection-name').value.trim(),
+        thumbnail_url: document.getElementById('admin-collection-image').value.trim() || null,
+        description: document.getElementById('admin-collection-desc').value.trim() || null,
+        product_ids,
+      };
+      try {
+        let url = '/api/admin/collections';
+        let method = 'POST';
+        if (id) { url = '/api/admin/collections/' + id; method = 'PUT'; }
+        const res = await fetch(url, { method, headers, body: JSON.stringify(bodyData) });
+        const data = await res.json();
+        if (res.ok) {
+          showToast(id ? 'Cập nhật bộ sưu tập thành công!' : 'Tạo bộ sưu tập thành công!');
+          resetCollectionForm();
+          await loadCollections();
+        } else {
+          showToast(data.message || 'Lỗi xử lý bộ sưu tập', 'info');
+        }
+      } catch (err) {
+        showToast('Lỗi kết nối máy chủ', 'info');
+      }
+    }
+
+    async function deleteCollection(id) {
+      if (!confirm('Bạn có chắc chắn muốn xóa bộ sưu tập này?')) return;
+      try {
+        const res = await fetch('/api/admin/collections/' + id, { method: 'DELETE', headers });
+        const data = await res.json();
+        if (res.ok) {
+          showToast('Xóa bộ sưu tập thành công!');
+          await loadCollections();
+        } else {
+          showToast(data.message || 'Lỗi khi xóa bộ sưu tập', 'info');
+        }
+      } catch (err) {
+        showToast('Lỗi kết nối máy chủ', 'info');
+      }
+    }
+
+    // --- POST MANAGEMENT TAB ---
+    let adminPosts = [];
+    const POST_CATEGORY_LABELS = {
+      tin_thoi_trang: 'Tin thời trang',
+      huong_dan_phoi_do: 'Hướng dẫn phối đồ',
+      xu_huong_moi: 'Xu hướng mới',
+      chinh_sach_doi_tra: 'Chính sách đổi trả',
+    };
+
+    async function loadPosts() {
+      const tbody = document.getElementById('admin-posts-tbody');
+      const emptyMsg = document.getElementById('admin-posts-empty');
+      tbody.innerHTML = '<tr><td colspan="5" class="text-center py-4 text-gray-400">Đang tải bài viết...</td></tr>';
+      emptyMsg.classList.add('hidden');
+      try {
+        const res = await fetch('/api/admin/posts');
+        adminPosts = await res.json();
+        tbody.innerHTML = '';
+        if (adminPosts.length === 0) {
+          emptyMsg.classList.remove('hidden');
+          return;
+        }
+        adminPosts.forEach(p => {
+          tbody.innerHTML += `
+            <tr class="text-xs border-b border-gray-100 hover:bg-gray-50/50 transition">
+              <td class="py-3 px-2"><div class="w-10 h-10 rounded overflow-hidden bg-gray-100">${p.thumbnail_url ? `<img src="${p.thumbnail_url}" class="w-full h-full object-cover">` : ''}</div></td>
+              <td class="py-3 px-2 font-semibold text-gray-800">${p.title}</td>
+              <td class="py-3 px-2 text-gray-500">${POST_CATEGORY_LABELS[p.category] || p.category}</td>
+              <td class="py-3 px-2 text-center">
+                <button onclick="togglePostPublished('${p.id}')" class="px-2 py-0.5 rounded text-[10px] font-bold transition ${p.is_published ? 'bg-emerald-50 text-emerald-600 border border-emerald-100' : 'bg-gray-100 text-gray-500 border border-gray-200'}">${p.is_published ? 'Đã đăng' : 'Đã ẩn'}</button>
+              </td>
+              <td class="py-3 px-2 text-center">
+                <div class="flex items-center justify-center gap-1.5">
+                  <button onclick="editPost('${p.id}')" class="p-1 text-gray-400 hover:text-blue-600 transition" title="Sửa"><i data-lucide="edit-3" class="w-4 h-4"></i></button>
+                  <button onclick="deletePost('${p.id}')" class="p-1 text-gray-400 hover:text-red-500 transition" title="Xóa"><i data-lucide="trash-2" class="w-4 h-4"></i></button>
+                </div>
+              </td>
+            </tr>`;
+        });
+        lucide.createIcons();
+      } catch (err) {
+        tbody.innerHTML = '<tr><td colspan="5" class="text-center py-4 text-rose-500">Lỗi tải danh sách bài viết.</td></tr>';
+      }
+    }
+
+    function editPost(id) {
+      const p = adminPosts.find(item => item.id.toString() === id.toString());
+      if (!p) return;
+      document.getElementById('admin-post-id').value = p.id;
+      document.getElementById('admin-post-title').value = p.title;
+      document.getElementById('admin-post-category').value = p.category;
+      document.getElementById('admin-post-image').value = p.thumbnail_url || '';
+      document.getElementById('admin-post-content').value = p.content;
+      document.getElementById('admin-post-published').checked = !!p.is_published;
+      document.getElementById('admin-post-form-title').innerText = 'Chỉnh Sửa Bài Viết';
+      document.getElementById('btn-admin-post-submit').innerText = 'Cập nhật Bài Viết';
+    }
+
+    function resetPostForm() {
+      document.getElementById('admin-post-id').value = '';
+      document.getElementById('admin-post-title').value = '';
+      document.getElementById('admin-post-category').value = 'tin_thoi_trang';
+      document.getElementById('admin-post-image').value = '';
+      document.getElementById('admin-post-content').value = '';
+      document.getElementById('admin-post-published').checked = true;
+      document.getElementById('admin-post-form-title').innerText = 'Thêm Bài Viết Mới';
+      document.getElementById('btn-admin-post-submit').innerText = 'Lưu Bài Viết';
+    }
+
+    async function handlePostSubmit(e) {
+      e.preventDefault();
+      const id = document.getElementById('admin-post-id').value;
+      const bodyData = {
+        title: document.getElementById('admin-post-title').value.trim(),
+        category: document.getElementById('admin-post-category').value,
+        thumbnail_url: document.getElementById('admin-post-image').value.trim() || null,
+        content: document.getElementById('admin-post-content').value.trim(),
+        is_published: document.getElementById('admin-post-published').checked,
+      };
+      try {
+        let url = '/api/admin/posts';
+        let method = 'POST';
+        if (id) { url = '/api/admin/posts/' + id; method = 'PUT'; }
+        const res = await fetch(url, { method, headers, body: JSON.stringify(bodyData) });
+        const data = await res.json();
+        if (res.ok) {
+          showToast(id ? 'Cập nhật bài viết thành công!' : 'Tạo bài viết thành công!');
+          resetPostForm();
+          await loadPosts();
+        } else {
+          showToast(data.message || 'Lỗi xử lý bài viết', 'info');
+        }
+      } catch (err) {
+        showToast('Lỗi kết nối máy chủ', 'info');
+      }
+    }
+
+    async function deletePost(id) {
+      if (!confirm('Bạn có chắc chắn muốn xóa bài viết này?')) return;
+      try {
+        const res = await fetch('/api/admin/posts/' + id, { method: 'DELETE', headers });
+        const data = await res.json();
+        if (res.ok) {
+          showToast('Xóa bài viết thành công!');
+          await loadPosts();
+        } else {
+          showToast(data.message || 'Lỗi khi xóa bài viết', 'info');
+        }
+      } catch (err) {
+        showToast('Lỗi kết nối máy chủ', 'info');
+      }
+    }
+
+    async function togglePostPublished(id) {
+      const p = adminPosts.find(item => item.id.toString() === id.toString());
+      if (!p) return;
+      try {
+        const res = await fetch('/api/admin/posts/' + id, {
+          method: 'PUT', headers,
+          body: JSON.stringify({ title: p.title, category: p.category, thumbnail_url: p.thumbnail_url, content: p.content, is_published: !p.is_published })
+        });
+        const data = await res.json();
+        if (res.ok) {
+          await loadPosts();
+        } else {
+          showToast(data.message || 'Lỗi cập nhật trạng thái bài viết', 'info');
+        }
+      } catch (err) {
+        showToast('Lỗi kết nối máy chủ', 'info');
+      }
+    }
+
+    // --- REPORTS & ANALYTICS TAB ---
+    let currentReportPeriod = 'week';
+    let reportRevenueChartInstance = null;
+    let reportTopProductsChartInstance = null;
+    let reportSizeChartInstance = null;
+    let reportColorChartInstance = null;
+    let reportCategoryChartInstance = null;
+
+    async function loadReports() {
+      await Promise.all([
+        loadReportRevenue(currentReportPeriod),
+        loadReportOrders(),
+        loadReportTopProducts(),
+        loadReportSizeColor(),
+        loadReportInventory(),
+        loadReportCustomers(),
+        loadReportCategories(),
+      ]);
+    }
+
+    async function changeReportPeriod(period) {
+      currentReportPeriod = period;
+      document.querySelectorAll('.report-period-btn').forEach(btn => {
+        btn.className = btn.dataset.period === period
+          ? 'report-period-btn px-3 py-1.5 text-xs font-bold rounded-lg bg-white shadow-sm text-black transition'
+          : 'report-period-btn px-3 py-1.5 text-xs font-bold rounded-lg text-gray-500 hover:text-black transition';
+      });
+      await loadReportRevenue(period);
+    }
+
+    async function loadReportRevenue(period) {
+      try {
+        const res = await fetch('/api/admin/reports/revenue?period=' + period);
+        const data = await res.json();
+        const ctx = document.getElementById('reportRevenueChart');
+        if (reportRevenueChartInstance) reportRevenueChartInstance.destroy();
+        reportRevenueChartInstance = new Chart(ctx, {
+          type: 'bar',
+          data: {
+            labels: data.chart.map(item => item.label),
+            datasets: [{
+              label: 'Doanh thu',
+              data: data.chart.map(item => item.revenue),
+              backgroundColor: '#4e73df',
+              borderRadius: 6,
+            }]
+          },
+          options: {
+            responsive: true,
+            maintainAspectRatio: false,
+            plugins: {
+              legend: { display: false },
+              tooltip: { callbacks: { label: (ctx) => 'Doanh thu: ' + formatVND(ctx.raw) } }
+            },
+            scales: {
+              x: { grid: { display: false }, ticks: { font: { size: 10 } } },
+              y: { ticks: { callback: (v) => formatVND(v), font: { size: 10 } } }
+            }
+          }
+        });
+      } catch (err) {
+        console.error('Error loading revenue report:', err);
+      }
+    }
+
+    async function loadReportOrders() {
+      try {
+        const res = await fetch('/api/admin/reports/orders');
+        const data = await res.json();
+        document.getElementById('report-orders-total').textContent = data.total_orders;
+        document.getElementById('report-orders-pending').textContent = data.pending;
+        document.getElementById('report-orders-processing').textContent = data.processing;
+        document.getElementById('report-orders-shipping').textContent = data.shipping;
+        document.getElementById('report-orders-completed').textContent = data.completed;
+        document.getElementById('report-orders-cancelled').textContent = data.cancelled;
+      } catch (err) {
+        console.error('Error loading order stats:', err);
+      }
+    }
+
+    async function loadReportTopProducts() {
+      try {
+        const res = await fetch('/api/admin/reports/top-products?limit=10');
+        const data = await res.json();
+        const ctx = document.getElementById('reportTopProductsChart');
+        if (reportTopProductsChartInstance) reportTopProductsChartInstance.destroy();
+        reportTopProductsChartInstance = new Chart(ctx, {
+          type: 'bar',
+          data: {
+            labels: data.map(item => item.name),
+            datasets: [{
+              label: 'Đã bán',
+              data: data.map(item => item.sold),
+              backgroundColor: '#1cc88a',
+              borderRadius: 6,
+            }]
+          },
+          options: {
+            indexAxis: 'y',
+            responsive: true,
+            maintainAspectRatio: false,
+            plugins: { legend: { display: false } },
+            scales: {
+              x: { ticks: { font: { size: 10 } } },
+              y: { ticks: { font: { size: 10 } } }
+            }
+          }
+        });
+      } catch (err) {
+        console.error('Error loading top products report:', err);
+      }
+    }
+
+    async function loadReportSizeColor() {
+      const pieColors = ['#c45e3a', '#4e73df', '#1cc88a', '#f6c23e', '#36b9cc', '#e74a3b', '#a3b899', '#8e8e93'];
+      try {
+        const [sizeRes, colorRes] = await Promise.all([
+          fetch('/api/admin/reports/size-stats'),
+          fetch('/api/admin/reports/color-stats'),
+        ]);
+        const sizeData = await sizeRes.json();
+        const colorData = await colorRes.json();
+
+        const ctxSize = document.getElementById('reportSizeChart');
+        if (reportSizeChartInstance) reportSizeChartInstance.destroy();
+        reportSizeChartInstance = new Chart(ctxSize, {
+          type: 'doughnut',
+          data: {
+            labels: sizeData.map(item => item.size),
+            datasets: [{ data: sizeData.map(item => item.sold), backgroundColor: pieColors, borderWidth: 2, borderColor: '#ffffff' }]
+          },
+          options: { responsive: true, maintainAspectRatio: false, plugins: { legend: { position: 'bottom', labels: { font: { size: 10 } } } } }
+        });
+
+        const ctxColor = document.getElementById('reportColorChart');
+        if (reportColorChartInstance) reportColorChartInstance.destroy();
+        reportColorChartInstance = new Chart(ctxColor, {
+          type: 'doughnut',
+          data: {
+            labels: colorData.map(item => item.color),
+            datasets: [{ data: colorData.map(item => item.sold), backgroundColor: pieColors, borderWidth: 2, borderColor: '#ffffff' }]
+          },
+          options: { responsive: true, maintainAspectRatio: false, plugins: { legend: { position: 'bottom', labels: { font: { size: 10 } } } } }
+        });
+      } catch (err) {
+        console.error('Error loading size/color report:', err);
+      }
+    }
+
+    async function loadReportInventory() {
+      const tbody = document.getElementById('report-inventory-tbody');
+      tbody.innerHTML = '<tr><td colspan="3" class="text-center py-4 text-gray-400">Đang tải...</td></tr>';
+      try {
+        const res = await fetch('/api/admin/reports/inventory?threshold=5');
+        const data = await res.json();
+        tbody.innerHTML = '';
+        data.products.forEach(p => {
+          tbody.innerHTML += `
+            <tr class="text-xs border-b border-gray-100 hover:bg-gray-50/50 transition ${p.low_stock ? 'bg-red-50/40' : ''}">
+              <td class="py-3 px-2 font-semibold text-gray-800">${p.name}</td>
+              <td class="py-3 px-2 text-center font-bold ${p.low_stock ? 'text-red-500' : 'text-gray-700'}">${p.stock}</td>
+              <td class="py-3 px-2 text-center">${p.low_stock ? '<span class="px-2 py-0.5 rounded text-[10px] font-bold bg-red-50 text-red-600 border border-red-100">Sắp hết hàng</span>' : '<span class="px-2 py-0.5 rounded text-[10px] font-bold bg-emerald-50 text-emerald-600 border border-emerald-100">Còn hàng</span>'}</td>
+            </tr>`;
+        });
+      } catch (err) {
+        tbody.innerHTML = '<tr><td colspan="3" class="text-center py-4 text-rose-500">Lỗi tải thống kê tồn kho.</td></tr>';
+      }
+    }
+
+    async function loadReportCustomers() {
+      const tbody = document.getElementById('report-customers-tbody');
+      tbody.innerHTML = '<tr><td colspan="3" class="text-center py-4 text-gray-400">Đang tải...</td></tr>';
+      try {
+        const res = await fetch('/api/admin/reports/customers');
+        const data = await res.json();
+        document.getElementById('report-customers-total').textContent = data.total_customers;
+        document.getElementById('report-customers-new').textContent = data.new_customers;
+        tbody.innerHTML = '';
+        if (data.top_customers.length === 0) {
+          tbody.innerHTML = '<tr><td colspan="3" class="text-center py-4 text-gray-400">Chưa có dữ liệu khách hàng.</td></tr>';
+          return;
+        }
+        data.top_customers.forEach(c => {
+          tbody.innerHTML += `
+            <tr class="text-xs border-b border-gray-100 hover:bg-gray-50/50 transition">
+              <td class="py-3 px-2 font-semibold text-gray-800">${c.customer ? c.customer.full_name : 'Ẩn danh'}</td>
+              <td class="py-3 px-2 text-center text-gray-500">${c.order_count}</td>
+              <td class="py-3 px-2 text-right font-bold text-gray-700">${formatVND(c.total_spent)}</td>
+            </tr>`;
+        });
+      } catch (err) {
+        tbody.innerHTML = '<tr><td colspan="3" class="text-center py-4 text-rose-500">Lỗi tải thống kê khách hàng.</td></tr>';
+      }
+    }
+
+    async function loadReportCategories() {
+      const pieColors = ['#c45e3a', '#4e73df', '#1cc88a', '#f6c23e', '#36b9cc', '#e74a3b'];
+      try {
+        const res = await fetch('/api/admin/reports/categories');
+        const data = await res.json();
+        const ctx = document.getElementById('reportCategoryChart');
+        if (reportCategoryChartInstance) reportCategoryChartInstance.destroy();
+        reportCategoryChartInstance = new Chart(ctx, {
+          type: 'doughnut',
+          data: {
+            labels: data.map(item => item.category),
+            datasets: [{ data: data.map(item => item.revenue), backgroundColor: pieColors.slice(0, data.length), borderWidth: 2, borderColor: '#ffffff' }]
+          },
+          options: {
+            responsive: true, maintainAspectRatio: false,
+            plugins: {
+              legend: { display: false },
+              tooltip: { callbacks: { label: (ctx) => `${ctx.label}: ${formatVND(ctx.raw)} (${data[ctx.dataIndex].percent}%)` } }
+            },
+            cutout: '65%'
+          }
+        });
+
+        const legendNode = document.getElementById('report-category-legend');
+        legendNode.innerHTML = data.map((item, idx) => `
+          <div class="flex items-center gap-1.5">
+            <span class="w-2.5 h-2.5 rounded-full inline-block" style="background-color: ${pieColors[idx % pieColors.length]}"></span>
+            <span class="text-gray-600 font-medium">${item.category} (${item.percent}%)</span>
+          </div>`).join('');
+      } catch (err) {
+        console.error('Error loading category report:', err);
       }
     }
 
