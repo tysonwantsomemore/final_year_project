@@ -17,7 +17,11 @@ class AdminCheck
     public function handle(Request $request, Closure $next): Response
     {
         if (!Auth::check() || Auth::user()->role !== 'Admin') {
-            return response()->json(['message' => 'Quyền truy cập bị từ chối. Cần tài khoản Admin.'], 403);
+            if ($request->is('api/*')) {
+                return response()->json(['message' => 'Quyền truy cập bị từ chối. Cần tài khoản Admin.'], 403);
+            }
+
+            return redirect('/')->with('error', 'Quyền truy cập bị từ chối. Cần tài khoản Admin.');
         }
 
         return $next($request);

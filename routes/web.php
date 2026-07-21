@@ -7,8 +7,11 @@ use App\Http\Controllers\AdminController;
 use App\Http\Controllers\MarketingController;
 use App\Http\Controllers\ReportController;
 
-// Main frontend route
+// Main frontend route (customer storefront)
 Route::get('/', [ShopController::class, 'index']);
+
+// Admin dashboard page - separate view/route, protected by role-based check
+Route::get('/admin', [AdminController::class, 'index'])->middleware(\App\Http\Middleware\AdminCheck::class);
 
 // Shop customer API routes
 Route::prefix('api')->group(function () {

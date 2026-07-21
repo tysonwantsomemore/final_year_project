@@ -13,6 +13,11 @@ use Illuminate\Support\Facades\DB;
 
 class AdminController extends Controller
 {
+    public function index()
+    {
+        return view('admin.dashboard');
+    }
+
     public function getStats()
     {
         $totalRevenue = Order::where('status', '!=', 'Cancelled')->sum('total_amount');
