@@ -9,13 +9,29 @@ class Review extends Model
     protected $fillable = [
         'user_id',
         'product_id',
-        'customer_name',
+        'order_item_id',
         'rating',
-        'comment'
+        'comment',
+        'status'
     ];
+
+    public function user()
+    {
+        return $this->belongsTo(User::class);
+    }
 
     public function product()
     {
         return $this->belongsTo(Product::class);
+    }
+
+    public function orderItem()
+    {
+        return $this->belongsTo(OrderItem::class);
+    }
+
+    public function images()
+    {
+        return $this->hasMany(ReviewImage::class);
     }
 }
