@@ -4,6 +4,8 @@ use Illuminate\Support\Facades\Route;
 use App\Http\Controllers\ShopController;
 use App\Http\Controllers\AuthController;
 use App\Http\Controllers\AdminController;
+use App\Http\Controllers\MarketingController;
+use App\Http\Controllers\ReportController;
 
 // Main frontend route
 Route::get('/', [ShopController::class, 'index']);
@@ -53,5 +55,39 @@ Route::prefix('api')->group(function () {
         Route::get('/users', [AdminController::class, 'getUsers']);
         Route::put('/users/{id}', [AdminController::class, 'updateUser']);
         Route::delete('/users/{id}', [AdminController::class, 'deleteUser']);
+
+        // Admin Marketing - Banner
+        Route::get('/banners', [MarketingController::class, 'getBanners']);
+        Route::post('/banners', [MarketingController::class, 'createBanner']);
+        Route::put('/banners/{id}', [MarketingController::class, 'updateBanner']);
+        Route::delete('/banners/{id}', [MarketingController::class, 'deleteBanner']);
+
+        // Admin Marketing - Promotion (Khuyến mãi)
+        Route::get('/promotions', [MarketingController::class, 'getPromotions']);
+        Route::post('/promotions', [MarketingController::class, 'createPromotion']);
+        Route::put('/promotions/{id}', [MarketingController::class, 'updatePromotion']);
+        Route::delete('/promotions/{id}', [MarketingController::class, 'deletePromotion']);
+
+        // Admin Marketing - Collection (Bộ sưu tập)
+        Route::get('/collections', [MarketingController::class, 'getCollections']);
+        Route::post('/collections', [MarketingController::class, 'createCollection']);
+        Route::put('/collections/{id}', [MarketingController::class, 'updateCollection']);
+        Route::delete('/collections/{id}', [MarketingController::class, 'deleteCollection']);
+
+        // Admin Marketing - Post (Bài viết)
+        Route::get('/posts', [MarketingController::class, 'getPosts']);
+        Route::post('/posts', [MarketingController::class, 'createPost']);
+        Route::put('/posts/{id}', [MarketingController::class, 'updatePost']);
+        Route::delete('/posts/{id}', [MarketingController::class, 'deletePost']);
+
+        // Admin Reports - Báo cáo & Thống kê
+        Route::get('/reports/revenue', [ReportController::class, 'getRevenue']);
+        Route::get('/reports/orders', [ReportController::class, 'getOrderStats']);
+        Route::get('/reports/top-products', [ReportController::class, 'getTopProducts']);
+        Route::get('/reports/size-stats', [ReportController::class, 'getSizeStats']);
+        Route::get('/reports/color-stats', [ReportController::class, 'getColorStats']);
+        Route::get('/reports/inventory', [ReportController::class, 'getInventoryStats']);
+        Route::get('/reports/customers', [ReportController::class, 'getCustomerStats']);
+        Route::get('/reports/categories', [ReportController::class, 'getCategoryStats']);
     });
 });
