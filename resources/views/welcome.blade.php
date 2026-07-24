@@ -2184,28 +2184,39 @@
         currentSelectedPrice = product.price;
 
         const isFav = wishlistState.includes(product.id.toString());
-        const favBtnLabel = isFav ? 'Đã yêu thích' : 'Thêm vào yêu thích';
+        const favBtnLabel = isFav ? 'Đã yêu thích' : 'Yêu thích';
         const favIconClass = isFav ? 'text-red-500 fill-current' : 'text-gray-500 fill-transparent hover:text-red-500';
 
         // Dynamic Interactive Gallery Images
-        const galleryImages = [
-          { url: product.thumbnail_url, label: 'Bản chính', style: '' },
-          { url: product.thumbnail_url, label: 'Cận cảnh', style: 'object-position: center 20%; transform: scale(1.15);' },
-          { url: product.thumbnail_url, label: 'Phối màu', style: 'filter: hue-rotate(15deg) brightness(1.05);' }
-        ];
+        let galleryImages = [];
+        if (product.images && product.images.length > 0) {
+          galleryImages = product.images.map((img, idx) => ({
+            url: img.image_url,
+            label: img.alt_text || `Góc chụp ${idx + 1}`,
+            style: ''
+          }));
+        } else {
+          galleryImages = [
+            { url: product.thumbnail_url, label: 'Bản chính', style: '' },
+            { url: product.thumbnail_url, label: 'Cận cảnh', style: 'object-position: center 20%; transform: scale(1.15);' },
+            { url: product.thumbnail_url, label: 'Phối cảnh', style: 'filter: hue-rotate(15deg) brightness(1.05);' }
+          ];
+        }
+
+        const priceDiff = product.old_price ? Math.round(((product.old_price - product.price) / product.old_price) * 100) : 0;
 
         detailContainer.innerHTML = `
-          <div class="grid grid-cols-1 md:grid-cols-2 gap-12">
+          <div class="grid grid-cols-1 lg:grid-cols-12 gap-12">
             <!-- Gallery -->
-            <div class="space-y-4">
-              <div class="bg-white rounded-3xl overflow-hidden border border-gray-100 aspect-[3/4] shadow-md relative group">
-                <img id="detail-main-img" src="${product.thumbnail_url}" alt="${product.name}" class="w-full h-full object-cover transition-all duration-500">
-                <div class="absolute inset-0 bg-black/5 opacity-0 group-hover:opacity-100 transition-opacity pointer-events-none"></div>
+            <div class="lg:col-span-7 space-y-4">
+              <div class="bg-[#fcfbf9] rounded-[32px] overflow-hidden border border-gray-100 aspect-[3/4] shadow-sm relative group">
+                <img id="detail-main-img" src="${product.thumbnail_url}" alt="${product.name}" class="w-full h-full object-cover transition-all duration-700 ease-out group-hover:scale-105">
+                <div class="absolute inset-0 bg-black/5 opacity-0 group-hover:opacity-100 transition-opacity duration-300 pointer-events-none"></div>
               </div>
-              <div class="grid grid-cols-3 gap-3">
+              <div class="grid grid-cols-4 gap-3">
                 ${galleryImages.map((img, idx) => `
                   <button onclick="switchDetailImage('${img.url}', '${img.style}', this)" 
-                          class="aspect-[3/4] rounded-2xl overflow-hidden border-2 transition-all bg-white relative ${idx === 0 ? 'border-black ring-2 ring-offset-2 ring-black/10' : 'border-gray-100 hover:border-gray-300'}"
+                          class="aspect-[3/4] rounded-2xl overflow-hidden border-2 transition-all duration-300 bg-white relative ${idx === 0 ? 'border-black ring-4 ring-black/5 scale-95 shadow-sm' : 'border-transparent opacity-80 hover:opacity-100 hover:border-gray-200'}"
                           style="outline: none;">
                     <img src="${img.url}" class="w-full h-full object-cover" style="${img.style}">
                     <div class="absolute inset-0 bg-black/5 hover:bg-transparent transition-all"></div>
@@ -2215,135 +2226,146 @@
             </div>
             
             <!-- Product information -->
-            <div class="space-y-6">
-              <div class="space-y-2">
-                ${product.tag ? `<span class="bg-[#c45e3a] text-white text-xs font-bold px-3 py-1 rounded-full uppercase tracking-wider inline-block">${product.tag}</span>` : ''}
-                <h1 class="font-heading text-3xl font-bold text-gray-800 leading-tight">${product.name}</h1>
-                
-                <div class="flex items-center gap-4 text-sm font-semibold">
-                  <div class="flex items-center gap-1 text-yellow-500">
-                    <i data-lucide="star" class="w-4.5 h-4.5 fill-current"></i>
-                    <span class="text-gray-800">${product.rating}</span>
-                  </div>
-                  <span class="text-gray-300">|</span>
-                  <span class="text-[#c45e3a] hover:underline cursor-pointer" onclick="scrollToReviews()">${reviewsState.length} lượt nhận xét</span>
-                  <span class="text-gray-300">|</span>
+            <div class="lg:col-span-5 space-y-6 flex flex-col justify-between">
+              <div class="space-y-4">
+                <div class="flex items-center justify-between">
+                  ${product.tag ? `<span class="bg-[#c45e3a]/10 text-[#c45e3a] text-[10px] font-bold px-3 py-1.5 rounded-full uppercase tracking-widest inline-block border border-[#c45e3a]/25">${product.tag}</span>` : ''}
                   <span id="detail-stock-badge"></span>
                 </div>
-              </div>
-              
-              <div class="flex items-center gap-3">
-                <span id="detail-product-price" class="font-heading text-3xl font-bold text-[#c45e3a]">${formatVND(product.price)}</span>
-                ${product.old_price ? `<span class="text-lg text-gray-400 line-through font-light">${formatVND(product.old_price)}</span>` : ''}
-              </div>
-              
-              <p class="text-gray-600 font-light text-sm leading-relaxed">${product.description}</p>
-              
-              <!-- Select size -->
-              <div class="space-y-2">
-                <div class="flex items-center">
-                  <span class="text-xs font-bold uppercase text-gray-500 tracking-wider">Kích thước:</span>
-                  <span id="detail-active-size" class="text-xs font-bold text-gray-800 ml-1.5">${currentSelectedSize}</span>
+                
+                <h1 class="font-heading text-3xl font-extrabold text-gray-900 tracking-tight leading-tight">${product.name}</h1>
+                
+                <div class="flex items-center gap-3 text-xs font-semibold text-gray-500">
+                  <div class="flex items-center gap-1 text-amber-500 bg-amber-50 px-2 py-1 rounded-lg border border-amber-100">
+                    <i data-lucide="star" class="w-3.5 h-3.5 fill-current"></i>
+                    <span class="text-gray-800 font-bold">${product.rating}</span>
+                  </div>
+                  <span>·</span>
+                  <span class="text-[#c45e3a] hover:underline cursor-pointer font-bold" onclick="scrollToReviews()">${reviewsState.length} lượt nhận xét</span>
+                  <span>·</span>
+                  <span class="font-bold text-gray-600">SKU: ${product.sku}</span>
                 </div>
-                <div class="flex gap-2">
-                  ${sizesArr.map(size => `
-                    <button onclick="selectDetailSize('${size}', this)" class="border px-4 py-2.5 rounded-xl text-xs font-bold transition ${size === currentSelectedSize ? 'border-black bg-black text-white shadow-sm' : 'border-gray-200 text-gray-600 bg-white hover:bg-gray-50 hover:border-black'}">${size}</button>
-                  `).join('')}
-                </div>
-              </div>
-              
-              <!-- Select color -->
-              <div class="space-y-2">
-                <div class="flex items-center">
-                  <span class="text-xs font-bold uppercase text-gray-500 tracking-wider">Màu sắc:</span>
-                  <span id="detail-active-color" class="text-xs font-bold text-gray-800 ml-1.5">${currentSelectedColor}</span>
-                </div>
-                <div class="flex gap-3 items-center">
-                  ${colorsArr.map(color => {
-                    const norm = color.toLowerCase().trim();
-                    const hex = colorMap[norm] || '#e2e8f0';
-                    const isLight = ['trắng', 'kem', 'be', 'kem sữa'].includes(norm);
-                    return `
-                      <button onclick="selectDetailColor('${color}', this)" 
-                              title="${color}"
-                              class="w-9 h-9 rounded-full border-2 transition-all duration-200 relative flex items-center justify-center ${color === currentSelectedColor ? 'border-[#c45e3a] scale-110 shadow-md ring-2 ring-offset-2 ring-[#c45e3a]/40' : 'border-gray-200 hover:border-gray-400'}"
-                              style="background-color: ${hex}; outline: none;">
-                        ${isLight ? `<span class="absolute inset-0.5 rounded-full border border-gray-200/50"></span>` : ''}
-                        ${color === currentSelectedColor ? `
-                          <span class="absolute inset-0 flex items-center justify-center">
-                            <i data-lucide="check" class="w-4 h-4 ${isLight ? 'text-black' : 'text-white'}"></i>
-                          </span>
-                        ` : ''}
-                      </button>
-                    `;
-                  }).join('')}
-                </div>
-              </div>
 
-              <!-- Trust Badges -->
-              <div class="grid grid-cols-3 gap-3 py-4 border-t border-b border-gray-100 my-6">
-                <div class="flex flex-col items-center text-center p-2 rounded-2xl bg-gray-50 border border-gray-100/50">
-                  <i data-lucide="truck" class="w-5 h-5 text-[#c45e3a] mb-1"></i>
-                  <span class="text-[10px] font-bold text-gray-800">Giao Miễn Phí</span>
-                  <span class="text-[8px] text-gray-400 mt-0.5">Đơn hàng từ 500k</span>
+                <div class="flex items-center gap-3 pt-2">
+                  <span id="detail-product-price" class="font-heading text-3xl font-black text-[#c45e3a] tracking-tight">${formatVND(product.price)}</span>
+                  ${product.old_price ? `
+                    <span class="text-base text-gray-400 line-through font-light">${formatVND(product.old_price)}</span>
+                    <span class="bg-red-50 text-red-600 text-[10px] font-bold px-2 py-1 rounded-lg border border-red-100/50">-${priceDiff}%</span>
+                  ` : ''}
                 </div>
-                <div class="flex flex-col items-center text-center p-2 rounded-2xl bg-gray-50 border border-gray-100/50">
-                  <i data-lucide="rotate-ccw" class="w-5 h-5 text-[#c45e3a] mb-1"></i>
-                  <span class="text-[10px] font-bold text-gray-800">Đổi Trả 7 Ngày</span>
-                  <span class="text-[8px] text-gray-400 mt-0.5">Dễ dàng, nhanh chóng</span>
+                
+                <div class="h-px bg-gray-100 my-2"></div>
+                
+                <p class="text-gray-600 font-light text-sm leading-relaxed">${product.description}</p>
+                
+                <!-- Select size -->
+                <div class="space-y-3 pt-2">
+                  <div class="flex items-center justify-between">
+                    <span class="text-xs font-bold uppercase text-gray-400 tracking-wider">Kích thước</span>
+                    <span id="detail-active-size" class="text-xs font-extrabold text-[#c45e3a] bg-gray-100 px-2 py-0.5 rounded">${currentSelectedSize}</span>
+                  </div>
+                  <div class="flex flex-wrap gap-2">
+                    ${sizesArr.map(size => `
+                      <button onclick="selectDetailSize('${size}', this)" class="border px-4 py-2.5 rounded-xl text-xs font-bold transition-all duration-200 ${size === currentSelectedSize ? 'border-black bg-black text-white shadow-md shadow-black/10 scale-105' : 'border-gray-200 text-gray-600 bg-white hover:bg-gray-50 hover:border-black'}">${size}</button>
+                    `).join('')}
+                  </div>
                 </div>
-                <div class="flex flex-col items-center text-center p-2 rounded-2xl bg-gray-50 border border-gray-100/50">
-                  <i data-lucide="shield-check" class="w-5 h-5 text-[#c45e3a] mb-1"></i>
-                  <span class="text-[10px] font-bold text-gray-800">Chính Hãng 100%</span>
-                  <span class="text-[8px] text-gray-400 mt-0.5">Cam kết chất lượng</span>
+                
+                <!-- Select color -->
+                <div class="space-y-3 pt-2">
+                  <div class="flex items-center justify-between">
+                    <span class="text-xs font-bold uppercase text-gray-400 tracking-wider">Màu sắc</span>
+                    <span id="detail-active-color" class="text-xs font-extrabold text-[#c45e3a] bg-gray-100 px-2 py-0.5 rounded">${currentSelectedColor}</span>
+                  </div>
+                  <div class="flex gap-3 items-center">
+                    ${colorsArr.map(color => {
+                      const norm = color.toLowerCase().trim();
+                      const hex = colorMap[norm] || '#e2e8f0';
+                      const isLight = ['trắng', 'kem', 'be', 'kem sữa'].includes(norm);
+                      return `
+                        <button onclick="selectDetailColor('${color}', this)" 
+                                title="${color}"
+                                class="w-9 h-9 rounded-full border-2 transition-all duration-300 relative flex items-center justify-center ${color === currentSelectedColor ? 'border-[#c45e3a] scale-110 shadow-md ring-4 ring-[#c45e3a]/15' : 'border-gray-200 hover:border-gray-400 hover:scale-105'}"
+                                style="background-color: ${hex}; outline: none;">
+                          ${isLight ? `<span class="absolute inset-0.5 rounded-full border border-gray-200/50"></span>` : ''}
+                          ${color === currentSelectedColor ? `
+                            <span class="absolute inset-0 flex items-center justify-center">
+                              <i data-lucide="check" class="w-4 h-4 ${isLight ? 'text-black' : 'text-white'}"></i>
+                            </span>
+                          ` : ''}
+                        </button>
+                      `;
+                    }).join('')}
+                  </div>
+                </div>
+
+                <!-- Trust Badges -->
+                <div class="grid grid-cols-3 gap-3 py-4 border-t border-b border-gray-100 my-6">
+                  <div class="flex flex-col items-center text-center p-3 rounded-2xl bg-gray-50/50 border border-gray-100 hover:shadow-sm transition-shadow">
+                    <i data-lucide="truck" class="w-5 h-5 text-[#c45e3a] mb-1.5"></i>
+                    <span class="text-[10px] font-bold text-gray-800">Giao Miễn Phí</span>
+                    <span class="text-[8px] text-gray-400 mt-0.5">Đơn hàng từ 500k</span>
+                  </div>
+                  <div class="flex flex-col items-center text-center p-3 rounded-2xl bg-gray-50/50 border border-gray-100 hover:shadow-sm transition-shadow">
+                    <i data-lucide="rotate-ccw" class="w-5 h-5 text-[#c45e3a] mb-1.5"></i>
+                    <span class="text-[10px] font-bold text-gray-800">Đổi Trả 7 Ngày</span>
+                    <span class="text-[8px] text-gray-400 mt-0.5">Dễ dàng, nhanh chóng</span>
+                  </div>
+                  <div class="flex flex-col items-center text-center p-3 rounded-2xl bg-gray-50/50 border border-gray-100 hover:shadow-sm transition-shadow">
+                    <i data-lucide="shield-check" class="w-5 h-5 text-[#c45e3a] mb-1.5"></i>
+                    <span class="text-[10px] font-bold text-gray-800">Chính Hãng 100%</span>
+                    <span class="text-[8px] text-gray-400 mt-0.5">Cam kết chất lượng</span>
+                  </div>
                 </div>
               </div>
               
               <!-- Quantity and Add to Cart -->
-              <div class="pt-2 flex flex-col sm:flex-row gap-4">
-                <div class="flex border border-gray-200 rounded-full w-fit bg-white overflow-hidden self-start">
-                  <button onclick="changeDetailQty(-1)" class="px-4 py-3 hover:bg-gray-100 transition"><i data-lucide="minus" class="w-4 h-4"></i></button>
-                  <input type="number" id="detail-qty" value="1" min="1" max="99" class="w-12 text-center outline-none text-sm font-bold bg-transparent">
-                  <button onclick="changeDetailQty(1)" class="px-4 py-3 hover:bg-gray-100 transition"><i data-lucide="plus" class="w-4 h-4"></i></button>
-                </div>
-                
-                <button id="detail-cart-btn" onclick="addDetailToCart()" class="flex-1 bg-[#1a1a1a] hover:bg-[#c45e3a] text-white font-bold py-3.5 rounded-full transition flex items-center justify-center gap-2 shadow-lg shadow-black/10">
-                  <i data-lucide="shopping-bag" class="w-4 h-4"></i> Thêm vào giỏ hàng
-                </button>
-                
-                <button onclick="toggleWishlist('${product.id}')" class="border border-gray-200 p-3 rounded-full hover:bg-gray-50 transition flex items-center gap-1 text-xs font-semibold">
-                  <i data-lucide="heart" class="w-5 h-5 ${favIconClass}"></i> <span class="hidden sm:inline">${favBtnLabel}</span>
-                </button>
-              </div>
-
-              <!-- Accordions -->
-              <div class="space-y-2 pt-2">
-                <div class="border border-gray-100 rounded-2xl overflow-hidden bg-white">
-                  <button onclick="toggleAccordion('acc-spec')" class="w-full flex items-center justify-between p-4 text-xs font-bold text-gray-800 hover:bg-gray-50 transition">
-                    <span>THÔNG SỐ & CHẤT LIỆU</span>
-                    <i id="acc-spec-icon" data-lucide="chevron-down" class="w-4 h-4 text-gray-400 transition-transform"></i>
-                  </button>
-                  <div id="acc-spec" class="hidden px-4 pb-4 text-xs text-gray-600 leading-relaxed space-y-2 border-t border-gray-50 pt-3">
-                    <p>• <strong>Chất liệu:</strong> 100% Cotton tự nhiên cao cấp mềm mại, thấm hút mồ hôi và thoáng khí.</p>
-                    <p>• <strong>Kiểu dáng:</strong> Thiết kế thời trang, dễ dàng phối hợp trang phục hàng ngày.</p>
-                    <p>• <strong>Chất lượng:</strong> Đường kim mũi chỉ đạt tiêu chuẩn xuất khẩu cao cấp.</p>
+              <div class="space-y-4">
+                <div class="flex flex-col sm:flex-row gap-4">
+                  <div class="flex border border-gray-200 rounded-full w-fit bg-white overflow-hidden self-start shadow-sm hover:border-gray-300 transition">
+                    <button onclick="changeDetailQty(-1)" class="px-4 py-3 hover:bg-gray-50 transition active:scale-95"><i data-lucide="minus" class="w-4 h-4 text-gray-600"></i></button>
+                    <input type="number" id="detail-qty" value="1" min="1" max="99" class="w-12 text-center outline-none text-sm font-bold bg-transparent text-gray-800">
+                    <button onclick="changeDetailQty(1)" class="px-4 py-3 hover:bg-gray-50 transition active:scale-95"><i data-lucide="plus" class="w-4 h-4 text-gray-600"></i></button>
                   </div>
-                </div>
-                
-                <div class="border border-gray-100 rounded-2xl overflow-hidden bg-white">
-                  <button onclick="toggleAccordion('acc-care')" class="w-full flex items-center justify-between p-4 text-xs font-bold text-gray-800 hover:bg-gray-50 transition">
-                    <span>HƯỚNG DẪN BẢO QUẢN</span>
-                    <i id="acc-care-icon" data-lucide="chevron-down" class="w-4 h-4 text-gray-400 transition-transform"></i>
+                  
+                  <button id="detail-cart-btn" onclick="addDetailToCart()" class="flex-1 bg-[#1a1a1a] hover:bg-[#c45e3a] text-white font-bold py-3.5 rounded-full transition-all duration-300 flex items-center justify-center gap-2 shadow-lg shadow-black/10 hover:shadow-xl hover:shadow-[#c45e3a]/15 hover:-translate-y-0.5 active:translate-y-0">
+                    <i data-lucide="shopping-bag" class="w-4 h-4"></i> Thêm vào giỏ hàng
                   </button>
-                  <div id="acc-care" class="hidden px-4 pb-4 text-xs text-gray-600 leading-relaxed space-y-2 border-t border-gray-50 pt-3">
-                    <p>• Giặt máy ở chế độ nhẹ nhàng với nước lạnh hoặc ấm.</p>
-                    <p>• Không sử dụng hóa chất tẩy rửa mạnh để giữ màu tốt hơn.</p>
-                    <p>• Phơi nơi khô ráo thoáng mát, hạn chế vắt quá kiệt nước.</p>
+                  
+                  <button onclick="toggleWishlist('${product.id}')" class="border border-gray-200 p-3.5 rounded-full hover:bg-gray-50 hover:border-gray-300 transition-all active:scale-95 flex items-center justify-center gap-2 text-xs font-semibold text-gray-600">
+                    <i data-lucide="heart" class="w-5 h-5 ${favIconClass}"></i> <span class="hidden sm:inline">${favBtnLabel}</span>
+                  </button>
+                </div>
+
+                <!-- Accordions -->
+                <div class="space-y-2 pt-2">
+                  <div class="border border-gray-100 rounded-2xl overflow-hidden bg-white shadow-sm">
+                    <button onclick="toggleAccordion('acc-spec')" class="w-full flex items-center justify-between p-4 text-xs font-bold text-gray-800 hover:bg-gray-50 transition">
+                      <span>THÔNG SỐ & CHẤT LIỆU</span>
+                      <i id="acc-spec-icon" data-lucide="chevron-down" class="w-4 h-4 text-gray-400 transition-transform duration-300"></i>
+                    </button>
+                    <div id="acc-spec" class="hidden px-4 pb-4 text-xs text-gray-600 leading-relaxed space-y-2 border-t border-gray-50 pt-3">
+                      <p>• <strong>Chất liệu:</strong> 100% Cotton tự nhiên cao cấp mềm mại, thấm hút mồ hôi và thoáng khí.</p>
+                      <p>• <strong>Kiểu dáng:</strong> Thiết kế thời trang, dễ dàng phối hợp trang phục hàng ngày.</p>
+                      <p>• <strong>Chất lượng:</strong> Đường kim mũi chỉ đạt tiêu chuẩn xuất khẩu cao cấp.</p>
+                    </div>
+                  </div>
+                  
+                  <div class="border border-gray-100 rounded-2xl overflow-hidden bg-white shadow-sm">
+                    <button onclick="toggleAccordion('acc-care')" class="w-full flex items-center justify-between p-4 text-xs font-bold text-gray-800 hover:bg-gray-50 transition">
+                      <span>HƯỚNG DẪN BẢO QUẢN</span>
+                      <i id="acc-care-icon" data-lucide="chevron-down" class="w-4 h-4 text-gray-400 transition-transform duration-300"></i>
+                    </button>
+                    <div id="acc-care" class="hidden px-4 pb-4 text-xs text-gray-600 leading-relaxed space-y-2 border-t border-gray-50 pt-3">
+                      <p>• Giặt máy ở chế độ nhẹ nhàng với nước lạnh hoặc ấm.</p>
+                      <p>• Không sử dụng hóa chất tẩy rửa mạnh để giữ màu tốt hơn.</p>
+                      <p>• Phơi nơi khô ráo thoáng mát, hạn chế vắt quá kiệt nước.</p>
+                    </div>
                   </div>
                 </div>
               </div>
             </div>
-          </div>`;
+          </div>`;`;
 
         renderDetailReviews(product);
         renderRelatedProducts(product);
@@ -2663,10 +2685,6 @@
       renderCartDrawer();
       if (window.location.hash === '#/cart') renderCartPage();
     }
-
-    // -------------------------------------------------------------
-    // Page Rendering: CART Drawer & Page
-    // -------------------------------------------------------------
     async function renderCartDrawer() {
       const drawerItems = document.getElementById('cart-drawer-items');
       const drawerEmpty = document.getElementById('cart-drawer-empty');
@@ -2696,29 +2714,29 @@
         subtotal += itemTotal;
 
         drawerItems.innerHTML += `
-          <div class="flex gap-4 p-3 bg-white border border-gray-100 rounded-2xl shadow-sm relative group">
-            <div class="w-16 h-20 bg-[#f5f0ea] rounded-xl overflow-hidden shrink-0 flex items-center justify-center">
+          <div class="flex gap-4 p-4 bg-white border border-gray-100 rounded-2xl shadow-sm relative group hover:shadow-md transition-shadow">
+            <div class="w-16 h-20 bg-[#fcfbf9] rounded-xl overflow-hidden shrink-0 border border-gray-100 flex items-center justify-center">
               <img src="${prod.thumbnail_url}" alt="${prod.name}" class="w-full h-full object-cover">
             </div>
             
-            <div class="flex-1 flex flex-col justify-between">
+            <div class="flex-1 flex flex-col justify-between py-0.5">
               <div>
-                <h4 class="font-bold text-xs text-gray-800 line-clamp-1">${prod.name}</h4>
-                <p class="text-[10px] text-gray-400 mt-0.5">Size: ${item.size} · Màu: ${item.color}</p>
+                <h4 class="font-extrabold text-xs text-gray-800 line-clamp-1 hover:text-[#c45e3a] cursor-pointer transition-colors" onclick="window.location.hash = '#/product/${prod.id}'; closeCartDrawer();">${prod.name}</h4>
+                <p class="text-[10px] text-gray-400 mt-1 font-semibold">Size: <span class="text-gray-700">${item.size}</span> · Màu: <span class="text-gray-700">${item.color}</span></p>
               </div>
               
-              <div class="flex items-center justify-between mt-1">
-                <div class="flex border border-gray-200 rounded-full bg-white overflow-hidden">
-                  <button onclick="updateCartItemQty(${index}, ${item.quantity - 1})" class="px-2 py-1 hover:bg-gray-100 transition text-xs font-semibold">-</button>
-                  <span class="w-6 text-center text-xs self-center font-bold">${item.quantity}</span>
-                  <button onclick="updateCartItemQty(${index}, ${item.quantity + 1})" class="px-2 py-1 hover:bg-gray-100 transition text-xs font-semibold">+</button>
+              <div class="flex items-center justify-between mt-2">
+                <div class="flex border border-gray-200 rounded-full bg-white overflow-hidden shadow-sm hover:border-gray-300 transition">
+                  <button onclick="updateCartItemQty(${index}, ${item.quantity - 1})" class="px-2.5 py-1 hover:bg-gray-50 transition text-xs font-bold text-gray-500 active:scale-95">-</button>
+                  <span class="w-6 text-center text-xs self-center font-bold text-gray-800">${item.quantity}</span>
+                  <button onclick="updateCartItemQty(${index}, ${item.quantity + 1})" class="px-2.5 py-1 hover:bg-gray-50 transition text-xs font-bold text-gray-500 active:scale-95">+</button>
                 </div>
-                <span class="text-xs font-bold text-[#c45e3a]">${formatVND(itemPrice)}</span>
+                <span class="text-xs font-black text-[#c45e3a]">${formatVND(itemPrice)}</span>
               </div>
             </div>
             
-            <button onclick="removeCartItem(${index}, event)" class="absolute top-2 right-2 text-gray-300 hover:text-red-500 transition">
-              <i data-lucide="trash-2" class="w-4 h-4"></i>
+            <button onclick="removeCartItem(${index}, event)" class="absolute top-3 right-3 text-gray-300 hover:text-red-500 transition p-1 hover:bg-red-50 rounded-full active:scale-95 font-semibold">
+              <i data-lucide="trash-2" class="w-3.5 h-3.5"></i>
             </button>
           </div>`;
       });
@@ -2737,12 +2755,15 @@
 
       if (cartState.length === 0) {
         wrapper.innerHTML = `
-          <div class="text-center py-20 bg-white rounded-3xl border border-gray-100 shadow-sm p-6 col-span-3">
-            <span class="text-6xl block mb-4">🛒</span>
-            <h3 class="font-heading text-2xl font-bold text-gray-800">Giỏ hàng trống</h3>
-            <p class="text-gray-400 text-sm mt-2 max-w-sm mx-auto">Chưa có sản phẩm nào được chọn. Hãy ghé qua cửa hàng thời trang Beestyle của chúng tôi để mua sắm ngay.</p>
-            <a href="#/shop" class="bg-[#1a1a1a] hover:bg-[#c45e3a] text-white text-xs font-bold px-8 py-3.5 rounded-full mt-6 inline-block transition shadow-lg">Tiếp Tục Mua Sắm</a>
+          <div class="text-center py-20 bg-white rounded-[32px] border border-gray-100 shadow-sm p-8 col-span-3 flex flex-col items-center justify-center space-y-4">
+            <div class="w-20 h-20 rounded-full bg-gray-50 flex items-center justify-center text-gray-400">
+              <i data-lucide="shopping-cart" class="w-10 h-10"></i>
+            </div>
+            <h3 class="font-heading text-2xl font-extrabold text-gray-800">Giỏ hàng của bạn đang trống</h3>
+            <p class="text-gray-400 text-sm max-w-sm mx-auto font-light leading-relaxed">Chưa có sản phẩm nào được chọn. Hãy ghé qua cửa hàng thời trang Beestyle của chúng tôi để mua sắm ngay.</p>
+            <a href="#/shop" class="bg-[#1a1a1a] hover:bg-[#c45e3a] text-white text-xs font-bold px-8 py-3.5 rounded-full mt-2 inline-block transition duration-300 shadow-lg shadow-black/10 hover:shadow-[#c45e3a]/10 hover:-translate-y-0.5 active:translate-y-0">Tiếp Tục Mua Sắm</a>
           </div>`;
+        lucide.createIcons();
         return;
       }
 
@@ -2750,7 +2771,7 @@
 
       let subtotal = 0;
 
-      let itemsHtml = `<div class="bg-white rounded-3xl p-6 border border-gray-200 shadow-sm space-y-4">`;
+      let itemsHtml = `<div class="bg-white rounded-[32px] p-6 md:p-8 border border-gray-100 shadow-sm space-y-6">`;
       cartState.forEach((item, index) => {
         const prod = productsState.find(p => p.id.toString() === item.productId.toString());
         if (!prod) return;
@@ -2760,36 +2781,36 @@
         subtotal += itemTotal;
 
         itemsHtml += `
-          <div class="flex flex-col sm:flex-row items-start sm:items-center justify-between gap-4 py-4 ${index > 0 ? 'border-t border-gray-100' : ''}">
-            <div class="flex gap-4">
-              <div class="w-16 h-20 bg-gray-50 rounded-xl overflow-hidden shrink-0">
+          <div class="flex flex-col sm:flex-row items-start sm:items-center justify-between gap-6 py-6 ${index > 0 ? 'border-t border-gray-100' : ''}">
+            <div class="flex gap-5">
+              <div class="w-20 h-26 bg-[#fcfbf9] rounded-2xl overflow-hidden shrink-0 border border-gray-100 shadow-sm">
                 <img src="${prod.thumbnail_url}" alt="${prod.name}" class="w-full h-full object-cover">
               </div>
-              <div>
-                <h4 class="font-bold text-sm text-gray-800 hover:text-[#c45e3a] cursor-pointer" onclick="window.location.hash = '#/product/${prod.id}'">${prod.name}</h4>
-                <p class="text-xs text-gray-400 mt-1">Kích cỡ: <span class="font-bold">${item.size}</span> · Màu sắc: <span class="font-bold">${item.color}</span></p>
+              <div class="space-y-1">
+                <h4 class="font-extrabold text-sm text-gray-900 hover:text-[#c45e3a] cursor-pointer transition-colors" onclick="window.location.hash = '#/product/${prod.id}'">${prod.name}</h4>
+                <p class="text-xs text-gray-500 font-medium">Kích cỡ: <span class="text-gray-800 font-bold">${item.size}</span> · Màu sắc: <span class="text-gray-800 font-bold">${item.color}</span></p>
                 <div class="sm:hidden flex items-center gap-4 mt-2">
-                  <span class="text-sm font-bold text-[#c45e3a]">${formatVND(itemPrice)}</span>
+                  <span class="text-sm font-black text-[#c45e3a]">${formatVND(itemPrice)}</span>
                 </div>
               </div>
             </div>
             
             <div class="flex sm:flex-row items-center justify-between sm:justify-end gap-6 w-full sm:w-auto">
-              <div class="flex items-center gap-2">
-                <span class="text-xs text-gray-400 font-semibold sm:hidden">Số lượng:</span>
-                <div class="flex border border-gray-200 rounded-full bg-white overflow-hidden">
-                  <button onclick="updateCartItemQty(${index}, ${item.quantity - 1})" class="px-3 py-1.5 hover:bg-gray-100 transition text-sm font-semibold">-</button>
-                  <span class="w-8 text-center text-sm self-center font-bold">${item.quantity}</span>
-                  <button onclick="updateCartItemQty(${index}, ${item.quantity + 1})" class="px-3 py-1.5 hover:bg-gray-100 transition text-sm font-semibold">+</button>
+              <div class="flex items-center gap-3">
+                <span class="text-xs text-gray-400 font-bold sm:hidden">Số lượng:</span>
+                <div class="flex border border-gray-200 rounded-full bg-white overflow-hidden shadow-sm hover:border-gray-300 transition">
+                  <button onclick="updateCartItemQty(${index}, ${item.quantity - 1})" class="px-3.5 py-1.5 hover:bg-gray-50 transition text-sm font-bold active:scale-90 text-gray-600">-</button>
+                  <span class="w-8 text-center text-sm self-center font-bold text-gray-800">${item.quantity}</span>
+                  <button onclick="updateCartItemQty(${index}, ${item.quantity + 1})" class="px-3.5 py-1.5 hover:bg-gray-50 transition text-sm font-bold active:scale-90 text-gray-600">+</button>
                 </div>
               </div>
               
-              <div class="text-right hidden sm:block">
-                <p class="text-xs text-gray-400">Thành tiền</p>
-                <p class="text-sm font-bold text-gray-800">${formatVND(itemTotal)}</p>
+              <div class="text-right hidden sm:block min-w-[100px]">
+                <p class="text-[10px] text-gray-400 font-bold uppercase tracking-wider">Thành tiền</p>
+                <p class="text-sm font-black text-gray-900 mt-0.5">${formatVND(itemTotal)}</p>
               </div>
               
-              <button onclick="removeCartItem(${index}, event)" class="text-gray-300 hover:text-red-500 transition p-2 hover:bg-gray-50 rounded-full">
+              <button onclick="removeCartItem(${index}, event)" class="text-gray-300 hover:text-red-500 hover:bg-red-50 transition p-2.5 rounded-full active:scale-90">
                 <i data-lucide="trash-2" class="w-5 h-5"></i>
               </button>
             </div>
@@ -2807,47 +2828,48 @@
       }
 
       summary.innerHTML = `
-        <div class="bg-white rounded-3xl p-6 border border-gray-200 shadow-sm space-y-6">
-          <h3 class="font-bold text-lg text-gray-800 border-b border-gray-100 pb-2">Tóm tắt đơn hàng</h3>
+        <div class="bg-white rounded-[32px] p-6 md:p-8 border border-gray-100 shadow-sm space-y-6">
+          <h3 class="font-extrabold text-lg text-gray-900 border-b border-gray-100 pb-3">Tóm tắt đơn hàng</h3>
           
-          <div class="space-y-3 text-sm">
+          <div class="space-y-4 text-xs font-semibold">
             <div class="flex justify-between text-gray-500">
               <span>Tạm tính</span>
-              <span class="font-semibold text-gray-800">${formatVND(subtotal)}</span>
+              <span class="font-bold text-gray-900 text-sm">${formatVND(subtotal)}</span>
             </div>
             ${appliedVoucher ? `
-              <div class="flex justify-between text-green-600 font-semibold">
+              <div class="flex justify-between text-emerald-600">
                 <span>Voucher (${appliedVoucher.code})</span>
-                <span>-${formatVND(discountAmount)}</span>
+                <span class="font-bold">-${formatVND(discountAmount)}</span>
               </div>
             ` : ''}
             <div class="flex justify-between text-gray-500">
               <span>Phí vận chuyển</span>
-              <span class="font-semibold text-green-600">Miễn phí</span>
+              <span class="font-bold text-emerald-600 bg-emerald-50 px-2 py-0.5 rounded">Miễn phí</span>
             </div>
-            <div class="border-t border-gray-100 pt-3 flex justify-between font-bold text-base text-gray-800">
-              <span>Tổng cộng</span>
-              <span class="text-[#c45e3a] text-lg">${formatVND(finalTotal)}</span>
+            <div class="h-px bg-gray-100 my-2"></div>
+            <div class="flex justify-between font-bold text-gray-900 pt-1">
+              <span class="text-sm font-bold">Tổng cộng</span>
+              <span class="text-[#c45e3a] text-xl font-black">${formatVND(finalTotal)}</span>
             </div>
           </div>
           
-          <div class="space-y-2">
-            <label class="text-xs font-bold text-gray-400 uppercase tracking-wider">Mã giảm giá</label>
+          <div class="space-y-3 pt-2">
+            <label class="text-[10px] font-bold text-gray-400 uppercase tracking-widest block">Mã giảm giá</label>
             <div class="flex gap-2">
-              <input type="text" id="voucher-input" placeholder="Nhập mã code..." value="${appliedVoucher ? appliedVoucher.code : ''}" class="flex-1 px-4 py-2 text-sm border border-gray-200 rounded-xl outline-none focus:border-[#c45e3a] uppercase font-mono">
-              <button onclick="applyVoucherCode()" class="bg-[#1a1a1a] hover:bg-[#c45e3a] text-white text-xs font-semibold px-4 py-2 rounded-xl transition">Áp dụng</button>
+              <input type="text" id="voucher-input" placeholder="Nhập mã code..." value="${appliedVoucher ? appliedVoucher.code : ''}" class="flex-1 px-4 py-3 text-xs border border-gray-200 rounded-xl outline-none focus:border-[#c45e3a] uppercase font-mono tracking-wider">
+              <button onclick="applyVoucherCode()" class="bg-[#1a1a1a] hover:bg-[#c45e3a] text-white text-xs font-bold px-5 py-3 rounded-xl transition duration-300 shadow-md active:scale-95">Áp dụng</button>
             </div>
             ${appliedVoucher ? `
-              <p class="text-xs text-green-600 font-semibold flex items-center gap-1 mt-1">
-                ✓ Đã áp dụng mã giảm giá thành công.
-                <button onclick="removeVoucher()" class="text-red-500 underline ml-2 hover:text-red-700">Hủy</button>
+              <p class="text-xs text-emerald-600 font-bold flex items-center gap-1.5 mt-1 bg-emerald-50 px-3 py-2 rounded-xl border border-emerald-100">
+                <span>✓ Đã áp dụng thành công</span>
+                <button onclick="removeVoucher()" class="text-red-500 hover:text-red-700 underline ml-auto text-[10px]">Hủy</button>
               </p>
             ` : `
-              <p class="text-[10px] text-gray-400">Gợi ý: Thử nhập mã <span class="font-bold text-gray-600">BEESTYLE30</span></p>
+              <p class="text-[10px] text-gray-400">Gợi ý: Thử nhập mã <span class="font-bold text-[#c45e3a] bg-orange-50 px-1 py-0.5 rounded">BEESTYLE30</span></p>
             `}
           </div>
           
-          <a href="#/checkout" class="w-full text-center bg-[#1a1a1a] hover:bg-[#c45e3a] text-white py-4 rounded-full font-bold shadow-lg transition block text-sm">
+          <a href="#/checkout" class="w-full text-center bg-[#1a1a1a] hover:bg-[#c45e3a] text-white py-4 rounded-full font-bold shadow-lg shadow-black/10 hover:shadow-[#c45e3a]/15 transition-all duration-300 block text-xs tracking-wider uppercase">
             Tiến Hành Thanh Toán
           </a>
         </div>`;

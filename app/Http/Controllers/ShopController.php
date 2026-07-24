@@ -547,6 +547,7 @@ class ShopController extends Controller
             'variant_data' => json_encode($variantData),
             'category' => $product->category,
             'reviews' => $product->reviews,
+            'images' => $product->images,
         ];
     }
 
