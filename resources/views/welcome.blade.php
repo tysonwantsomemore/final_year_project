@@ -4,11 +4,10 @@
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
   <meta name="csrf-token" content="{{ csrf_token() }}">
-  <title>Beestyle - Thời Trang Cao Cấp &amp; Phong Cách</title>
+  <title>BeeStyle Men - Thời trang áo nam hiện đại</title>
   <script src="https://cdn.tailwindcss.com/3.4.17"></script>
   <script src="https://cdn.jsdelivr.net/npm/lucide@0.263.0/dist/umd/lucide.min.js"></script>
   <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
-  <script src="/_sdk/element_sdk.js"></script>
   <link href="https://fonts.googleapis.com/css2?family=Playfair+Display:wght@400;500;600;700&amp;family=DM+Sans:wght@300;400;500;600;700&amp;display=swap" rel="stylesheet">
   <style>
     html, body { height: 100%; margin: 0; scroll-behavior: smooth; }
@@ -28,19 +27,14 @@
     ::-webkit-scrollbar-track { background: #faf9f7; }
     ::-webkit-scrollbar-thumb { background: #e8e5e0; border-radius: 3px; }
     ::-webkit-scrollbar-thumb:hover { background: #c45e3a; }
-    /* Color Swatch active state animation */
-    .color-swatch-active {
-        box-shadow: 0 0 0 2px #ffffff, 0 0 0 4px #c45e3a;
-        transform: scale(1.1);
-    }
-    /* Color Swatch active state animation */
-    .color-swatch-active {
-        box-shadow: 0 0 0 2px #ffffff, 0 0 0 4px #c45e3a;
-        transform: scale(1.1);
-    }
+    *, *::before, *::after { box-sizing: border-box; }
+    .color-swatch-active { box-shadow: 0 0 0 2px #fff, 0 0 0 4px #c45e3a; transform: scale(1.1); }
+    .admin-sidebar-collapsed { width: 5rem !important; }
+    .admin-sidebar-collapsed .sidebar-text { display: none; }
+    .admin-sidebar-collapsed a, .admin-sidebar-collapsed button { justify-content: center; padding-left: .75rem; padding-right: .75rem; }
+    .skeleton { background: linear-gradient(90deg,#f1f1f1 25%,#fafafa 50%,#f1f1f1 75%); background-size: 200% 100%; animation: skeleton 1.25s infinite; }
+    @keyframes skeleton { to { background-position: -200% 0; } }
   </style>
-  <style>body { box-sizing: border-box; }</style>
-  <script src="/_sdk/data_sdk.js" type="text/javascript"></script>
  </head>
  <body class="h-full font-body bg-[#faf9f7] text-[#1a1a1a] flex flex-col overflow-x-hidden">
 
@@ -48,7 +42,7 @@
   <header class="sticky top-0 z-50 bg-[#faf9f7]/95 backdrop-blur-md border-b border-[#e8e5e0]">
    <div class="max-w-7xl mx-auto px-4 py-4 flex items-center justify-between">
     <a href="#/" id="brand-name" class="font-heading text-2xl font-bold tracking-tight text-[#1a1a1a] hover:text-[#c45e3a] transition flex items-center gap-2">
-      <span class="text-3xl">🐝</span>Beestyle
+      <span class="text-3xl">🐝</span>BeeStyle
     </a>
     
     <nav class="hidden md:flex gap-8 text-sm font-medium">
@@ -72,7 +66,7 @@
      
      <button class="relative p-2 hover:bg-[#e8e5e0] rounded-full transition" id="cart-btn" title="Giỏ hàng"> 
        <i data-lucide="shopping-bag" style="width:20px;height:20px;"></i> 
-       <span id="cart-count" class="absolute -top-0.5 -right-0.5 bg-[#c45e3a] text-white text-[10px] w-4.5 h-4.5 rounded-full flex items-center justify-center font-semibold">0</span> 
+       <span id="cart-count" class="absolute -top-0.5 -right-0.5 bg-[#c45e3a] text-white text-[10px] w-5 h-5 rounded-full flex items-center justify-center font-semibold">0</span> 
      </button> 
 
      <!-- Auth Button / Dropdown Container -->
@@ -101,15 +95,15 @@
    <div class="bg-white rounded-2xl p-6 w-full max-w-xl mx-4 shadow-2xl scale-95 opacity-0 transition-all duration-300 transform" id="search-box">
     <div class="flex items-center gap-3 border-b border-[#e8e5e0] pb-4">
       <i data-lucide="search" style="width:22px;height:22px;color:#c45e3a;"></i> 
-      <input type="text" placeholder="Tìm kiếm trang phục, phụ kiện..." class="flex-1 outline-none text-lg font-body placeholder-gray-400" id="search-input"> 
+      <input type="text" placeholder="Tìm áo thun, polo, sơ mi, áo khoác..." class="flex-1 outline-none text-lg font-body placeholder-gray-400" id="search-input"> 
       <button id="close-search" class="p-1.5 hover:bg-gray-100 rounded-full transition"><i data-lucide="x" style="width:20px;height:20px;"></i></button>
     </div>
     <div class="mt-4">
       <p class="text-xs font-semibold text-gray-400 uppercase tracking-wider mb-2">Từ khóa hot</p>
       <div class="flex flex-wrap gap-2" id="search-suggestions">
         <button onclick="quickSearch('Áo thun')" class="text-xs bg-[#f5f0ea] hover:bg-[#c45e3a] hover:text-white px-3 py-1.5 rounded-full text-gray-600 transition">Áo thun</button>
-        <button onclick="quickSearch('Váy')" class="text-xs bg-[#f5f0ea] hover:bg-[#c45e3a] hover:text-white px-3 py-1.5 rounded-full text-gray-600 transition">Váy midi</button>
-        <button onclick="quickSearch('Quần jeans')" class="text-xs bg-[#f5f0ea] hover:bg-[#c45e3a] hover:text-white px-3 py-1.5 rounded-full text-gray-600 transition">Quần jeans</button>
+        <button onclick="quickSearch('Áo polo')" class="text-xs bg-[#f5f0ea] hover:bg-[#c45e3a] hover:text-white px-3 py-1.5 rounded-full text-gray-600 transition">Áo polo</button>
+        <button onclick="quickSearch('Áo sơ mi')" class="text-xs bg-[#f5f0ea] hover:bg-[#c45e3a] hover:text-white px-3 py-1.5 rounded-full text-gray-600 transition">Áo sơ mi</button>
         <button onclick="quickSearch('Mới')" class="text-xs bg-[#f5f0ea] hover:bg-[#c45e3a] hover:text-white px-3 py-1.5 rounded-full text-gray-600 transition">Mới về</button>
       </div>
     </div>
@@ -129,12 +123,12 @@
       <section class="relative overflow-hidden bg-gradient-to-br from-[#f5f0ea] via-[#faf9f7] to-[#e8dfd4] border-b border-[#e8e5e0]">
        <div class="max-w-7xl mx-auto px-4 py-16 md:py-24 flex flex-col md:flex-row items-center gap-12">
         <div class="flex-1 space-y-6 text-center md:text-left z-10">
-         <p class="text-xs uppercase tracking-[4px] text-[#c45e3a] font-bold">Bộ sưu tập thời thượng 2026</p>
+         <p class="text-xs uppercase tracking-[4px] text-[#c45e3a] font-bold">Bộ sưu tập áo nam 2026</p>
          <h1 id="hero-title" class="font-heading text-4xl md:text-6xl font-bold leading-tight text-[#1a1a1a]">
            Nâng tầm<br><span class="text-[#c45e3a] italic">phong cách</span><br>của bạn
          </h1>
          <p id="hero-subtitle" class="text-gray-600 text-base md:text-lg max-w-lg mx-auto md:mx-0 font-light leading-relaxed">
-           Thời trang cao cấp, tối giản nhưng đậm chất riêng. Hãy khám phá và tự tin tỏa sáng mỗi ngày cùng Beestyle.
+           Áo nam hiện đại, dễ phối và chỉn chu trong mọi hoàn cảnh. Khám phá phong cách riêng cùng BeeStyle Men.
          </p>
          <div class="flex flex-wrap justify-center md:justify-start gap-4">
            <a href="#/shop" class="bg-[#1a1a1a] text-white px-8 py-3.5 rounded-full font-medium hover:bg-[#c45e3a] transition shadow-lg shadow-[#1a1a1a]/10 hover:shadow-[#c45e3a]/20">Mua Ngay</a> 
@@ -145,11 +139,11 @@
          <div class="absolute -top-10 -left-10 w-48 h-48 bg-[#c45e3a]/10 rounded-full blur-3xl"></div>
          <div class="absolute -bottom-10 -right-10 w-48 h-48 bg-[#d4956b]/20 rounded-full blur-3xl"></div>
          <div class="w-72 h-96 md:w-96 md:h-[30rem] rounded-2xl overflow-hidden shadow-2xl relative border-4 border-white bg-white group">
-          <img src="https://images.unsplash.com/photo-1515886657613-9f3515b0c78f?w=600&auto=format&fit=crop&q=80" alt="Hero Fashion" class="w-full h-full object-cover group-hover:scale-105 transition-transform duration-500">
+          <img src="https://images.unsplash.com/photo-1617137968427-85924c800a22?w=900&auto=format&fit=crop&q=85" alt="Hero Fashion" class="w-full h-full object-cover group-hover:scale-105 transition-transform duration-500">
           <div class="absolute bottom-6 left-6 right-6 bg-white/95 backdrop-blur-sm p-4 rounded-xl shadow-lg border border-gray-100 flex items-center justify-between">
             <div>
-              <p class="text-xs text-gray-500 uppercase tracking-widest font-semibold">Phong cách mùa xuân</p>
-              <h4 class="font-heading font-bold text-gray-800 text-sm">BST Cotton &amp; Linen</h4>
+              <p class="text-xs text-gray-500 uppercase tracking-widest font-semibold">Phong cách nam hiện đại</p>
+              <h4 class="font-heading font-bold text-gray-800 text-sm">BST Essential Men</h4>
             </div>
             <a href="#/shop" class="bg-[#1a1a1a] text-white p-2 rounded-full hover:bg-[#c45e3a] transition">
               <i data-lucide="arrow-right" class="w-4 h-4"></i>
@@ -164,28 +158,24 @@
       <section class="max-w-7xl mx-auto px-4 py-16">
        <div class="text-center max-w-lg mx-auto mb-12">
          <h2 class="font-heading text-3xl font-bold mb-3">Danh Mục Nổi Bật</h2>
-         <p class="text-gray-500 text-sm">Các thiết kế tinh tế được phân loại giúp bạn dễ dàng chọn lựa bộ trang phục phù hợp nhất</p>
+         <p class="text-gray-500 text-sm">Chọn nhanh mẫu áo phù hợp cho đi học, đi làm, dạo phố và những dịp quan trọng.</p>
        </div>
        <div class="grid grid-cols-2 md:grid-cols-4 gap-6">
-        <a href="#/shop?category=shirt" class="bg-[#f0ebe4] rounded-2xl p-8 text-center hover:shadow-xl transition-all duration-300 cursor-pointer group flex flex-col items-center">
+        <a href="#/shop?search=Áo%20thun" class="bg-[#f0ebe4] rounded-2xl p-8 text-center hover:-translate-y-1 hover:shadow-xl transition-all duration-300 group flex flex-col items-center">
          <div class="w-16 h-16 bg-white rounded-full flex items-center justify-center text-3xl group-hover:scale-110 transition-transform shadow-md">👕</div>
-         <p class="font-semibold text-gray-800 mt-4 group-hover:text-[#c45e3a] transition">Áo Nam &amp; Nữ</p>
-         <span class="text-xs text-gray-400 mt-1 font-medium hover:underline">Khám phá →</span>
+         <p class="font-semibold text-gray-800 mt-4 group-hover:text-[#c45e3a] transition">Áo thun nam</p><span class="text-xs text-gray-400 mt-1 font-medium">Dễ mặc mỗi ngày →</span>
         </a>
-        <a href="#/shop?category=pants" class="bg-[#e4ecf0] rounded-2xl p-8 text-center hover:shadow-xl transition-all duration-300 cursor-pointer group flex flex-col items-center">
-         <div class="w-16 h-16 bg-white rounded-full flex items-center justify-center text-3xl group-hover:scale-110 transition-transform shadow-md">👖</div>
-         <p class="font-semibold text-gray-800 mt-4 group-hover:text-[#c45e3a] transition">Quần Jeans &amp; Tây</p>
-         <span class="text-xs text-gray-400 mt-1 font-medium hover:underline">Khám phá →</span>
+        <a href="#/shop?search=Áo%20polo" class="bg-[#e4ecf0] rounded-2xl p-8 text-center hover:-translate-y-1 hover:shadow-xl transition-all duration-300 group flex flex-col items-center">
+         <div class="w-16 h-16 bg-white rounded-full flex items-center justify-center text-3xl group-hover:scale-110 transition-transform shadow-md">🧵</div>
+         <p class="font-semibold text-gray-800 mt-4 group-hover:text-[#c45e3a] transition">Áo polo nam</p><span class="text-xs text-gray-400 mt-1 font-medium">Lịch sự, năng động →</span>
         </a>
-        <a href="#/shop?category=dress" class="bg-[#f0e4ec] rounded-2xl p-8 text-center hover:shadow-xl transition-all duration-300 cursor-pointer group flex flex-col items-center">
-         <div class="w-16 h-16 bg-white rounded-full flex items-center justify-center text-3xl group-hover:scale-110 transition-transform shadow-md">👗</div>
-         <p class="font-semibold text-gray-800 mt-4 group-hover:text-[#c45e3a] transition">Váy Đầm Dạo Phố</p>
-         <span class="text-xs text-gray-400 mt-1 font-medium hover:underline">Khám phá →</span>
+        <a href="#/shop?search=Áo%20sơ%20mi" class="bg-[#f0e4ec] rounded-2xl p-8 text-center hover:-translate-y-1 hover:shadow-xl transition-all duration-300 group flex flex-col items-center">
+         <div class="w-16 h-16 bg-white rounded-full flex items-center justify-center text-3xl group-hover:scale-110 transition-transform shadow-md">👔</div>
+         <p class="font-semibold text-gray-800 mt-4 group-hover:text-[#c45e3a] transition">Áo sơ mi nam</p><span class="text-xs text-gray-400 mt-1 font-medium">Chỉn chu đi làm →</span>
         </a>
-        <a href="#/shop?category=accessories" class="bg-[#ecf0e4] rounded-2xl p-8 text-center hover:shadow-xl transition-all duration-300 cursor-pointer group flex flex-col items-center">
-         <div class="w-16 h-16 bg-white rounded-full flex items-center justify-center text-3xl group-hover:scale-110 transition-transform shadow-md">👜</div>
-         <p class="font-semibold text-gray-800 mt-4 group-hover:text-[#c45e3a] transition">Phụ Kiện Cao Cấp</p>
-         <span class="text-xs text-gray-400 mt-1 font-medium hover:underline">Khám phá →</span>
+        <a href="#/shop?search=Áo%20khoác" class="bg-[#ecf0e4] rounded-2xl p-8 text-center hover:-translate-y-1 hover:shadow-xl transition-all duration-300 group flex flex-col items-center">
+         <div class="w-16 h-16 bg-white rounded-full flex items-center justify-center text-3xl group-hover:scale-110 transition-transform shadow-md">🧥</div>
+         <p class="font-semibold text-gray-800 mt-4 group-hover:text-[#c45e3a] transition">Áo khoác nam</p><span class="text-xs text-gray-400 mt-1 font-medium">Hoàn thiện phong cách →</span>
         </a>
        </div>
       </section>
@@ -235,7 +225,7 @@
           <div class="text-center space-y-3">
             <div class="w-12 h-12 bg-white rounded-full flex items-center justify-center text-xl shadow mx-auto text-[#c45e3a]"><i data-lucide="shield-check" class="w-6 h-6"></i></div>
             <h4 class="font-semibold text-lg text-gray-800">100% Chính Hãng</h4>
-            <p class="text-gray-500 text-sm max-w-xs mx-auto">Cam kết mọi mặt hàng thời trang tại Beestyle đều do xưởng thiết kế và sản xuất tỉ mỉ.</p>
+            <p class="text-gray-500 text-sm max-w-xs mx-auto">Cam kết mọi mặt hàng thời trang tại BeeStyle đều do xưởng thiết kế và sản xuất tỉ mỉ.</p>
           </div>
         </div>
       </section>
@@ -245,8 +235,8 @@
     <div id="shop-view" class="page-view hidden">
       <div class="bg-[#f0ebe4]/40 border-b border-[#e8e5e0] py-8 mb-8">
         <div class="max-w-7xl mx-auto px-4">
-          <h1 class="font-heading text-3xl font-bold text-gray-800" id="shop-title">Cửa Hàng Thời Trang</h1>
-          <p class="text-gray-500 text-sm mt-1" id="shop-subtitle">Khám phá các thiết kế chất lượng cao phù hợp với phong cách của bạn.</p>
+          <h1 class="font-heading text-3xl font-bold text-gray-800" id="shop-title">Cửa Hàng Áo Nam</h1>
+          <p class="text-gray-500 text-sm mt-1" id="shop-subtitle">Khám phá áo thun, polo, sơ mi và áo khoác nam chất lượng cao.</p>
         </div>
       </div>
       
@@ -265,22 +255,10 @@
             
             <!-- Category Filter -->
             <div class="space-y-2">
-              <h4 class="font-semibold text-sm text-gray-800">Danh mục sản phẩm</h4>
+              <h4 class="font-semibold text-sm text-gray-800">Danh mục áo nam</h4>
               <div class="space-y-1" id="category-filter-list">
                 <label class="flex items-center gap-2 text-sm text-gray-600 hover:text-black cursor-pointer py-1">
-                  <input type="radio" name="category" value="all" checked class="accent-[#c45e3a]"> Tất cả sản phẩm
-                </label>
-                <label class="flex items-center gap-2 text-sm text-gray-600 hover:text-black cursor-pointer py-1">
-                  <input type="radio" name="category" value="shirt" class="accent-[#c45e3a]"> Áo Nam & Nữ
-                </label>
-                <label class="flex items-center gap-2 text-sm text-gray-600 hover:text-black cursor-pointer py-1">
-                  <input type="radio" name="category" value="pants" class="accent-[#c45e3a]"> Quần Jeans & Tây
-                </label>
-                <label class="flex items-center gap-2 text-sm text-gray-600 hover:text-black cursor-pointer py-1">
-                  <input type="radio" name="category" value="dress" class="accent-[#c45e3a]"> Váy Đầm Dạo Phố
-                </label>
-                <label class="flex items-center gap-2 text-sm text-gray-600 hover:text-black cursor-pointer py-1">
-                  <input type="radio" name="category" value="accessories" class="accent-[#c45e3a]"> Phụ kiện
+                  <input type="radio" name="category" value="all" checked class="accent-[#c45e3a]"> Tất cả áo nam
                 </label>
               </div>
             </div>
@@ -330,6 +308,7 @@
           
           <!-- Product grid -->
           <div class="grid grid-cols-2 md:grid-cols-3 gap-6" id="shop-product-grid"></div>
+          <div id="shop-pagination" class="flex flex-wrap items-center justify-center gap-2 pt-4"></div>
           
           <!-- Empty State -->
           <div id="shop-empty-state" class="hidden flex flex-col items-center justify-center py-16 bg-white rounded-3xl border border-[#e8e5e0] text-center p-6">
@@ -651,6 +630,11 @@
       </div>
     </div>
 
+    <!-- NOT FOUND VIEW -->
+    <div id="not-found-view" class="page-view hidden max-w-3xl mx-auto px-4 py-24 text-center">
+      <div class="rounded-3xl border border-gray-100 bg-white p-10 shadow-sm"><p class="text-6xl">404</p><h1 class="font-heading mt-4 text-3xl font-bold">Trang không tồn tại</h1><p class="mt-2 text-sm text-gray-500">Đường dẫn bạn truy cập chưa được hỗ trợ hoặc đã thay đổi.</p><a href="#/" class="mt-6 inline-flex rounded-full bg-[#1a1a1a] px-7 py-3 text-sm font-bold text-white hover:bg-[#c45e3a]">Về trang chủ</a></div>
+    </div>
+
     <!-- ADMIN VIEW -->
     <div id="admin-view" class="page-view hidden w-full min-h-screen flex bg-[#f8f9fc]">
       <!-- Sidebar -->
@@ -658,7 +642,7 @@
         <!-- Brand -->
         <a href="#/" class="h-16 flex items-center justify-center gap-2 border-b border-white/10 px-4">
           <span class="text-2xl animate-pulse">🐝</span>
-          <span class="font-heading font-bold text-lg tracking-wider sidebar-text">Beestyle Admin</span>
+          <span class="font-heading font-bold text-lg tracking-wider sidebar-text">BeeStyle Admin</span>
         </a>
         
         <!-- Sidebar Navigation -->
@@ -724,33 +708,17 @@
               <i data-lucide="menu" class="w-5 h-5"></i>
             </button>
             <div class="relative hidden sm:block">
-              <input type="text" placeholder="Tìm kiếm nhanh..." class="w-64 bg-gray-100 border border-gray-200 rounded-xl px-4 py-1.5 text-xs outline-none focus:border-[#4e73df] transition">
+              <input type="text" id="admin-global-search" placeholder="Tìm trong trang quản trị..." class="w-64 bg-gray-100 border border-gray-200 rounded-xl px-4 py-1.5 text-xs outline-none focus:border-[#4e73df] transition">
               <button class="absolute right-2 top-1.5 text-gray-400 hover:text-[#4e73df]"><i data-lucide="search" class="w-4 h-4"></i></button>
             </div>
           </div>
 
           <div class="flex items-center gap-4">
-            <!-- Notifications -->
-            <div class="relative">
-              <button class="p-2 hover:bg-gray-100 rounded-full transition text-gray-500 relative">
-                <i data-lucide="bell" class="w-5 h-5"></i>
-                <span class="absolute top-1 right-1 w-2 h-2 bg-red-500 rounded-full"></span>
-              </button>
-            </div>
-
-            <!-- Messages -->
-            <div class="relative">
-              <button class="p-2 hover:bg-gray-100 rounded-full transition text-gray-500 relative">
-                <i data-lucide="mail" class="w-5 h-5"></i>
-                <span class="absolute top-1 right-1 w-2 h-2 bg-[#4e73df] rounded-full"></span>
-              </button>
-            </div>
-
             <div class="h-8 w-px bg-gray-200"></div>
 
             <!-- Profile Info -->
             <div class="flex items-center gap-2">
-              <span class="text-xs font-semibold text-gray-600 hidden md:inline">Beestyle Admin</span>
+              <span class="text-xs font-semibold text-gray-600 hidden md:inline">BeeStyle Admin</span>
               <img src="https://images.unsplash.com/photo-1534528741775-53994a69daeb?w=100&auto=format&fit=crop&q=80" alt="Avatar" class="w-8 h-8 rounded-full object-cover border border-[#4e73df]/20">
             </div>
           </div>
@@ -765,9 +733,9 @@
             <div class="flex flex-col sm:flex-row sm:items-center sm:justify-between gap-4">
               <div>
                 <h1 class="font-heading text-2xl font-bold text-gray-800">Dashboard</h1>
-                <p class="text-xs text-gray-500">Xem thống kê và doanh số cửa hàng thời trang Beestyle.</p>
+                <p class="text-xs text-gray-500">Xem thống kê và doanh số cửa hàng thời trang BeeStyle.</p>
               </div>
-              <button class="bg-[#4e73df] hover:bg-[#2e59d9] text-white text-xs font-bold px-4 py-2.5 rounded-xl shadow-md shadow-[#4e73df]/20 transition flex items-center gap-2">
+              <button type="button" onclick="downloadAdminReport()" class="bg-[#4e73df] hover:bg-[#2e59d9] text-white text-xs font-bold px-4 py-2.5 rounded-xl shadow-md shadow-[#4e73df]/20 transition flex items-center gap-2">
                 <i data-lucide="download-cloud" class="w-4 h-4"></i> Tải Báo Cáo
               </button>
             </div>
@@ -880,7 +848,7 @@
                 
                 <div class="space-y-1">
                   <label class="text-[10px] text-gray-500 font-semibold uppercase">Tên sản phẩm *</label>
-                  <input type="text" id="admin-prod-name" placeholder="Áo thun polo Beestyle" required class="w-full px-3 py-2 border border-gray-200 rounded-xl outline-none focus:border-[#4e73df] transition text-xs">
+                  <input type="text" id="admin-prod-name" placeholder="Áo thun polo BeeStyle" required class="w-full px-3 py-2 border border-gray-200 rounded-xl outline-none focus:border-[#4e73df] transition text-xs">
                 </div>
                 
                 <div class="grid grid-cols-2 gap-3">
@@ -897,12 +865,7 @@
                 <div class="grid grid-cols-3 gap-3">
                   <div class="space-y-1">
                     <label class="text-[10px] text-gray-500 font-semibold uppercase">Danh mục *</label>
-                    <select id="admin-prod-category" required class="w-full px-3 py-2 border border-gray-200 rounded-xl outline-none focus:border-[#4e73df] transition text-xs bg-white cursor-pointer">
-                      <option value="shirt">Áo Nam & Nữ</option>
-                      <option value="pants">Quần Jeans & Tây</option>
-                      <option value="dress">Váy Đầm Dạo Phố</option>
-                      <option value="accessories">Phụ kiện</option>
-                    </select>
+                    <select id="admin-prod-category" required class="w-full px-3 py-2 border border-gray-200 rounded-xl outline-none focus:border-[#4e73df] transition text-xs bg-white cursor-pointer"><option value="">Đang tải danh mục...</option></select>
                   </div>
                   <div class="space-y-1">
                     <label class="text-[10px] text-gray-500 font-semibold uppercase">Nhãn/Tag</label>
@@ -1148,8 +1111,8 @@
   <footer class="bg-[#1a1a1a] text-white mt-16 border-t border-white/10 shrink-0">
    <div class="max-w-7xl mx-auto px-4 py-12 grid grid-cols-1 md:grid-cols-4 gap-8">
     <div>
-     <h4 class="font-heading text-xl font-bold mb-4 tracking-wider flex items-center gap-2"><span class="text-2xl">🐝</span>Beestyle</h4>
-     <p class="text-gray-400 text-sm leading-relaxed font-light">Thời trang hiện đại cho cuộc sống năng động. Tinh hoa dệt may Việt Nam kết hợp phong cách tối giản quốc tế.</p>
+     <h4 class="font-heading text-xl font-bold mb-4 tracking-wider flex items-center gap-2"><span class="text-2xl">🐝</span>BeeStyle</h4>
+     <p class="text-gray-400 text-sm leading-relaxed font-light">Thời trang hiện đại cho cuộc sống năng động. Thiết kế áo nam hiện đại, chất liệu dễ mặc và phong cách ứng dụng dành cho nam giới Việt.</p>
     </div>
     <div>
      <h5 class="font-semibold mb-4 text-sm tracking-widest uppercase">Trang mua sắm</h5>
@@ -1157,16 +1120,15 @@
       <li><a href="#/" class="hover:text-white transition">Trang chủ</a></li>
       <li><a href="#/shop" class="hover:text-white transition">Cửa hàng sản phẩm</a></li>
       <li><a href="#/orders" class="hover:text-white transition">Đơn hàng của bạn</a></li>
-      <li><a href="#/admin" class="text-[#c45e3a] hover:underline font-semibold transition">Trang quản trị Admin</a></li>
      </ul>
     </div>
     <div>
      <h5 class="font-semibold mb-4 text-sm tracking-widest uppercase">Hỗ trợ khách hàng</h5>
      <ul class="space-y-2 text-sm text-gray-400">
-      <li><a href="#/" class="hover:text-white transition">Chính sách đổi trả 7 ngày</a></li>
-      <li><a href="#/" class="hover:text-white transition">Chính sách vận chuyển &amp; COD</a></li>
-      <li><a href="#/" class="hover:text-white transition">Hướng dẫn chọn size chi tiết</a></li>
-      <li><a href="#/" class="hover:text-white transition">Câu hỏi thường gặp FAQ</a></li>
+      <li><button type="button" onclick="openInfoModal('return')" class="hover:text-white transition text-left">Chính sách đổi trả 7 ngày</button></li>
+      <li><button type="button" onclick="openInfoModal('shipping')" class="hover:text-white transition text-left">Chính sách vận chuyển &amp; COD</button></li>
+      <li><button type="button" onclick="openInfoModal('size')" class="hover:text-white transition text-left">Hướng dẫn chọn size chi tiết</button></li>
+      <li><button type="button" onclick="openInfoModal('faq')" class="hover:text-white transition text-left">Câu hỏi thường gặp FAQ</button></li>
      </ul>
     </div>
     <div>
@@ -1184,7 +1146,7 @@
     </div>
    </div>
    <div class="border-t border-white/5 text-center py-6 text-xs text-gray-500 font-light">
-    © 2026 Beestyle Fashion &amp; E-commerce. Powered by Laravel &amp; SQLite.
+    © 2026 BeeStyle Fashion &amp; E-commerce. Đồ án tốt nghiệp phát triển bằng Laravel.
    </div>
   </footer>
 
@@ -1270,7 +1232,7 @@
 
       <div class="bg-[#faf9f7] p-5 rounded-2xl border border-gray-200/80 space-y-3">
         <div class="flex justify-between text-xs text-gray-500">
-          <span>Đơn hàng tại Beestyle</span>
+          <span>Đơn hàng tại BeeStyle</span>
           <span class="font-semibold text-gray-800" id="online-payment-order-id">#temp</span>
         </div>
         <div class="flex justify-between text-xs text-gray-500 border-t border-gray-200/50 pt-2">
@@ -1281,7 +1243,7 @@
 
       <!-- QR Code Simulation -->
       <div class="flex flex-col items-center justify-center p-4 bg-white border border-gray-100 rounded-2xl shadow-inner w-56 h-56 mx-auto relative group">
-        <img src="https://images.unsplash.com/photo-1595079676339-1534801ad6cf?w=400&auto=format&fit=crop&q=80" alt="QR Code" class="w-44 h-44 object-cover filter blur-[0.5px] group-hover:blur-0 transition duration-300">
+        <img src="https://api.qrserver.com/v1/create-qr-code/?size=220x220&data=BEESTYLE-DEMO-PAYMENT" alt="Mã QR thanh toán mô phỏng" class="w-44 h-44 object-contain">
         <div class="absolute inset-0 bg-black/5 rounded-2xl pointer-events-none"></div>
       </div>
 
@@ -1317,7 +1279,7 @@
       <form id="login-form" class="space-y-4" onsubmit="handleLoginSubmit(event)">
         <div class="space-y-1">
           <label class="text-xs font-bold text-gray-500">Email *</label>
-          <input type="email" id="login-email" required placeholder="admin@beestyle.vn" class="w-full px-4 py-2.5 border border-gray-200 rounded-xl outline-none focus:border-[#c45e3a] transition text-sm">
+          <input type="email" id="login-email" required placeholder="email@example.com" class="w-full px-4 py-2.5 border border-gray-200 rounded-xl outline-none focus:border-[#c45e3a] transition text-sm">
         </div>
         <div class="space-y-1">
           <label class="text-xs font-bold text-gray-500">Mật khẩu *</label>
@@ -1325,18 +1287,6 @@
         </div>
         <button type="submit" class="w-full bg-[#1a1a1a] hover:bg-[#c45e3a] text-white py-3 rounded-full text-sm font-bold shadow-lg transition">Đăng Nhập</button>
 
-        <!-- Quick Login Shortcuts -->
-        <div class="bg-[#faf9f7] border border-gray-200/80 rounded-2xl p-4 mt-4 space-y-2">
-          <p class="text-[9px] uppercase font-bold text-gray-400 tracking-wider">Đăng nhập nhanh để test</p>
-          <div class="grid grid-cols-2 gap-2">
-            <button type="button" onclick="fillQuickAuth('admin@beestyle.vn', 'admin123')" class="bg-blue-50 text-blue-700 hover:bg-blue-100 border border-blue-200 py-2 px-3 rounded-xl text-[10px] font-bold transition text-center truncate">
-              🔑 Admin (Quản trị)
-            </button>
-            <button type="button" onclick="fillQuickAuth('customer@beestyle.vn', 'customer123')" class="bg-amber-50 text-amber-700 hover:bg-amber-100 border border-amber-200 py-2 px-3 rounded-xl text-[10px] font-bold transition text-center truncate">
-              👤 Customer (Khách)
-            </button>
-          </div>
-        </div>
       </form>
 
       <!-- Register Form -->
@@ -1357,10 +1307,26 @@
           <label class="text-xs font-bold text-gray-500">Mật khẩu *</label>
           <input type="password" id="register-password" required placeholder="Tối thiểu 6 ký tự" class="w-full px-4 py-2.5 border border-gray-200 rounded-xl outline-none focus:border-[#c45e3a] transition text-sm">
         </div>
+        <div class="space-y-1">
+          <label class="text-xs font-bold text-gray-500">Nhập lại mật khẩu *</label>
+          <input type="password" id="register-password-confirm" required placeholder="Nhập lại mật khẩu" class="w-full px-4 py-2.5 border border-gray-200 rounded-xl outline-none focus:border-[#c45e3a] transition text-sm">
+        </div>
         <button type="submit" class="w-full bg-[#1a1a1a] hover:bg-[#c45e3a] text-white py-3 rounded-full text-sm font-bold shadow-lg transition">Đăng Ký Tài Khoản</button>
       </form>
     </div>
   </div>
+  <!-- Information Modal -->
+  <div id="info-modal" class="fixed inset-0 z-[90] hidden items-center justify-center p-4">
+    <div class="absolute inset-0 bg-black/60 backdrop-blur-sm" onclick="closeInfoModal()"></div>
+    <div class="relative z-10 w-full max-w-2xl max-h-[88vh] overflow-y-auto rounded-3xl bg-white p-6 md:p-8 shadow-2xl">
+      <div class="flex items-start justify-between gap-4 border-b border-gray-100 pb-4">
+        <div><p class="text-[10px] font-bold uppercase tracking-[.2em] text-[#c45e3a]">BeeStyle Men</p><h3 id="info-modal-title" class="font-heading text-2xl font-bold text-gray-900"></h3></div>
+        <button type="button" onclick="closeInfoModal()" class="rounded-full p-2 text-gray-400 hover:bg-gray-100 hover:text-black"><i data-lucide="x" class="h-5 w-5"></i></button>
+      </div>
+      <div id="info-modal-content" class="prose prose-sm mt-5 max-w-none text-sm leading-7 text-gray-600"></div>
+    </div>
+  </div>
+
   <!-- Toast Notification System -->
   <div id="toast" class="fixed bottom-6 right-6 bg-[#1a1a1a] text-white px-5 py-3 rounded-2xl shadow-2xl transform translate-y-20 opacity-0 transition-all duration-300 z-50 flex items-center gap-2 text-sm border border-white/10"></div>
 
@@ -1419,6 +1385,97 @@
     let currentOrderDetailId = null;
     let pendingOrderData = null;
     let onlinePaymentTimerInterval = null;
+    let currentShopPage = 1;
+    const PRODUCTS_PER_PAGE = 9;
+    const SHIPPING_THRESHOLD = 500000;
+    const DEFAULT_SHIPPING_FEE = 30000;
+
+    function escapeHtml(value = '') {
+      return String(value).replace(/[&<>'"]/g, char => ({'&':'&amp;','<':'&lt;','>':'&gt;',"'":'&#039;','"':'&quot;'}[char]));
+    }
+
+    function safeImageUrl(value) {
+      const fallback = 'https://images.unsplash.com/photo-1521572163474-6864f9cf17ab?w=800&auto=format&fit=crop&q=80';
+      try {
+        const url = new URL(value || fallback, window.location.origin);
+        return ['http:', 'https:'].includes(url.protocol) ? url.href : fallback;
+      } catch (_) { return fallback; }
+    }
+
+    function jsString(value = '') {
+      return JSON.stringify(String(value)).replace(/</g, '\u003c');
+    }
+
+    function userStorageKey(name) {
+      const identity = authUser?.id || authUser?.email || 'guest';
+      return `beestyle_${name}_${String(identity).replace(/[^a-zA-Z0-9_-]/g, '_')}`;
+    }
+
+    function calculateShipping(subtotal) {
+      return subtotal >= SHIPPING_THRESHOLD ? 0 : DEFAULT_SHIPPING_FEE;
+    }
+
+    function getProductStock(productId) {
+      const product = productsState.find(p => String(p.id) === String(productId));
+      return Math.max(0, Number(product?.stock ?? 0));
+    }
+
+    function getCartQuantityForProduct(productId) {
+      return cartState.filter(item => String(item.productId) === String(productId)).reduce((sum, item) => sum + Number(item.quantity || 0), 0);
+    }
+
+    function validatePhone(phone) {
+      return /^(?:\+84|0)(?:3|5|7|8|9)\d{8}$/.test(String(phone).replace(/\s+/g, ''));
+    }
+
+    function isAdmin(user = authUser) {
+      return String(user?.role || '').toLowerCase() === 'admin';
+    }
+
+    function renderCategoryControls() {
+      const filterList = document.getElementById('category-filter-list');
+      const adminSelect = document.getElementById('admin-prod-category');
+      const categories = Array.isArray(categoriesState) ? categoriesState : [];
+      if (filterList) {
+        filterList.innerHTML = `<label class="flex items-center gap-2 text-sm text-gray-600 hover:text-black cursor-pointer py-1"><input type="radio" name="category" value="all" class="accent-[#c45e3a]" ${currentCategoryFilter === 'all' ? 'checked' : ''}> Tất cả áo nam</label>` + categories.map(cat => `<label class="flex items-center gap-2 text-sm text-gray-600 hover:text-black cursor-pointer py-1"><input type="radio" name="category" value="${escapeHtml(cat.slug)}" class="accent-[#c45e3a]" ${currentCategoryFilter === String(cat.slug) ? 'checked' : ''}> ${escapeHtml(cat.name)}</label>`).join('');
+      }
+      if (adminSelect) {
+        adminSelect.innerHTML = categories.length ? categories.map(cat => `<option value="${escapeHtml(cat.slug)}">${escapeHtml(cat.name)}</option>`).join('') : '<option value="">Chưa có danh mục</option>';
+      }
+    }
+
+    function toggleAdminSidebar() {
+      const sidebar = document.getElementById('admin-sidebar');
+      const icon = document.getElementById('sidebar-toggle-icon');
+      if (!sidebar) return;
+      sidebar.classList.toggle('admin-sidebar-collapsed');
+      if (icon) icon.classList.toggle('rotate-180');
+    }
+
+    function toggleAdminSidebarMobile() {
+      const sidebar = document.getElementById('admin-sidebar');
+      if (sidebar) sidebar.classList.toggle('-translate-x-full');
+    }
+
+    function openInfoModal(type) {
+      const data = {
+        shipping: ['Chính sách vận chuyển', `<p>BeeStyle giao hàng toàn quốc. Đơn từ <strong>${formatVND(SHIPPING_THRESHOLD)}</strong> được miễn phí vận chuyển; đơn thấp hơn áp dụng phí dự kiến <strong>${formatVND(DEFAULT_SHIPPING_FEE)}</strong>.</p><p>Thời gian dự kiến 2–5 ngày làm việc tùy khu vực. Khách hàng vui lòng kiểm tra tình trạng bao bì trước khi nhận.</p>`],
+        return: ['Chính sách đổi trả 7 ngày', '<p>Sản phẩm được hỗ trợ đổi size hoặc đổi mẫu trong 7 ngày kể từ khi nhận hàng, với điều kiện còn nguyên tem, chưa qua sử dụng và không có mùi lạ.</p><p>Sản phẩm lỗi do nhà sản xuất được hỗ trợ đổi miễn phí. Sản phẩm khuyến mại có thể áp dụng điều kiện riêng.</p>'],
+        size: ['Hướng dẫn chọn size áo nam', '<div class="overflow-x-auto"><table class="w-full border-collapse text-center"><thead><tr><th class="border p-2">Size</th><th class="border p-2">Cân nặng</th><th class="border p-2">Chiều cao</th></tr></thead><tbody><tr><td class="border p-2">S</td><td class="border p-2">45–55 kg</td><td class="border p-2">1m55–1m65</td></tr><tr><td class="border p-2">M</td><td class="border p-2">55–65 kg</td><td class="border p-2">1m60–1m70</td></tr><tr><td class="border p-2">L</td><td class="border p-2">65–75 kg</td><td class="border p-2">1m65–1m78</td></tr><tr><td class="border p-2">XL</td><td class="border p-2">75–85 kg</td><td class="border p-2">1m70–1m85</td></tr></tbody></table></div><p class="mt-3">Bảng chỉ mang tính tham khảo; hãy ưu tiên số đo vai và vòng ngực nếu bạn thích mặc ôm hoặc rộng.</p>'],
+        faq: ['Câu hỏi thường gặp', '<p><strong>Tôi có được kiểm tra hàng không?</strong><br>Có, khách hàng được kiểm tra ngoại quan và đúng mẫu/size trước khi thanh toán theo chính sách đơn vị vận chuyển.</p><p><strong>Tôi có thể hủy đơn?</strong><br>Có thể hủy khi đơn còn ở trạng thái chờ xử lý.</p><p><strong>Thanh toán online có phải giao dịch thật?</strong><br>Trong phiên bản đồ án, chức năng này là mô phỏng luồng thanh toán.</p>']
+      };
+      const [title, content] = data[type] || data.faq;
+      document.getElementById('info-modal-title').textContent = title;
+      document.getElementById('info-modal-content').innerHTML = content;
+      const modal = document.getElementById('info-modal');
+      modal.classList.remove('hidden'); modal.classList.add('flex');
+      lucide.createIcons();
+    }
+
+    function closeInfoModal() {
+      const modal = document.getElementById('info-modal');
+      modal.classList.add('hidden'); modal.classList.remove('flex');
+    }
 
     function renderAuthUI() {
       const headerContainer = document.getElementById('auth-header-container');
@@ -1428,7 +1485,7 @@
 
       if (authUser) {
         // Show/hide admin navigation depending on user role
-        if (authUser.role === 'Admin') {
+        if (isAdmin(authUser)) {
           if (navAdmin) navAdmin.classList.remove('hidden');
           if (navAdminMobile) navAdminMobile.classList.remove('hidden');
         } else {
@@ -1444,15 +1501,15 @@
                 <div class="w-5 h-5 bg-gradient-to-tr from-[#c45e3a] to-amber-400 text-white rounded-full flex items-center justify-center font-bold text-[10px]">
                   ${authUser.full_name ? authUser.full_name[0].toUpperCase() : 'U'}
                 </div>
-                <span class="max-w-[80px] truncate">${authUser.full_name}</span>
+                <span class="max-w-[80px] truncate">${escapeHtml(authUser.full_name)}</span>
                 <i data-lucide="chevron-down" class="w-3 h-3 text-gray-400"></i>
               </button>
               <div class="absolute right-0 mt-2 w-48 bg-white border border-gray-100 rounded-2xl shadow-xl py-2 hidden group-hover:block transition-all duration-300 z-50">
                 <div class="px-4 py-2 border-b border-gray-50">
-                  <p class="text-xs font-bold text-gray-800 line-clamp-1">${authUser.full_name}</p>
-                  <p class="text-[10px] text-gray-400 line-clamp-1">${authUser.role}</p>
+                  <p class="text-xs font-bold text-gray-800 line-clamp-1">${escapeHtml(authUser.full_name)}</p>
+                  <p class="text-[10px] text-gray-400 line-clamp-1">${escapeHtml(authUser.role)}</p>
                 </div>
-                ${authUser.role === 'Admin' ? `
+                ${isAdmin(authUser) ? `
                   <a href="#/admin" class="flex items-center gap-2 px-4 py-2 text-xs text-gray-700 hover:bg-gray-50 transition">
                     <i data-lucide="shield-check" class="w-3.5 h-3.5 text-[#c45e3a]"></i>
                     <span>Quản trị Admin</span>
@@ -1484,8 +1541,8 @@
                   ${authUser.full_name ? authUser.full_name[0].toUpperCase() : 'U'}
                 </div>
                 <div>
-                  <p class="text-xs font-bold text-gray-800">${authUser.full_name}</p>
-                  <p class="text-[10px] text-gray-400">${authUser.role}</p>
+                  <p class="text-xs font-bold text-gray-800">${escapeHtml(authUser.full_name)}</p>
+                  <p class="text-[10px] text-gray-400">${escapeHtml(authUser.role)}</p>
                 </div>
               </div>
               <a href="#/profile" class="w-full flex items-center justify-center gap-2 py-2.5 bg-gray-50 text-gray-700 text-xs font-bold rounded-xl hover:bg-gray-100 transition">
@@ -1587,6 +1644,9 @@
         const data = await res.json();
         if (res.ok) {
           authUser = data.user;
+          cartState = JSON.parse(localStorage.getItem(userStorageKey('cart')) || '[]');
+          wishlistState = JSON.parse(localStorage.getItem(userStorageKey('wishlist')) || '[]');
+          updateCartBadge(); updateWishlistBadge();
           showToast('Đăng nhập thành công!', 'success');
           closeAuthModal();
           renderAuthUI();
@@ -1610,6 +1670,10 @@
       const email = document.getElementById('register-email').value;
       const phone = document.getElementById('register-phone').value;
       const password = document.getElementById('register-password').value;
+      const passwordConfirm = document.getElementById('register-password-confirm').value;
+      if (password.length < 6) { showToast('Mật khẩu phải có ít nhất 6 ký tự.', 'info'); return; }
+      if (password !== passwordConfirm) { showToast('Mật khẩu nhập lại chưa khớp.', 'info'); return; }
+      if (phone && !validatePhone(phone)) { showToast('Số điện thoại không đúng định dạng Việt Nam.', 'info'); return; }
       
       try {
         const res = await fetch('/api/register', {
@@ -1620,6 +1684,10 @@
         const data = await res.json();
         if (res.ok) {
           authUser = data.user;
+          cartState = []; wishlistState = [];
+          localStorage.setItem(userStorageKey('cart'), '[]');
+          localStorage.setItem(userStorageKey('wishlist'), '[]');
+          updateCartBadge(); updateWishlistBadge();
           showToast('Đăng ký thành công!', 'success');
           closeAuthModal();
           renderAuthUI();
@@ -1628,6 +1696,7 @@
           document.getElementById('register-email').value = '';
           document.getElementById('register-phone').value = '';
           document.getElementById('register-password').value = '';
+          document.getElementById('register-password-confirm').value = '';
           
           await router();
         } else {
@@ -1650,8 +1719,6 @@
           authUser = null;
           cartState = [];
           wishlistState = [];
-          localStorage.removeItem('beestyle_cart');
-          localStorage.removeItem('beestyle_wishlist');
           updateCartBadge();
           updateWishlistBadge();
           showToast('Đăng xuất thành công!', 'info');
@@ -1676,22 +1743,20 @@
         const authData = await authRes.json();
         if (authData.logged_in) {
           authUser = authData.user;
-          cartState = JSON.parse(localStorage.getItem('beestyle_cart') || '[]');
-          wishlistState = JSON.parse(localStorage.getItem('beestyle_wishlist') || '[]');
+          cartState = JSON.parse(localStorage.getItem(userStorageKey('cart')) || '[]');
+          wishlistState = JSON.parse(localStorage.getItem(userStorageKey('wishlist')) || '[]');
         } else {
           authUser = null;
           cartState = [];
           wishlistState = [];
-          localStorage.removeItem('beestyle_cart');
-          localStorage.removeItem('beestyle_wishlist');
         }
       } catch (err) {
         console.error("Error checking auth status:", err);
         authUser = null;
         cartState = [];
         wishlistState = [];
-        localStorage.removeItem('beestyle_cart');
-        localStorage.removeItem('beestyle_wishlist');
+        localStorage.removeItem(userStorageKey('cart'));
+        localStorage.removeItem(userStorageKey('wishlist'));
       }
       
       renderAuthUI();
@@ -1699,6 +1764,7 @@
       try {
         const catRes = await fetch('/api/categories');
         categoriesState = await catRes.json();
+        renderCategoryControls();
       } catch (err) {
         console.error("Error loading categories:", err);
       }
@@ -1789,18 +1855,20 @@
         showPage('order-detail-view');
         await renderOrderDetailPage(id);
       } else if (hash === '#/admin') {
-        if (!authUser || authUser.role !== 'Admin') {
+        if (!authUser || !isAdmin(authUser)) {
           showToast('Bạn không có quyền truy cập trang quản trị!', 'info');
           window.location.hash = '#/';
-          openAuthModal();
+          if (!authUser) openAuthModal();
           return;
         }
         showPage('admin-view');
         document.getElementById('nav-admin').classList.add('text-[#c45e3a]', 'font-bold');
         await renderAdminPage();
+      } else {
+        showPage('not-found-view');
       }
       
-      window.scrollTo(0, 0);
+      window.scrollTo({ top: 0, behavior: 'auto' });
     }
 
     function showPage(viewId) {
@@ -1830,7 +1898,7 @@
     }
 
     function updateCartBadge() {
-      const totalItems = cartState.reduce((sum, item) => sum + item.quantity, 0);
+      const totalItems = cartState.reduce((sum, item) => sum + Number(item.quantity || 0), 0);
       document.getElementById('cart-count').textContent = totalItems;
       document.getElementById('cart-title-count').textContent = `(${totalItems} sản phẩm)`;
     }
@@ -1847,7 +1915,7 @@
     }
 
     function formatVND(amount) {
-      return new Intl.NumberFormat('vi-VN', { style: 'currency', currency: 'VND' }).format(amount);
+      return new Intl.NumberFormat('vi-VN', { style: 'currency', currency: 'VND', maximumFractionDigits: 0 }).format(Number(amount || 0));
     }
 
     // -------------------------------------------------------------
@@ -1869,7 +1937,7 @@
         wishlistState.splice(index, 1);
         showToast('Đã xóa sản phẩm khỏi danh sách yêu thích!', 'info');
       }
-      localStorage.setItem('beestyle_wishlist', JSON.stringify(wishlistState));
+      localStorage.setItem(userStorageKey('wishlist'), JSON.stringify(wishlistState));
       updateWishlistBadge();
       
       const hash = window.location.hash || '#/';
@@ -1914,8 +1982,8 @@
               </button>
               
               <div class="relative bg-[#faf9f7] rounded-xl overflow-hidden mb-3 aspect-[3/4] flex items-center justify-center">
-                <img src="${p.thumbnail_url}" alt="${p.name}" class="product-img w-full h-full object-cover">
-                ${p.tag ? `<span class="absolute top-3 left-3 bg-[#c45e3a] text-white text-[10px] px-2.5 py-1 rounded-full font-bold uppercase tracking-wider">${p.tag}</span>` : ''}
+                <img src="${safeImageUrl(p.thumbnail_url)}" alt="${escapeHtml(p.name)}" class="product-img w-full h-full object-cover" onerror="this.src='https://images.unsplash.com/photo-1521572163474-6864f9cf17ab?w=800&auto=format&fit=crop&q=80'">
+                ${p.tag ? `<span class="absolute top-3 left-3 bg-[#c45e3a] text-white text-[10px] px-2.5 py-1 rounded-full font-bold uppercase tracking-wider">${escapeHtml(p.tag)}</span>` : ''}
                 
                 <div class="absolute inset-0 bg-black/5 opacity-0 group-hover:opacity-100 transition duration-300 flex items-end justify-center pb-4">
                   <button class="bg-[#1a1a1a] text-white text-[10px] font-bold px-4 py-2.5 rounded-full shadow-lg hover:bg-[#c45e3a] transition transform translate-y-2 group-hover:translate-y-0 duration-300" onclick="event.stopPropagation(); quickAddToCart('${p.id}')">
@@ -1928,7 +1996,7 @@
                   <i data-lucide="star" class="w-3.5 h-3.5 fill-current"></i>
                   <span class="text-xs font-bold text-gray-700">${p.rating}</span>
                 </div>
-                <h3 class="font-bold text-sm text-gray-800 line-clamp-1 group-hover:text-[#c45e3a] transition">${p.name}</h3>
+                <h3 class="font-bold text-sm text-gray-800 line-clamp-1 group-hover:text-[#c45e3a] transition">${escapeHtml(p.name)}</h3>
                 <div class="flex items-center gap-2 mt-1">
                   <span class="font-bold text-sm text-[#c45e3a]">${formatVND(p.price)}</span>
                   ${p.old_price ? `<span class="text-xs text-gray-400 line-through">${formatVND(p.old_price)}</span>` : ''}
@@ -1952,12 +2020,12 @@
     let showWishlistOnly = false;
 
     async function renderShopPage(queryParams) {
-      if (queryParams) {
-        if (queryParams.has('category')) currentCategoryFilter = queryParams.get('category');
-        if (queryParams.has('tag')) selectedActiveTag = queryParams.get('tag');
-        if (queryParams.has('wishlist')) showWishlistOnly = queryParams.get('wishlist') === 'true';
-        if (queryParams.has('search')) currentSearchQuery = queryParams.get('search');
-      }
+      queryParams = queryParams || new URLSearchParams();
+      currentCategoryFilter = queryParams.get('category') || 'all';
+      selectedActiveTag = queryParams.get('tag') || null;
+      showWishlistOnly = queryParams.get('wishlist') === 'true';
+      currentSearchQuery = queryParams.get('search') || '';
+      currentShopPage = Math.max(1, parseInt(queryParams.get('page') || '1', 10));
 
       // Sync form controls on UI
       const categoryInputs = document.querySelectorAll('input[name="category"]');
@@ -2009,7 +2077,11 @@
           document.getElementById('filter-tag-sale').classList.remove('bg-[#c45e3a]', 'text-white');
         }
 
-        document.getElementById('product-count-text').textContent = `Hiển thị ${filtered.length} sản phẩm`;
+        document.getElementById('product-count-text').textContent = `Tìm thấy ${filtered.length} sản phẩm`;
+        const totalPages = Math.max(1, Math.ceil(filtered.length / PRODUCTS_PER_PAGE));
+        if (currentShopPage > totalPages) currentShopPage = totalPages;
+        const pageItems = filtered.slice((currentShopPage - 1) * PRODUCTS_PER_PAGE, currentShopPage * PRODUCTS_PER_PAGE);
+        renderShopPagination(totalPages);
         
         grid.innerHTML = '';
         if (filtered.length === 0) {
@@ -2019,7 +2091,7 @@
           grid.classList.remove('hidden');
           emptyState.classList.add('hidden');
 
-          filtered.forEach(p => {
+          pageItems.forEach(p => {
             const isFav = wishlistState.includes(p.id.toString());
             const favIconClass = isFav ? 'text-red-500 fill-current' : 'text-gray-400 fill-transparent hover:text-red-500';
             
@@ -2030,8 +2102,8 @@
                 </button>
                 
                 <div class="relative bg-[#faf9f7] rounded-xl overflow-hidden mb-3 aspect-[3/4] flex items-center justify-center">
-                  <img src="${p.thumbnail_url}" alt="${p.name}" class="product-img w-full h-full object-cover">
-                  ${p.tag ? `<span class="absolute top-3 left-3 bg-[#c45e3a] text-white text-[10px] px-2.5 py-1 rounded-full font-bold uppercase tracking-wider">${p.tag}</span>` : ''}
+                  <img src="${safeImageUrl(p.thumbnail_url)}" alt="${escapeHtml(p.name)}" class="product-img w-full h-full object-cover" onerror="this.src='https://images.unsplash.com/photo-1521572163474-6864f9cf17ab?w=800&auto=format&fit=crop&q=80'">
+                  ${p.tag ? `<span class="absolute top-3 left-3 bg-[#c45e3a] text-white text-[10px] px-2.5 py-1 rounded-full font-bold uppercase tracking-wider">${escapeHtml(p.tag)}</span>` : ''}
                   
                   <div class="absolute inset-0 bg-black/5 opacity-0 group-hover:opacity-100 transition duration-300 flex items-end justify-center pb-4">
                     <button class="bg-[#1a1a1a] text-white text-[10px] font-bold px-4 py-2.5 rounded-full shadow-lg hover:bg-[#c45e3a] transition transform translate-y-2 group-hover:translate-y-0 duration-300" onclick="event.stopPropagation(); quickAddToCart('${p.id}')">
@@ -2044,7 +2116,7 @@
                     <i data-lucide="star" class="w-3.5 h-3.5 fill-current"></i>
                     <span class="text-xs font-bold text-gray-700">${p.rating}</span>
                   </div>
-                  <h3 class="font-bold text-sm text-gray-800 line-clamp-2 group-hover:text-[#c45e3a] transition h-10">${p.name}</h3>
+                  <h3 class="font-bold text-sm text-gray-800 line-clamp-2 group-hover:text-[#c45e3a] transition h-10">${escapeHtml(p.name)}</h3>
                   <div class="flex items-center gap-2 mt-1">
                     <span class="font-bold text-sm text-[#c45e3a]">${formatVND(p.price)}</span>
                     ${p.old_price ? `<span class="text-xs text-gray-400 line-through">${formatVND(p.old_price)}</span>` : ''}
@@ -2061,13 +2133,13 @@
 
     document.getElementById('category-filter-list').addEventListener('change', (e) => {
       if (e.target.name === 'category') {
-        currentCategoryFilter = e.target.value;
+        currentCategoryFilter = e.target.value; currentShopPage = 1;
         updateUrlParams();
       }
     });
 
     document.getElementById('price-range').addEventListener('input', (e) => {
-      currentMaxPrice = parseInt(e.target.value);
+      currentMaxPrice = parseInt(e.target.value); currentShopPage = 1;
       document.getElementById('price-range-val').textContent = `Dưới ${formatVND(currentMaxPrice)}`;
     });
     
@@ -2077,7 +2149,7 @@
 
     let searchTimeout = null;
     document.getElementById('shop-search-input').addEventListener('input', (e) => {
-      currentSearchQuery = e.target.value;
+      currentSearchQuery = e.target.value; currentShopPage = 1;
       if (searchTimeout) clearTimeout(searchTimeout);
       searchTimeout = setTimeout(() => {
         updateUrlParams();
@@ -2089,26 +2161,45 @@
     });
 
     document.getElementById('filter-tag-new').onclick = () => {
-      selectedActiveTag = selectedActiveTag === 'Mới' ? null : 'Mới';
+      selectedActiveTag = selectedActiveTag === 'Mới' ? null : 'Mới'; currentShopPage = 1;
       updateUrlParams();
     };
 
     document.getElementById('filter-tag-sale').onclick = () => {
-      selectedActiveTag = selectedActiveTag === 'Sale' ? null : 'Sale';
+      selectedActiveTag = selectedActiveTag === 'Sale' ? null : 'Sale'; currentShopPage = 1;
       updateUrlParams();
     };
 
     document.getElementById('filter-wishlist').onclick = () => {
-      showWishlistOnly = !showWishlistOnly;
+      showWishlistOnly = !showWishlistOnly; currentShopPage = 1;
       updateUrlParams();
     };
 
     document.getElementById('reset-filters').onclick = resetAllFilters;
 
+    function renderShopPagination(totalPages) {
+      const node = document.getElementById('shop-pagination');
+      if (!node) return;
+      if (totalPages <= 1) { node.innerHTML = ''; return; }
+      let html = `<button type="button" ${currentShopPage <= 1 ? 'disabled' : ''} onclick="goToShopPage(${currentShopPage - 1})" class="rounded-full border px-4 py-2 text-xs font-bold ${currentShopPage <= 1 ? 'cursor-not-allowed text-gray-300' : 'hover:border-black'}">Trước</button>`;
+      for (let page = 1; page <= totalPages; page++) {
+        if (totalPages > 7 && Math.abs(page - currentShopPage) > 2 && page !== 1 && page !== totalPages) continue;
+        html += `<button type="button" onclick="goToShopPage(${page})" class="h-9 min-w-9 rounded-full px-3 text-xs font-bold ${page === currentShopPage ? 'bg-[#1a1a1a] text-white' : 'border border-gray-200 hover:border-black'}">${page}</button>`;
+      }
+      html += `<button type="button" ${currentShopPage >= totalPages ? 'disabled' : ''} onclick="goToShopPage(${currentShopPage + 1})" class="rounded-full border px-4 py-2 text-xs font-bold ${currentShopPage >= totalPages ? 'cursor-not-allowed text-gray-300' : 'hover:border-black'}">Sau</button>`;
+      node.innerHTML = html;
+    }
+
+    function goToShopPage(page) {
+      currentShopPage = Math.max(1, Number(page));
+      updateUrlParams();
+    }
+
     function resetAllFilters() {
       currentCategoryFilter = 'all';
       currentMaxPrice = 1500000;
       currentSearchQuery = '';
+      currentShopPage = 1;
       selectedActiveTag = null;
       showWishlistOnly = false;
       document.getElementById('sort-select').value = 'default';
@@ -2122,6 +2213,7 @@
       if (currentSearchQuery.trim() !== '') params.set('search', currentSearchQuery);
       if (selectedActiveTag) params.set('tag', selectedActiveTag);
       if (showWishlistOnly) params.set('wishlist', 'true');
+      if (currentShopPage > 1) params.set('page', currentShopPage);
       
       const searchStr = params.toString();
       window.location.hash = `#/shop${searchStr ? '?' + searchStr : ''}`;
@@ -2199,7 +2291,7 @@
             <!-- Gallery -->
             <div class="space-y-4">
               <div class="bg-white rounded-3xl overflow-hidden border border-gray-100 aspect-[3/4] shadow-md relative group">
-                <img id="detail-main-img" src="${product.thumbnail_url}" alt="${product.name}" class="w-full h-full object-cover transition-all duration-500">
+                <img id="detail-main-img" src="${safeImageUrl(product.thumbnail_url)}" alt="${escapeHtml(product.name)}" class="w-full h-full object-cover transition-all duration-500">
                 <div class="absolute inset-0 bg-black/5 opacity-0 group-hover:opacity-100 transition-opacity pointer-events-none"></div>
               </div>
               <div class="grid grid-cols-3 gap-3">
@@ -2217,12 +2309,12 @@
             <!-- Product information -->
             <div class="space-y-6">
               <div class="space-y-2">
-                ${product.tag ? `<span class="bg-[#c45e3a] text-white text-xs font-bold px-3 py-1 rounded-full uppercase tracking-wider inline-block">${product.tag}</span>` : ''}
-                <h1 class="font-heading text-3xl font-bold text-gray-800 leading-tight">${product.name}</h1>
+                ${product.tag ? `<span class="bg-[#c45e3a] text-white text-xs font-bold px-3 py-1 rounded-full uppercase tracking-wider inline-block">${escapeHtml(product.tag)}</span>` : ''}
+                <h1 class="font-heading text-3xl font-bold text-gray-800 leading-tight">${escapeHtml(product.name)}</h1>
                 
                 <div class="flex items-center gap-4 text-sm font-semibold">
                   <div class="flex items-center gap-1 text-yellow-500">
-                    <i data-lucide="star" class="w-4.5 h-4.5 fill-current"></i>
+                    <i data-lucide="star" class="w-5 h-5 fill-current"></i>
                     <span class="text-gray-800">${product.rating}</span>
                   </div>
                   <span class="text-gray-300">|</span>
@@ -2237,17 +2329,17 @@
                 ${product.old_price ? `<span class="text-lg text-gray-400 line-through font-light">${formatVND(product.old_price)}</span>` : ''}
               </div>
               
-              <p class="text-gray-600 font-light text-sm leading-relaxed">${product.description}</p>
+              <p class="text-gray-600 font-light text-sm leading-relaxed">${escapeHtml(product.description)}</p>
               
               <!-- Select size -->
               <div class="space-y-2">
                 <div class="flex items-center">
                   <span class="text-xs font-bold uppercase text-gray-500 tracking-wider">Kích thước:</span>
-                  <span id="detail-active-size" class="text-xs font-bold text-gray-800 ml-1.5">${currentSelectedSize}</span>
+                  <span id="detail-active-size" class="text-xs font-bold text-gray-800 ml-1.5">${escapeHtml(currentSelectedSize)}</span>
                 </div>
                 <div class="flex gap-2">
                   ${sizesArr.map(size => `
-                    <button onclick="selectDetailSize('${size}', this)" class="border px-4 py-2.5 rounded-xl text-xs font-bold transition ${size === currentSelectedSize ? 'border-black bg-black text-white shadow-sm' : 'border-gray-200 text-gray-600 bg-white hover:bg-gray-50 hover:border-black'}">${size}</button>
+                    <button onclick='selectDetailSize(${jsString(size)}, this)' class="border px-4 py-2.5 rounded-xl text-xs font-bold transition ${size === currentSelectedSize ? 'border-black bg-black text-white shadow-sm' : 'border-gray-200 text-gray-600 bg-white hover:bg-gray-50 hover:border-black'}">${escapeHtml(size)}</button>
                   `).join('')}
                 </div>
               </div>
@@ -2256,7 +2348,7 @@
               <div class="space-y-2">
                 <div class="flex items-center">
                   <span class="text-xs font-bold uppercase text-gray-500 tracking-wider">Màu sắc:</span>
-                  <span id="detail-active-color" class="text-xs font-bold text-gray-800 ml-1.5">${currentSelectedColor}</span>
+                  <span id="detail-active-color" class="text-xs font-bold text-gray-800 ml-1.5">${escapeHtml(currentSelectedColor)}</span>
                 </div>
                 <div class="flex gap-3 items-center">
                   ${colorsArr.map(color => {
@@ -2264,8 +2356,8 @@
                     const hex = colorMap[norm] || '#e2e8f0';
                     const isLight = ['trắng', 'kem', 'be', 'kem sữa'].includes(norm);
                     return `
-                      <button onclick="selectDetailColor('${color}', this)" 
-                              title="${color}"
+                      <button onclick='selectDetailColor(${jsString(color)}, this)' 
+                              title="${escapeHtml(color)}"
                               class="w-9 h-9 rounded-full border-2 transition-all duration-200 relative flex items-center justify-center ${color === currentSelectedColor ? 'border-[#c45e3a] scale-110 shadow-md ring-2 ring-offset-2 ring-[#c45e3a]/40' : 'border-gray-200 hover:border-gray-400'}"
                               style="background-color: ${hex}; outline: none;">
                         ${isLight ? `<span class="absolute inset-0.5 rounded-full border border-gray-200/50"></span>` : ''}
@@ -2346,6 +2438,11 @@
           </div>`;
 
         renderDetailReviews(product);
+        if (authUser) {
+          const reviewName = document.getElementById('review-name'); const reviewEmail = document.getElementById('review-email');
+          if (reviewName) { reviewName.value = authUser.full_name || ''; reviewName.readOnly = true; }
+          if (reviewEmail) { reviewEmail.value = authUser.email || ''; reviewEmail.readOnly = true; }
+        }
         renderRelatedProducts(product);
         lucide.createIcons();
 
@@ -2365,7 +2462,7 @@
         if (cartBtn && stockVal === 0) {
           cartBtn.disabled = true;
           cartBtn.className = 'flex-1 bg-gray-300 text-gray-500 font-bold py-3.5 rounded-full cursor-not-allowed flex items-center justify-center gap-2';
-          cartBtn.innerHTML = `<i data-lucide="shopping-bag" class="w-4.5 h-4.5"></i> Hết hàng`;
+          cartBtn.innerHTML = `<i data-lucide="shopping-bag" class="w-5 h-5"></i> Hết hàng`;
           lucide.createIcons();
         }
 
@@ -2440,8 +2537,9 @@
 
     function changeDetailQty(amount) {
       const input = document.getElementById('detail-qty');
-      let val = parseInt(input.value) + amount;
-      if (val < 1) val = 1;
+      const stock = getProductStock(currentDetailProductId);
+      let val = Math.max(1, parseInt(input.value || '1', 10) + amount);
+      if (stock > 0) val = Math.min(val, stock);
       input.value = val;
     }
 
@@ -2452,8 +2550,12 @@
         return;
       }
       const qty = parseInt(document.getElementById('detail-qty').value);
-      addToCartState(currentDetailProductId, qty, currentSelectedSize, currentSelectedColor);
-      showToast('Đã thêm sản phẩm vào giỏ hàng!');
+      const stock = getProductStock(currentDetailProductId);
+      if (stock <= 0) { showToast('Sản phẩm đã hết hàng.', 'info'); return; }
+      if (getCartQuantityForProduct(currentDetailProductId) + qty > stock) { showToast(`Chỉ còn ${stock} sản phẩm trong kho.`, 'info'); return; }
+      if (addToCartState(currentDetailProductId, qty, currentSelectedSize, currentSelectedColor, currentSelectedPrice)) {
+        showToast('Đã thêm sản phẩm vào giỏ hàng!');
+      }
     }
 
     function scrollToReviews() {
@@ -2508,12 +2610,12 @@
             <div class="bg-gray-50 p-4 rounded-2xl space-y-2 border border-gray-100">
               <div class="flex items-center justify-between">
                 <div>
-                  <h5 class="font-bold text-sm text-gray-800">${r.customer_name}</h5>
+                  <h5 class="font-bold text-sm text-gray-800">${escapeHtml(r.customer_name)}</h5>
                   <div class="flex items-center gap-0.5 mt-0.5">${stars}</div>
                 </div>
                 <span class="text-xs text-gray-400 font-semibold">${reviewDate}</span>
               </div>
-              <p class="text-sm text-gray-600 font-light leading-relaxed">${r.comment}</p>
+              <p class="text-sm text-gray-600 font-light leading-relaxed">${escapeHtml(r.comment)}</p>
             </div>`;
         });
       }
@@ -2538,7 +2640,8 @@
 
     document.getElementById('review-form').onsubmit = async (e) => {
       e.preventDefault();
-      const name = document.getElementById('review-name').value;
+      if (!authUser) { showToast('Vui lòng đăng nhập để đánh giá sản phẩm.', 'info'); openAuthModal(); return; }
+      const name = authUser.full_name || document.getElementById('review-name').value;
       const comment = document.getElementById('review-comment').value;
 
       const bodyData = {
@@ -2592,7 +2695,7 @@
             </button>
             
             <div class="relative bg-[#faf9f7] rounded-xl overflow-hidden mb-3 aspect-[3/4] flex items-center justify-center">
-              <img src="${p.thumbnail_url}" alt="${p.name}" class="product-img w-full h-full object-cover">
+              <img src="${safeImageUrl(p.thumbnail_url)}" alt="${escapeHtml(p.name)}" class="product-img w-full h-full object-cover" onerror="this.src='https://images.unsplash.com/photo-1521572163474-6864f9cf17ab?w=800&auto=format&fit=crop&q=80'">
               
               <div class="absolute inset-0 bg-black/5 opacity-0 group-hover:opacity-100 transition duration-300 flex items-end justify-center pb-4">
                 <button class="bg-[#1a1a1a] text-white text-[10px] font-bold px-4 py-2.5 rounded-full shadow-lg hover:bg-[#c45e3a] transition transform translate-y-2 group-hover:translate-y-0 duration-300" onclick="event.stopPropagation(); quickAddToCart('${p.id}')">
@@ -2601,7 +2704,7 @@
               </div>
             </div>
             <div>
-              <h3 class="font-bold text-sm text-gray-800 line-clamp-1 group-hover:text-[#c45e3a] transition">${p.name}</h3>
+              <h3 class="font-bold text-sm text-gray-800 line-clamp-1 group-hover:text-[#c45e3a] transition">${escapeHtml(p.name)}</h3>
               <span class="font-bold text-sm text-[#c45e3a] mt-1 block">${formatVND(p.price)}</span>
             </div>
           </div>`;
@@ -2618,15 +2721,20 @@
         openAuthModal();
         return;
       }
+      const stock = getProductStock(productId);
+      const requestedTotal = getCartQuantityForProduct(productId) + Number(quantity || 0);
+      if (stock <= 0) { showToast('Sản phẩm đã hết hàng.', 'info'); return false; }
+      if (requestedTotal > stock) { showToast(`Số lượng vượt tồn kho. Hiện còn ${stock} sản phẩm.`, 'info'); return false; }
       const existing = cartState.find(item => item.productId.toString() === productId.toString() && item.size === size && item.color === color);
       if (existing) {
         existing.quantity += quantity;
       } else {
         cartState.push({ productId, quantity, size, color, price: customPrice });
       }
-      localStorage.setItem('beestyle_cart', JSON.stringify(cartState));
+      localStorage.setItem(userStorageKey('cart'), JSON.stringify(cartState));
       updateCartBadge();
       renderCartDrawer();
+      return true;
     }
 
     async function quickAddToCart(productId) {
@@ -2638,17 +2746,19 @@
       await ensureProductsLoaded();
       const product = productsState.find(p => p.id.toString() === productId.toString());
       if (product) {
+        if (Number(product.stock ?? 0) <= 0) { showToast('Sản phẩm đã hết hàng.', 'info'); return; }
         const sizes = product.sizes ? product.sizes.split(',').map(s => s.trim()) : ['Free Size'];
         const colors = product.colors ? product.colors.split(',').map(c => c.trim()) : ['Mặc định'];
-        addToCartState(productId, 1, sizes[0], colors[0], product.price);
-        showToast('Đã thêm sản phẩm vào giỏ hàng!');
+        if (addToCartState(productId, 1, sizes[0], colors[0], product.price)) {
+          showToast('Đã thêm sản phẩm vào giỏ hàng!');
+        }
       }
     }
 
     function removeCartItem(index, event) {
       if (event) event.stopPropagation();
       cartState.splice(index, 1);
-      localStorage.setItem('beestyle_cart', JSON.stringify(cartState));
+      localStorage.setItem(userStorageKey('cart'), JSON.stringify(cartState));
       updateCartBadge();
       renderCartDrawer();
       if (window.location.hash === '#/cart') renderCartPage();
@@ -2656,11 +2766,17 @@
     }
 
     function updateCartItemQty(index, newQty) {
-      if (newQty < 1) newQty = 1;
+      const item = cartState[index];
+      if (!item) return;
+      if (newQty < 1) { removeCartItem(index); return; }
+      const stock = getProductStock(item.productId);
+      const otherQty = cartState.filter((_, i) => i !== index && String(cartState[i].productId) === String(item.productId)).reduce((sum, row) => sum + Number(row.quantity || 0), 0);
+      const allowed = Math.max(0, stock - otherQty);
+      if (newQty > allowed) { showToast(`Sản phẩm này chỉ còn ${stock} trong kho.`, 'info'); newQty = allowed; }
+      if (newQty < 1) { removeCartItem(index); return; }
       cartState[index].quantity = newQty;
-      localStorage.setItem('beestyle_cart', JSON.stringify(cartState));
-      updateCartBadge();
-      renderCartDrawer();
+      localStorage.setItem(userStorageKey('cart'), JSON.stringify(cartState));
+      updateCartBadge(); renderCartDrawer();
       if (window.location.hash === '#/cart') renderCartPage();
     }
 
@@ -2698,13 +2814,13 @@
         drawerItems.innerHTML += `
           <div class="flex gap-4 p-3 bg-white border border-gray-100 rounded-2xl shadow-sm relative group">
             <div class="w-16 h-20 bg-[#f5f0ea] rounded-xl overflow-hidden shrink-0 flex items-center justify-center">
-              <img src="${prod.thumbnail_url}" alt="${prod.name}" class="w-full h-full object-cover">
+              <img src="${safeImageUrl(prod.thumbnail_url)}" alt="${escapeHtml(prod.name)}" class="w-full h-full object-cover">
             </div>
             
             <div class="flex-1 flex flex-col justify-between">
               <div>
-                <h4 class="font-bold text-xs text-gray-800 line-clamp-1">${prod.name}</h4>
-                <p class="text-[10px] text-gray-400 mt-0.5">Size: ${item.size} · Màu: ${item.color}</p>
+                <h4 class="font-bold text-xs text-gray-800 line-clamp-1">${escapeHtml(prod.name)}</h4>
+                <p class="text-[10px] text-gray-400 mt-0.5">Size: ${escapeHtml(item.size)} · Màu: ${escapeHtml(item.color)}</p>
               </div>
               
               <div class="flex items-center justify-between mt-1">
@@ -2740,7 +2856,7 @@
           <div class="text-center py-20 bg-white rounded-3xl border border-gray-100 shadow-sm p-6 col-span-3">
             <span class="text-6xl block mb-4">🛒</span>
             <h3 class="font-heading text-2xl font-bold text-gray-800">Giỏ hàng trống</h3>
-            <p class="text-gray-400 text-sm mt-2 max-w-sm mx-auto">Chưa có sản phẩm nào được chọn. Hãy ghé qua cửa hàng thời trang Beestyle của chúng tôi để mua sắm ngay.</p>
+            <p class="text-gray-400 text-sm mt-2 max-w-sm mx-auto">Chưa có sản phẩm nào được chọn. Hãy ghé qua cửa hàng thời trang BeeStyle của chúng tôi để mua sắm ngay.</p>
             <a href="#/shop" class="bg-[#1a1a1a] hover:bg-[#c45e3a] text-white text-xs font-bold px-8 py-3.5 rounded-full mt-6 inline-block transition shadow-lg">Tiếp Tục Mua Sắm</a>
           </div>`;
         return;
@@ -2763,11 +2879,11 @@
           <div class="flex flex-col sm:flex-row items-start sm:items-center justify-between gap-4 py-4 ${index > 0 ? 'border-t border-gray-100' : ''}">
             <div class="flex gap-4">
               <div class="w-16 h-20 bg-gray-50 rounded-xl overflow-hidden shrink-0">
-                <img src="${prod.thumbnail_url}" alt="${prod.name}" class="w-full h-full object-cover">
+                <img src="${safeImageUrl(prod.thumbnail_url)}" alt="${escapeHtml(prod.name)}" class="w-full h-full object-cover">
               </div>
               <div>
-                <h4 class="font-bold text-sm text-gray-800 hover:text-[#c45e3a] cursor-pointer" onclick="window.location.hash = '#/product/${prod.id}'">${prod.name}</h4>
-                <p class="text-xs text-gray-400 mt-1">Kích cỡ: <span class="font-bold">${item.size}</span> · Màu sắc: <span class="font-bold">${item.color}</span></p>
+                <h4 class="font-bold text-sm text-gray-800 hover:text-[#c45e3a] cursor-pointer" onclick="window.location.hash = '#/product/${prod.id}'">${escapeHtml(prod.name)}</h4>
+                <p class="text-xs text-gray-400 mt-1">Kích cỡ: <span class="font-bold">${escapeHtml(item.size)}</span> · Màu sắc: <span class="font-bold">${escapeHtml(item.color)}</span></p>
                 <div class="sm:hidden flex items-center gap-4 mt-2">
                   <span class="text-sm font-bold text-[#c45e3a]">${formatVND(itemPrice)}</span>
                 </div>
@@ -2799,11 +2915,12 @@
       wrapper.innerHTML = itemsHtml;
 
       let discountAmount = 0;
-      let finalTotal = subtotal;
+      const shippingFee = calculateShipping(subtotal);
+      let finalTotal = subtotal + shippingFee;
 
       if (appliedVoucher) {
         discountAmount = appliedVoucher.discount_amount;
-        finalTotal = Math.max(0, subtotal - discountAmount);
+        finalTotal = Math.max(0, subtotal - discountAmount) + shippingFee;
       }
 
       summary.innerHTML = `
@@ -2823,7 +2940,7 @@
             ` : ''}
             <div class="flex justify-between text-gray-500">
               <span>Phí vận chuyển</span>
-              <span class="font-semibold text-green-600">Miễn phí</span>
+              <span class="font-semibold ${shippingFee === 0 ? 'text-green-600' : 'text-gray-800'}">${shippingFee === 0 ? 'Miễn phí' : formatVND(shippingFee)}</span>
             </div>
             <div class="border-t border-gray-100 pt-3 flex justify-between font-bold text-base text-gray-800">
               <span>Tổng cộng</span>
@@ -2862,7 +2979,7 @@
       let subtotal = 0;
       cartState.forEach(item => {
         const prod = productsState.find(p => p.id.toString() === item.productId.toString());
-        if (prod) subtotal += prod.price * item.quantity;
+        if (prod) subtotal += Number(item.price ?? prod.price) * Number(item.quantity || 0);
       });
 
       try {
@@ -2926,22 +3043,23 @@
         itemsList.innerHTML += `
           <div class="flex items-center gap-3 py-3">
             <div class="w-12 h-14 bg-[#f5f0ea] rounded-lg overflow-hidden shrink-0 flex items-center justify-center">
-              <img src="${prod.thumbnail_url}" alt="${prod.name}" class="w-full h-full object-cover">
+              <img src="${safeImageUrl(prod.thumbnail_url)}" alt="${escapeHtml(prod.name)}" class="w-full h-full object-cover">
             </div>
             <div class="flex-1 text-xs">
-              <h4 class="font-bold text-gray-800 line-clamp-1">${prod.name}</h4>
-              <p class="text-gray-400 mt-0.5">${item.size} · ${item.color} · Qty: ${item.quantity}</p>
+              <h4 class="font-bold text-gray-800 line-clamp-1">${escapeHtml(prod.name)}</h4>
+              <p class="text-gray-400 mt-0.5">${escapeHtml(item.size)} · ${escapeHtml(item.color)} · Qty: ${item.quantity}</p>
             </div>
             <span class="text-xs font-bold text-gray-700">${formatVND(totalItemPrice)}</span>
           </div>`;
       });
 
       let discount = 0;
-      let total = subtotal;
+      const shippingFee = calculateShipping(subtotal);
+      let total = subtotal + shippingFee;
 
       if (appliedVoucher) {
         discount = appliedVoucher.discount_amount;
-        total = Math.max(0, subtotal - discount);
+        total = Math.max(0, subtotal - discount) + shippingFee;
       }
 
       summaryCalc.innerHTML = `
@@ -2957,7 +3075,7 @@
         ` : ''}
         <div class="flex justify-between text-gray-500">
           <span>Phí vận chuyển</span>
-          <span class="font-semibold text-green-600">Miễn phí</span>
+          <span class="font-semibold ${shippingFee === 0 ? 'text-green-600' : 'text-gray-700'}">${shippingFee === 0 ? 'Miễn phí' : formatVND(shippingFee)}</span>
         </div>
         <div class="border-t border-gray-100 pt-3 flex justify-between font-bold text-base text-gray-800">
           <span>Tổng cộng</span>
@@ -3048,6 +3166,12 @@
       const address = document.getElementById('checkout-address').value;
       const note = document.getElementById('checkout-note').value;
       const paymentMethod = document.querySelector('input[name="payment-method"]:checked').value;
+      if (!validatePhone(phone)) { showToast('Số điện thoại nhận hàng không hợp lệ.', 'info'); return; }
+      if (address.trim().length < 10) { showToast('Vui lòng nhập địa chỉ giao hàng đầy đủ.', 'info'); return; }
+      for (const row of cartState) {
+        const stock = getProductStock(row.productId);
+        if (Number(row.quantity) > stock) { showToast('Một sản phẩm trong giỏ đã vượt tồn kho. Vui lòng kiểm tra lại.', 'info'); window.location.hash = '#/cart'; return; }
+      }
       
       let subtotal = 0;
       const orderItems = cartState.map(item => {
@@ -3069,7 +3193,8 @@
         discount = appliedVoucher.discount_amount;
       }
       
-      const total = Math.max(0, subtotal - discount);
+      const shipping_fee = calculateShipping(subtotal);
+      const total = Math.max(0, subtotal - discount) + shipping_fee;
 
       const orderData = {
         customer_name: name,
@@ -3079,7 +3204,8 @@
         payment_method: paymentMethod,
         items: orderItems,
         total_amount: total,
-        voucher_id: appliedVoucher ? appliedVoucher.id : null
+        voucher_id: appliedVoucher ? appliedVoucher.id : null,
+        shipping_fee
       };
 
       if (paymentMethod === 'online_vnpay') {
@@ -3127,17 +3253,17 @@
         const data = await res.json();
 
         if (res.ok) {
-          const savedIds = JSON.parse(localStorage.getItem('beestyle_order_ids') || '[]');
+          const savedIds = JSON.parse(localStorage.getItem(userStorageKey('order_ids')) || '[]');
           savedIds.unshift(data.order_id);
-          localStorage.setItem('beestyle_order_ids', JSON.stringify(savedIds));
+          localStorage.setItem(userStorageKey('order_ids'), JSON.stringify(savedIds));
 
           cartState = [];
-          localStorage.setItem('beestyle_cart', JSON.stringify(cartState));
+          localStorage.setItem(userStorageKey('cart'), JSON.stringify(cartState));
           updateCartBadge();
           renderCartDrawer();
           appliedVoucher = null;
 
-          showToast('Đặt hàng thành công! Cám ơn bạn đã lựa chọn Beestyle.');
+          showToast('Đặt hàng thành công! Cám ơn bạn đã lựa chọn BeeStyle.');
           window.location.hash = '#/orders';
         } else {
           showToast(data.message || 'Lỗi đặt hàng, vui lòng thử lại', 'info');
@@ -3154,7 +3280,7 @@
       const container = document.getElementById('orders-list-container');
       container.innerHTML = '<div class="text-center py-20 text-gray-400">Đang tải lịch sử mua hàng...</div>';
 
-      const savedIds = JSON.parse(localStorage.getItem('beestyle_order_ids') || '[]');
+      const savedIds = JSON.parse(localStorage.getItem(userStorageKey('order_ids')) || '[]');
       
       if (savedIds.length === 0) {
         container.innerHTML = `
@@ -3208,7 +3334,7 @@
             const prodName = item.product ? item.product.name : 'Sản phẩm đã xóa';
             return `
               <div class="flex justify-between items-center text-xs py-2 text-gray-600">
-                <span>${prodName} <span class="text-gray-400">(${item.size || 'Free'} · ${item.color || 'Mặc định'})</span> x${item.quantity}</span>
+                <span>${escapeHtml(prodName)} <span class="text-gray-400">(${escapeHtml(item.size || 'Free')} · ${escapeHtml(item.color || 'Mặc định')})</span> x${item.quantity}</span>
                 <span class="font-bold">${formatVND(item.price * item.quantity)}</span>
               </div>
             `;
@@ -3232,9 +3358,9 @@
               
               <div class="border-t border-gray-100 pt-3 flex flex-col sm:flex-row justify-between text-xs gap-3">
                 <div class="space-y-1 text-gray-500 font-light">
-                  <p>📍 Người nhận: <span class="font-semibold text-gray-700">${order.customer_name} - ${order.customer_phone}</span></p>
-                  <p>🏠 Địa chỉ: <span class="font-semibold text-gray-700">${order.customer_address}</span></p>
-                  <p>💳 Thanh toán: <span class="font-semibold text-gray-700 uppercase">${order.payment_method === 'cod' ? 'Tiền mặt khi nhận hàng (COD)' : 'Chuyển khoản ngân hàng'}</span></p>
+                  <p>📍 Người nhận: <span class="font-semibold text-gray-700">${escapeHtml(order.customer_name)} - ${escapeHtml(order.customer_phone)}</span></p>
+                  <p>🏠 Địa chỉ: <span class="font-semibold text-gray-700">${escapeHtml(order.customer_address)}</span></p>
+                  <p>💳 Thanh toán: <span class="font-semibold text-gray-700 uppercase">${order.payment_method === 'cod' ? 'Tiền mặt khi nhận hàng (COD)' : order.payment_method === 'online_vnpay' ? 'Thanh toán online mô phỏng' : 'Chuyển khoản ngân hàng'}</span></p>
                 </div>
                 
                 <div class="text-right sm:self-end">
@@ -3281,7 +3407,7 @@
 
     function clearOrderHistory() {
       if (confirm('Bạn muốn xóa toàn bộ lịch sử mua hàng trên trình duyệt này?')) {
-        localStorage.removeItem('beestyle_order_ids');
+        localStorage.removeItem(userStorageKey('order_ids'));
         renderOrdersPage();
         showToast('Đã dọn dẹp lịch sử đặt hàng.', 'info');
       }
@@ -3320,7 +3446,7 @@
               <div class="flex items-start gap-2.5 text-xs p-3 bg-gray-50 rounded-xl border border-gray-100">
                 <span class="text-sm mt-0.5">${icon}</span>
                 <div class="flex-1">
-                  <p class="text-gray-700 leading-relaxed font-medium">${act.description}</p>
+                  <p class="text-gray-700 leading-relaxed font-medium">${escapeHtml(act.description)}</p>
                   <p class="text-[10px] text-gray-400 mt-1">${act.time}</p>
                 </div>
               </div>`;
@@ -3483,9 +3609,9 @@
             <tr class="border-b border-gray-50 text-xs">
               <td class="py-2.5 font-semibold text-gray-800 flex items-center gap-2">
                 <span class="w-6 h-8 rounded overflow-hidden shrink-0 inline-block bg-gray-100">
-                  <img src="${p.thumbnail_url}" class="w-full h-full object-cover">
+                  <img src="${safeImageUrl(p.thumbnail_url)}" class="w-full h-full object-cover">
                 </span>
-                <span class="line-clamp-1">${p.name}</span>
+                <span class="line-clamp-1">${escapeHtml(p.name)}</span>
               </td>
               <td class="py-2.5 text-right font-bold text-gray-700">${formatVND(p.price)}</td>
               <td class="py-2.5 text-right text-yellow-500 font-bold">★ ${p.rating}</td>
@@ -3509,10 +3635,10 @@
             <tr class="text-xs border-b border-gray-100 hover:bg-gray-50/50 transition">
               <td class="py-3 px-2">
                 <div class="w-9 h-12 rounded overflow-hidden shadow-sm bg-[#faf9f7] flex items-center justify-center">
-                  <img src="${p.thumbnail_url}" class="w-full h-full object-cover">
+                  <img src="${safeImageUrl(p.thumbnail_url)}" class="w-full h-full object-cover">
                 </div>
               </td>
-              <td class="py-3 px-2 font-semibold text-gray-800">${p.name}</td>
+              <td class="py-3 px-2 font-semibold text-gray-800">${escapeHtml(p.name)}</td>
               <td class="py-3 px-2 text-gray-500">${catText}</td>
               <td class="py-3 px-2 text-right font-bold text-gray-700">${formatVND(p.price)}</td>
               <td class="py-3 px-2 text-center">${stockBadge}</td>
@@ -3548,10 +3674,10 @@
                 <td class="py-3 px-2 font-mono font-bold text-[#c45e3a]">#${o.id}</td>
                 <td class="py-3 px-2 text-gray-400">${orderDate}</td>
                 <td class="py-3 px-2">
-                  <p class="font-bold text-gray-800">${o.customer_name}</p>
-                  <p class="text-[10px] text-gray-400">${o.customer_phone}</p>
+                  <p class="font-bold text-gray-800">${escapeHtml(o.customer_name)}</p>
+                  <p class="text-[10px] text-gray-400">${escapeHtml(o.customer_phone)}</p>
                 </td>
-                <td class="py-3 px-2 text-gray-500 max-w-xs truncate" title="${o.customer_address}">${o.customer_address}</td>
+                <td class="py-3 px-2 text-gray-500 max-w-xs truncate" title="${escapeHtml(o.customer_address)}">${escapeHtml(o.customer_address)}</td>
                 <td class="py-3 px-2 text-right font-bold text-gray-700">${formatVND(o.total_amount)}</td>
                 <td class="py-3 px-2 text-center font-bold">
                   <select ${o.status === 'Completed' || o.status === 'Cancelled' ? 'disabled' : ''} onchange="updateAdminOrderStatus('${o.id}', this.value)" class="border rounded px-2 py-1 text-[11px] bg-white cursor-pointer outline-none ${
@@ -3621,6 +3747,7 @@
       } else if (tabName === 'review') {
         loadAdminReviews();
       }
+      if (window.innerWidth < 768) document.getElementById('admin-sidebar')?.classList.add('-translate-x-full');
       lucide.createIcons();
     }
 
@@ -3757,12 +3884,12 @@
         adminUsers.forEach(u => {
           tbody.innerHTML += `
             <tr class="text-xs border-b border-gray-100 hover:bg-gray-50/50 transition">
-              <td class="py-3 px-2 font-semibold text-gray-800">${u.full_name}</td>
-              <td class="py-3 px-2 text-gray-500">${u.email}</td>
-              <td class="py-3 px-2 text-gray-500">${u.phone || 'Chưa cập nhật'}</td>
+              <td class="py-3 px-2 font-semibold text-gray-800">${escapeHtml(u.full_name)}</td>
+              <td class="py-3 px-2 text-gray-500">${escapeHtml(u.email)}</td>
+              <td class="py-3 px-2 text-gray-500">${escapeHtml(u.phone || 'Chưa cập nhật')}</td>
               <td class="py-3 px-2 text-center">
                 <span class="px-2 py-0.5 rounded text-[10px] font-bold ${
-                  u.role === 'Admin' ? 'bg-purple-50 text-purple-600 border border-purple-100' : 'bg-blue-50 text-blue-600 border border-blue-100'
+                  isAdmin(u) ? 'bg-purple-50 text-purple-600 border border-purple-100' : 'bg-blue-50 text-blue-600 border border-blue-100'
                 }">${u.role}</span>
               </td>
               <td class="py-3 px-2 text-center">
@@ -3885,10 +4012,10 @@
 
           tbody.innerHTML += `
             <tr class="text-xs border-b border-gray-100 hover:bg-gray-50/50 transition">
-              <td class="py-3 px-2 font-semibold text-gray-800">${prodName}</td>
-              <td class="py-3 px-2 text-gray-700">${r.user ? r.user.full_name : 'Ẩn danh'}</td>
+              <td class="py-3 px-2 font-semibold text-gray-800">${escapeHtml(prodName)}</td>
+              <td class="py-3 px-2 text-gray-700">${escapeHtml(r.user ? r.user.full_name : 'Ẩn danh')}</td>
               <td class="py-3 px-2 text-center text-sm font-bold text-amber-500">${starsHtml}</td>
-              <td class="py-3 px-2 text-gray-600 max-w-xs truncate" title="${r.comment || ''}">${r.comment || '<span class="italic text-gray-400">Không có bình luận</span>'}</td>
+              <td class="py-3 px-2 text-gray-600 max-w-xs truncate" title="${escapeHtml(r.comment || '')}">${r.comment || '<span class="italic text-gray-400">Không có bình luận</span>'}</td>
               <td class="py-3 px-2 text-center text-gray-500">${reviewDate}</td>
               <td class="py-3 px-2 text-center">
                 <button onclick="deleteAdminReview('${r.id}')" class="p-1 text-gray-400 hover:text-red-500 transition" title="Xóa bình luận"><i data-lucide="trash-2" class="w-4 h-4"></i></button>
@@ -4195,12 +4322,12 @@
         const data = await res.json();
 
         if (res.ok) {
-          const savedIds = JSON.parse(localStorage.getItem('beestyle_order_ids') || '[]');
+          const savedIds = JSON.parse(localStorage.getItem(userStorageKey('order_ids')) || '[]');
           savedIds.unshift(data.order_id);
-          localStorage.setItem('beestyle_order_ids', JSON.stringify(savedIds));
+          localStorage.setItem(userStorageKey('order_ids'), JSON.stringify(savedIds));
 
           cartState = [];
-          localStorage.setItem('beestyle_cart', JSON.stringify(cartState));
+          localStorage.setItem(userStorageKey('cart'), JSON.stringify(cartState));
           updateCartBadge();
           renderCartDrawer();
           appliedVoucher = null;
@@ -4337,7 +4464,7 @@
     }
 
     async function restoreDefaultProducts() {
-      if (confirm('Bạn có muốn khôi phục danh sách sản phẩm thời trang mặc định ban đầu? (Thao tác này sẽ xóa toàn bộ sản phẩm và đơn hàng hiện tại)')) {
+      if (confirm('Bạn có muốn khôi phục danh sách sản phẩm áo nam mặc định ban đầu? (Thao tác này sẽ xóa toàn bộ sản phẩm và đơn hàng hiện tại)')) {
         try {
           const res = await fetch('/api/admin/products/restore-defaults', {
             method: 'POST',
@@ -4552,10 +4679,10 @@
           searchResultsList.innerHTML += `
             <div onclick="window.location.hash = '#/product/${p.id}'; closeSearchOverlay();" class="flex items-center gap-3 p-2 hover:bg-gray-50 rounded-xl cursor-pointer transition">
               <div class="w-8 h-10 bg-gray-50 rounded overflow-hidden shrink-0">
-                <img src="${p.thumbnail_url}" class="w-full h-full object-cover">
+                <img src="${safeImageUrl(p.thumbnail_url)}" class="w-full h-full object-cover">
               </div>
               <div class="flex-1 text-xs text-left">
-                <h5 class="font-bold text-gray-800 line-clamp-1">${p.name}</h5>
+                <h5 class="font-bold text-gray-800 line-clamp-1">${escapeHtml(p.name)}</h5>
                 <span class="font-semibold text-[#c45e3a] mt-0.5 block">${formatVND(p.price)}</span>
               </div>
             </div>`;
@@ -4566,7 +4693,7 @@
 
     function quickSearch(val) {
       closeSearchOverlay();
-      window.location.hash = `#/shop?search=${val}`;
+      window.location.hash = `#/shop?search=${encodeURIComponent(val)}`;
     }
 
     const cartDrawer = document.getElementById('cart-drawer');
@@ -4595,62 +4722,44 @@
       document.getElementById('mobile-menu').classList.toggle('hidden');
     };
 
+    function downloadAdminReport() {
+      const rows = [['Mã đơn','Khách hàng','Số điện thoại','Tổng tiền','Trạng thái','Ngày đặt']];
+      (adminOrders || []).forEach(order => rows.push([order.id, order.customer_name, order.customer_phone, order.total_amount, order.status, order.created_at]));
+      const csv = '\uFEFF' + rows.map(row => row.map(cell => `"${String(cell ?? '').replace(/"/g, '""')}"`).join(',')).join('\n');
+      const blob = new Blob([csv], { type: 'text/csv;charset=utf-8;' });
+      const url = URL.createObjectURL(blob);
+      const a = document.createElement('a'); a.href = url; a.download = `beestyle-bao-cao-${new Date().toISOString().slice(0,10)}.csv`; a.click();
+      URL.revokeObjectURL(url); showToast('Đã tải báo cáo đơn hàng CSV.');
+    }
+
+    const adminSearchInput = document.getElementById('admin-global-search');
+    if (adminSearchInput) {
+      adminSearchInput.addEventListener('input', event => {
+        const keyword = event.target.value.toLowerCase().trim();
+        document.querySelectorAll('#admin-view tbody tr').forEach(row => { row.style.display = !keyword || row.innerText.toLowerCase().includes(keyword) ? '' : 'none'; });
+      });
+    }
+
+    document.addEventListener('keydown', event => {
+      if (event.key === 'Escape') { closeSearchOverlay(); closeCart(); closeInfoModal(); closeAuthModal(); closeAdminOrderDetailModal(); }
+    });
+
     // -------------------------------------------------------------
-    // Element SDK Fallback Integration
+    // Configuration
     // -------------------------------------------------------------
     const defaultConfig = {
-      brand_name: 'Beestyle',
-      hero_title: 'Nâng tầm\nphong cách\ncủa bạn',
-      hero_subtitle: 'Thời trang cao cấp, tối giản nhưng đậm chất riêng. Hãy khám phá và tự tin tỏa sáng mỗi ngày cùng Beestyle.',
-      background_color: '#faf9f7',
-      text_color: '#1a1a1a',
-      accent_color: '#c45e3a',
+      brand_name: 'BeeStyle',
+      hero_subtitle: 'Áo nam hiện đại, dễ phối và chỉn chu trong mọi hoàn cảnh. Khám phá phong cách riêng cùng BeeStyle Men.'
     };
 
-    function applyConfig(config) {
-      const brandNodes = document.querySelectorAll('#brand-name');
-      brandNodes.forEach(node => {
-        node.innerHTML = `<span class="text-3xl">🐝</span>` + (config.brand_name || defaultConfig.brand_name);
-      });
-      
-      const title = config.hero_title || defaultConfig.hero_title;
-      const heroTitleNode = document.getElementById('hero-title');
-      if (heroTitleNode) {
-        heroTitleNode.innerHTML = title.replace(/\n/g, '<br>');
-      }
-      
-      const heroSubNode = document.getElementById('hero-subtitle');
-      if (heroSubNode) {
-        heroSubNode.textContent = config.hero_subtitle || defaultConfig.hero_subtitle;
-      }
-      
-      document.body.style.backgroundColor = config.background_color || defaultConfig.background_color;
-      document.body.style.color = config.text_color || defaultConfig.text_color;
+    function applyConfig(config = defaultConfig) {
+      document.querySelectorAll('#brand-name').forEach(node => { node.innerHTML = `<span class="text-3xl">🐝</span>${escapeHtml(config.brand_name || defaultConfig.brand_name)}`; });
+      const subtitle = document.getElementById('hero-subtitle');
+      if (subtitle) subtitle.textContent = config.hero_subtitle || defaultConfig.hero_subtitle;
     }
-
-    if (window.elementSdk && window.elementSdk.init) {
-      window.elementSdk.init({
-        defaultConfig,
-        onConfigChange: async (config) => applyConfig(config),
-        mapToCapabilities: (config) => ({
-          recolorables: [
-            { get: () => config.background_color || defaultConfig.background_color, set: (v) => { config.background_color = v; window.elementSdk.setConfig({ background_color: v }); } },
-            { get: () => config.text_color || defaultConfig.text_color, set: (v) => { config.text_color = v; window.elementSdk.setConfig({ text_color: v }); } },
-            { get: () => config.accent_color || defaultConfig.accent_color, set: (v) => { config.accent_color = v; window.elementSdk.setConfig({ accent_color: v }); } },
-          ],
-          borderables: [],
-          fontEditable: { get: () => 'DM Sans', set: (v) => {} },
-          fontSizeable: { get: () => 16, set: (v) => {} },
-        }),
-        mapToEditPanelValues: (config) => new Map([
-          ['brand_name', config.brand_name || defaultConfig.brand_name],
-          ['hero_title', config.hero_title || defaultConfig.hero_title],
-          ['hero_subtitle', config.hero_subtitle || defaultConfig.hero_subtitle],
-        ])
-      });
-    } else {
-      applyConfig(defaultConfig);
-    }
+    applyConfig();
   </script>
  </body>
 </html>
+
+
