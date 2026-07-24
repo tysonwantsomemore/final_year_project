@@ -46,12 +46,13 @@ class AuthController extends Controller
             'phone' => 'nullable|string|max:20',
         ]);
 
+        $customerRole = \App\Models\Role::where('name', 'Customer')->first();
         $user = User::create([
             'full_name' => $data['full_name'],
             'email' => $data['email'],
             'password_hash' => Hash::make($data['password']),
             'phone' => $data['phone'] ?? null,
-            'role' => 'Customer',
+            'role_id' => $customerRole ? $customerRole->id : 2,
         ]);
 
         Auth::login($user);

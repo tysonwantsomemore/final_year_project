@@ -1,0 +1,15 @@
+<?php
+
+namespace App\Models;
+
+use Illuminate\Database\Eloquent\Model;
+
+class Contact extends Model
+{
+    protected $fillable = ['name', 'email', 'phone', 'subject', 'message', 'status', 'admin_note', 'replied_by'];
+
+    public function replier()
+    {
+        return $this->belongsTo(User::class, 'replied_by');
+    }
+}
